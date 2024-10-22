@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
 import '../screens/progress_screen.dart';
 import '../screens/camera_screen.dart';
-import '../screens/kids_profile_screen.dart';
+import '../screens/kids/kids_profile_screen.dart';
 import '../screens/settings_screen.dart';
 
 class BottomNavBar extends StatefulWidget {
