@@ -38,7 +38,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         onTap: _onTabTapped, // Handles tab selection
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey,
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
