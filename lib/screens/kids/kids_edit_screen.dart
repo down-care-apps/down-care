@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../widgets/form_kids.dart';
-import './kids_profile_screen.dart';
+import './kids_detail_screen.dart';
 
-class KidAddScreen extends StatelessWidget {
+class KidEditScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -10,7 +10,7 @@ class KidAddScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Tambah Profil Anak',
+          'Edit Profil Anak',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -31,7 +31,7 @@ class KidAddScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => KidsProfileScreen(),
+                        builder: (context) => KidDetailScreen(),
                       ),
                     );
                   }
@@ -42,7 +42,7 @@ class KidAddScreen extends StatelessWidget {
                       horizontal: 54.0, vertical: 16.0), // Adjust button padding
                 ),
                 child: const Text(
-                  'Tambah',
+                  'Simpan',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white, // Button text color
