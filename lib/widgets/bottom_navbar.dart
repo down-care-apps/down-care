@@ -17,28 +17,40 @@ class _BottomNavBarState extends State<BottomNavBar> {
   final List<Widget> _screens = [
     HomeScreen(),
     ProgressScreen(),
-    CameraScreen(),
+    // Instead of using the CameraScreen here, we'll navigate to it
+    Container(), // Placeholder for camera, we will handle the navigation
     KidsProfileScreen(),
     SettingsScreen(),
   ];
 
   void _onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    if (index == 2) {
+      // Navigate to full-screen camera when the Camera tab is tapped
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CameraScreen(), // Full-screen camera
+        ),
+      );
+    } else {
+      setState(() {
+        _currentIndex = index;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:
-          _screens[_currentIndex], // Display the current screen based on index
+      body: _currentIndex != 2
+          ? _screens[_currentIndex]
+          : null, // Do not show anything for camera
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: _onTabTapped, // Handles tab selection
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey,
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(

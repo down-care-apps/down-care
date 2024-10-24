@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'screens/signin_signup_choice_screen.dart';
-import 'screens/signin_signup_form_screen.dart';
+import 'screens/login/welcome.dart';
+import 'screens/login/sign_in_screen.dart';
+import 'screens/login/sign_up_screen.dart';
 import 'widgets/bottom_navbar.dart';
 
 void main() {
@@ -15,14 +16,19 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'DownCare App',
       theme: ThemeData(
-        primaryColor: const Color(0xFF2260FF), // Define your primary color here
-        primarySwatch: Colors.blue, // Optional, for creating a blue-based palette
+        primarySwatch: Colors.blue,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: const Color(0xFF2965FF), // Define primary color
+          secondary: const Color(0xFFECF1FF), // Define secondary color
+        ),
+        scaffoldBackgroundColor: Colors.white,
       ),
-      initialRoute: '/', // Start with the SignInSignUpChoiceScreen
+      initialRoute: '/main',
       routes: {
-        '/': (context) => const SignInSignUpChoiceScreen(), // First screen
-        '/signin-signup-form': (context) => const SignInSignUpFormScreen(), // Form screen
-        '/main': (context) => const MainScreen(), // Main app screen after login
+        '/': (context) => const Welcome(),
+        '/signin': (context) => const SignInScreen(),
+        '/signup': (context) => const SignUpScreen(),
+        '/main': (context) => const MainScreen(),
       },
     );
   }
@@ -35,6 +41,8 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BottomNavBar(),
+      backgroundColor:
+          Theme.of(context).scaffoldBackgroundColor, // Use defined color
     );
   }
 }

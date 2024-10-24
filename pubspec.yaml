@@ -10,6 +10,10 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
+  flutter_svg: ^1.0.0
+  camera: ^0.11.0+2 
+  image_picker: ^0.8.4+4
 
 dev_dependencies:
   flutter_test:
@@ -22,6 +26,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/app_icon.png
+    - assets/logo_blue.png
+    - assets/icon/google.svg
 
 flutter_launcher_icons:
   android: "launcher_icon"
