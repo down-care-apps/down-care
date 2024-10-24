@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:down_care/widgets/card_kids.dart';
+import './kids_add_screen.dart';
 
 class KidsProfileScreen extends StatelessWidget {
   @override
@@ -50,7 +51,12 @@ class KidsProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.all(24.0),
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle button press logic here
+                  Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => KidAddScreen(),
+                        ),
+                      );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF2260FF), // Button background color

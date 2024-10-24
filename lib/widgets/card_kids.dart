@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/kids/kids_detail_screen.dart';
 
 class KidsCard extends StatelessWidget {
   final String name;
@@ -72,7 +73,14 @@ class KidsCard extends StatelessWidget {
                   const SizedBox(height: 8.0),
                   // Info Button
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => KidDetailScreen(),
+                        ),
+                      ); // Navigate to KidDetailsScreen
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       side: const BorderSide(color: Colors.blue),
