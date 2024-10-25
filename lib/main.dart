@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:down_care/screens/login/sign_up_screen.dart';
+import 'package:down_care/screens/login/sign_in_screen.dart';
 import 'screens/login/welcome.dart';
-import 'screens/login/sign_in_screen.dart';
-import 'screens/login/sign_up_screen.dart';
 import 'widgets/bottom_navbar.dart';
 
 void main() {
@@ -41,8 +41,7 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BottomNavBar(),
-      backgroundColor:
-          Theme.of(context).scaffoldBackgroundColor, // Use defined color
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Use defined color
     );
   }
 }
