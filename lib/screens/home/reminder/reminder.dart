@@ -1,13 +1,28 @@
 import 'package:flutter/material.dart';
 
-class ReminderPage extends StatelessWidget {
-  const ReminderPage({super.key});
+class Reminder {
+  final String title;
+  final String description;
+  final TimeOfDay time;
+  final DateTime date;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('History')),
-      body: const Center(child: Text('History Page')),
+  Reminder({
+    required this.title,
+    required this.description,
+    required this.time,
+    required this.date,
+  });
+
+  Reminder copyWith({String? title, String? description, TimeOfDay? time, DateTime? date}) {
+    return Reminder(
+      title: title ?? this.title,
+      description: description ?? this.description,
+      time: time ?? this.time,
+      date: date ?? this.date,
     );
+  }
+
+  DateTime getDateTime() {
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
   }
 }

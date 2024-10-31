@@ -5,7 +5,7 @@ import 'package:down_care/screens/home/home_widgets/section_content.dart';
 import 'package:down_care/screens/home/home_widgets/article_carousel.dart';
 import 'package:down_care/screens/home/home_widgets/down_type.dart';
 import 'package:down_care/screens/home/history/history_diagnose.dart';
-import 'package:down_care/screens/home/reminder/reminder.dart';
+import 'package:down_care/screens/home/reminder/reminder_page.dart';
 import 'package:down_care/screens/home/maps/maps_screen.dart';
 
 class HomeScreen extends StatelessWidget {
