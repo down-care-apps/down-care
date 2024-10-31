@@ -29,6 +29,19 @@ class AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  void _navigateWithoutTransition(BuildContext context, String routeName) {
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation1, animation2) {
+          return routeName == '/signin' ? AuthScreen(isSignIn: true) : AuthScreen(isSignIn: false);
+        },
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
+    );
+  }
+
   Widget _buildInputField(String labelText, String hintText, bool isPassword, TextEditingController controller, String? error) {
     return InputField(
       labelText: labelText,
@@ -36,6 +49,7 @@ class AuthScreenState extends State<AuthScreen> {
       isPassword: isPassword,
       controller: controller,
       error: error,
+      maxLines: isPassword ? 1 : null, // Ensure maxLines is 1 for password fields
       onChanged: (value) {
         setState(() {
           error = value.isEmpty ? 'Please enter your ${labelText.toLowerCase()}' : null;
@@ -132,7 +146,7 @@ class AuthScreenState extends State<AuthScreen> {
                     children: [
                       Text(widget.isSignIn ? 'Belum punya akun?' : 'Sudah punya akun?', style: const TextStyle(color: Colors.black, fontSize: 16)),
                       TextButton(
-                        onPressed: () => Navigator.pushReplacementNamed(context, widget.isSignIn ? '/signup' : '/signin'),
+                        onPressed: () => _navigateWithoutTransition(context, widget.isSignIn ? '/signup' : '/signin'),
                         child: Text(widget.isSignIn ? 'Sign Up' : 'Sign In', style: const TextStyle(color: Colors.blue, fontSize: 16)),
                       ),
                     ],
