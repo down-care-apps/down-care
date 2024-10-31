@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // Import intl package for date formatting
 import 'package:down_care/widgets/input_field.dart';
+import 'package:down_care/screens/progress/detail_progress.dart'; // Import the DetailProgress screen
 
 class ProgressScreen extends StatefulWidget {
   @override
@@ -75,7 +76,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
             if (selectedKid != null) ...[
               TextButton(
                 onPressed: () {
-                  // Navigate to kid's growth statistics
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailProgress(kidProfile: selectedKid!),
+                    ),
+                  );
                 },
                 child: Text('View Details'),
               ),
