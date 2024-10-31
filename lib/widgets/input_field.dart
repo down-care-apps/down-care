@@ -9,6 +9,8 @@ class InputField extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final String? error;
   final ValueChanged<String>? onChanged;
+  final int? minLines;
+  final int? maxLines;
 
   const InputField({
     super.key,
@@ -20,6 +22,8 @@ class InputField extends StatelessWidget {
     this.validator,
     this.error,
     this.onChanged,
+    this.minLines,
+    this.maxLines,
   });
 
   @override
@@ -46,6 +50,8 @@ class InputField extends StatelessWidget {
             ),
             onChanged: onChanged,
             validator: validator,
+            minLines: minLines,
+            maxLines: maxLines,
           ),
         ),
         if (error != null)
