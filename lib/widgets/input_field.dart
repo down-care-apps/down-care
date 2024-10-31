@@ -11,6 +11,7 @@ class InputField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final int? minLines;
   final int? maxLines;
+  final TextInputType? keyboardType; // Add keyboardType parameter
 
   const InputField({
     super.key,
@@ -24,6 +25,7 @@ class InputField extends StatelessWidget {
     this.onChanged,
     this.minLines,
     this.maxLines,
+    this.keyboardType, // Initialize keyboardType
   });
 
   @override
@@ -39,6 +41,7 @@ class InputField extends StatelessWidget {
           child: TextFormField(
             controller: controller,
             obscureText: isPassword,
+            keyboardType: keyboardType, // Set keyboardType
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
