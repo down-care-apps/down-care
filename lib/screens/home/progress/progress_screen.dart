@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // Import intl package for date formatting
 import 'package:down_care/widgets/input_field.dart';
-import 'package:down_care/screens/progress/detail_progress.dart'; // Import the DetailProgress screen
+import 'package:down_care/screens/home/progress/detail_progress.dart'; // Import the DetailProgress screen
 
 class ProgressScreen extends StatefulWidget {
   @override

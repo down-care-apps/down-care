@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/kids/kids_detail_screen.dart';
+import '../screens/home/kids/kids_detail_screen.dart';
 
 class KidsCard extends StatelessWidget {
   final String name;

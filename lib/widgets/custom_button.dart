@@ -9,6 +9,7 @@ class CustomButton extends StatelessWidget {
   final Color? color;
   final BorderSide? borderSide;
   final String? svgIconPath; 
+  final Color textColor;
 
   const CustomButton({
     super.key,
@@ -19,6 +20,7 @@ class CustomButton extends StatelessWidget {
     this.color, 
     this.borderSide, 
     this.svgIconPath, 
+    this.textColor = Colors.white,
   });
 
   @override
@@ -42,8 +44,8 @@ class CustomButton extends StatelessWidget {
             ? (text != null
                 ? Text(
                     text!,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: textColor,
                       fontSize: 20,
                       fontFamily: 'League Spartan',
                       fontWeight: FontWeight.w500,
@@ -59,8 +61,8 @@ class CustomButton extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       text!,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: textColor,
                         fontSize: 20,
                         fontFamily: 'League Spartan',
                         fontWeight: FontWeight.w500,
