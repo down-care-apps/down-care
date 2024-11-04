@@ -1,7 +1,14 @@
+import 'package:down_care/api/auth_service.dart';
+import 'package:down_care/api/googleSignIn.dart';
+import 'package:down_care/main.dart';
+import 'package:down_care/screens/login/forgot_password.dart';
+import 'package:down_care/screens/login/sign_in_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/widgets/custom_button.dart';
-import 'package:down_care/screens/login/forgot_password.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isSignIn;
@@ -13,20 +20,105 @@ class AuthScreen extends StatefulWidget {
 }
 
 class AuthScreenState extends State<AuthScreen> {
+  final AuthService _authService = AuthService();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   String? emailError;
   String? passwordError;
+  bool isLoading = false;
+  String? errorMessage;
+  bool isSignIn = false;
 
-  void _validateFields() {
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthentication();
+  }
+
+  // Cek User Authentication
+  Future<void> _checkAuthentication() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+      );
+    }
+  }
+
+  //Get name from email
+  String _extractNameFromEmail(String email) {
+    // Split the email by '@' and take the first part
+    String namePart = email.split('@')[0];
+
+    // Replace '.' with space and capitalize the first letters
+    List<String> nameParts = namePart.split('.');
+    String name = nameParts.map((part) => part[0].toUpperCase() + part.substring(1)).join(' ');
+
+    return name;
+  }
+
+  //Sign Up with email and password
+  Future<void> signUpWithEmailPassword() async {
+    final name = _extractNameFromEmail(emailController.text);
+    try {
+      await _authService.signUpWithEmailPassword(emailController.text, passwordController.text, name);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registrasi berhasil, silahkan login')),
+      );
+
+      // Handle navigation or further actions if needed
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SignInScreen()),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.toString())),
+      );
+    }
+  }
+
+  // Sign In with email and password
+  Future<void> signInWithEmailPassword() async {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      setState(() => emailError = 'Please enter your email.');
+      setState(() => passwordError = 'Please enter your password.');
+      return;
+    }
+
     setState(() {
-      emailError = emailController.text.isEmpty ? 'Silakan masukkan email Anda' : null;
-      passwordError = passwordController.text.isEmpty ? 'Silakan masukkan kata sandi Anda' : null;
+      isLoading = true;
+      errorMessage = null;
     });
 
-    if (emailError == null && passwordError == null) {
-      Navigator.pushReplacementNamed(context, '/main');
+    try {
+      UserCredential userCredential = await _authService.signInWithEmailPassword(
+        emailController.text,
+        passwordController.text,
+      );
+      String? idToken = await userCredential.user?.getIdToken();
+      if (idToken != null) await _authService.callLoginApi(emailController.text, passwordController.text, idToken);
+      setState(() => isSignIn = true);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        if (e.code == 'user-not-found') {
+          emailError = 'No user found for that email.';
+        } else if (e.code == 'wrong-password') {
+          passwordError = 'Wrong password provided for that user.';
+        } else {
+          errorMessage = 'An error occurred. Please try again.';
+        }
+      });
+    } finally {
+      setState(() => isLoading = false);
     }
   }
 
@@ -53,7 +145,7 @@ class AuthScreenState extends State<AuthScreen> {
       maxLines: isPassword ? 1 : null, // Ensure maxLines is 1 for password fields
       onChanged: (value) {
         setState(() {
-          error = value.isEmpty ? 'Silakan masukkan ${labelText.toLowerCase()}' : null;
+          error = value.isEmpty ? 'Please enter your ${labelText.toLowerCase()}' : null;
         });
       },
     );
@@ -129,20 +221,22 @@ class AuthScreenState extends State<AuthScreen> {
                   CustomButton(
                     text: title,
                     widthFactor: 1.0,
-                    onPressed: _validateFields,
+                    onPressed: () async {
+                      if (widget.isSignIn) {
+                        await signInWithEmailPassword();
+                      } else {
+                        await signUpWithEmailPassword();
+                      }
+                    },
                   ),
                   SizedBox(height: screenSize.height * 0.01),
                   _buildDivider(),
                   SizedBox(height: screenSize.height * 0.01),
-                  CustomButton(
+                  const CustomButton(
                     widthFactor: 1.0,
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Pendaftaran Google belum tersedia')),
-                      );
-                    },
+                    onPressed: signInWithGoogle,
                     color: Colors.white,
-                    borderSide: const BorderSide(color: Colors.black, width: 2),
+                    borderSide: BorderSide(color: Colors.black, width: 2),
                     svgIconPath: 'assets/icon/google.svg',
                   ),
                   Row(
