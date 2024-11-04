@@ -1,3 +1,4 @@
+import 'package:down_care/api/user_api.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/screens/home/home_widgets/profile_card.dart';
 import 'package:down_care/screens/home/home_widgets/quick_menu.dart';
@@ -7,6 +8,7 @@ import 'package:down_care/screens/home/home_widgets/down_type.dart';
 import 'package:down_care/screens/home/history/history_diagnose.dart';
 import 'package:down_care/screens/home/reminder/reminder_page.dart';
 import 'package:down_care/screens/home/maps/maps_screen.dart';
+import 'package:down_care/api/logoutApi.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -33,32 +35,30 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
+  void _showLogoutDialog(BuildContext context) async {
+    final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Logout'),
           content: const Text('Are you sure you want to logout?'),
-          actions: [
+          actions: <Widget>[
             TextButton(
               child: const Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(context).pop(false),
             ),
             TextButton(
-              child: const Text('Logout'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Handle logout logic here
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('You have logged out.')),
-                );
-              },
+              child: const Text('OK'),
+              onPressed: () => Navigator.of(context).pop(true),
             ),
           ],
         );
       },
     );
+
+    if (shouldLogout == true) {
+      await logoutUser(context);
+    }
   }
 
   @override
@@ -80,10 +80,27 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildProfileCard() {
-    return const ProfileCard(
-      username: 'John Doe',
-      address: 'Jl. Semanggi Barat 2B, Malang',
-      avatarUrl: 'https://example.com/path_to_avatar.jpg',
+    return FutureBuilder<Map<String, dynamic>>(
+      future: UserService().getCurrentUserData(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return const Text('Error loading user data');
+        } else {
+          final user = snapshot.data!;
+          print(user);
+
+          final username = user['displayName'] as String? ?? 'Unknown User';
+          final avatarUrl = user['photoURL'] as String? ?? '';
+
+          return ProfileCard(
+            username: username,
+            address: 'Jl. Semanggi Barat 2B, Malang',
+            avatarUrl: avatarUrl,
+          );
+        }
+      },
     );
   }
 
