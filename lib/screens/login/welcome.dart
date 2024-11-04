@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:down_care/widgets/custom_button.dart';
+import 'package:down_care/main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Welcome extends StatelessWidget {
   const Welcome({super.key});
@@ -17,6 +19,8 @@ class Welcome extends StatelessWidget {
     fontWeight: FontWeight.w300,
     height: 1.5,
   );
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -57,9 +61,9 @@ class Welcome extends StatelessWidget {
                 ),
               ),
               SizedBox(height: screenSize.height * 0.04),
-              CustomButton(text: 'Sign In', onPressed: () => Navigator.pushNamed(context, '/signin')),
+              CustomButton(text: 'Masuk', onPressed: () => Navigator.pushNamed(context, '/signin')),
               SizedBox(height: screenSize.height * 0.02),
-              CustomButton(text: 'Sign Up', onPressed: () => Navigator.pushNamed(context, '/signup')),
+              CustomButton(text: 'Daftar', onPressed: () => Navigator.pushNamed(context, '/signup')),
             ],
           ),
         ),

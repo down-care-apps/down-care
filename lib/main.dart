@@ -1,3 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import './firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/screens/login/sign_up_screen.dart';
 import 'package:down_care/screens/login/sign_in_screen.dart';
@@ -8,7 +11,13 @@ import 'package:down_care/screens/home/progress/progress_screen.dart';
 import 'package:down_care/screens/home/reminder/reminder_page.dart';
 import 'package:down_care/screens/home/kids/kids_profile_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform, // Use the generated options
+  );
+
   runApp(const MyApp());
 }
 

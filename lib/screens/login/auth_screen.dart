@@ -1,4 +1,12 @@
+import 'package:down_care/api/auth_service.dart';
+import 'package:down_care/api/googleSignIn.dart';
+import 'package:down_care/main.dart';
+import 'package:down_care/screens/login/forgot_password.dart';
+import 'package:down_care/screens/login/sign_in_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/widgets/custom_button.dart';
 
@@ -12,20 +20,172 @@ class AuthScreen extends StatefulWidget {
 }
 
 class AuthScreenState extends State<AuthScreen> {
+  final AuthService _authService = AuthService();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   String? emailError;
   String? passwordError;
+  bool isLoading = false;
+  String? errorMessage;
+  bool isSignIn = false;
 
-  void _validateFields() {
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthentication();
+  }
+
+  // Cek User Authentication
+  Future<void> _checkAuthentication() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+      );
+    }
+  }
+
+  //Get name from email
+  String _extractNameFromEmail(String email) {
+    // Split the email by '@' and take the first part
+    String namePart = email.split('@')[0];
+
+    // Replace '.' with space and capitalize the first letters
+    List<String> nameParts = namePart.split('.');
+    String name = nameParts.map((part) => part[0].toUpperCase() + part.substring(1)).join(' ');
+
+    return name;
+  }
+
+  //Sign Up with email and password
+  Future<void> signUpWithEmailPassword() async {
+    final name = _extractNameFromEmail(emailController.text);
+    try {
+      // Check if the email is already registered
+      final isEmailRegistered = await _authService.isEmailRegistered(emailController.text);
+
+      if (isEmailRegistered) {
+        emailError = 'Email sudah terdaftar, silahkan gunakan email lain';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Email sudah terdaftar, silahkan gunakan email lain'), backgroundColor: Colors.red),
+        );
+        return; // Exit the method if the email is already registered
+      }
+
+      // Proceed with sign-up if email is not registered
+      await _authService.signUpWithEmailPassword(emailController.text, passwordController.text, name);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registrasi berhasil, silahkan login')),
+      );
+
+      // Handle navigation or further actions if needed
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SignInScreen()),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.toString())),
+      );
+    }
+  }
+
+  // Sign In with email and password
+  Future<void> signInWithEmailPassword() async {
+    // Reset previous errors
     setState(() {
-      emailError = emailController.text.isEmpty ? 'Please enter your email' : null;
-      passwordError = passwordController.text.isEmpty ? 'Please enter your password' : null;
+      emailError = null;
+      passwordError = null;
+      errorMessage = null;
     });
 
-    if (emailError == null && passwordError == null) {
-      Navigator.pushReplacementNamed(context, '/main');
+    // Validate inputs
+    if (emailController.text.isEmpty) {
+      setState(() => emailError = 'Silakan masukkan email Anda');
+      return;
+    }
+    if (passwordController.text.isEmpty) {
+      setState(() => passwordError = 'Silakan masukkan kata sandi Anda');
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      UserCredential userCredential = await _authService.signInWithEmailPassword(
+        emailController.text,
+        passwordController.text,
+      );
+
+      String? idToken = await userCredential.user?.getIdToken();
+      if (idToken != null) {
+        await _authService.callLoginApi(emailController.text, passwordController.text, idToken);
+      }
+
+      setState(() => isSignIn = true);
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        switch (e.code) {
+          case 'invalid-credential':
+            emailError = 'Email atau kata sandi salah';
+            passwordError = 'Email atau kata sandi salah';
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Email atau kata sandi salah'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            break;
+          case 'invalid-email':
+            emailError = 'Format email tidak valid';
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Format email tidak valid'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            break;
+          case 'too-many-requests':
+            errorMessage = 'Terlalu banyak percobaan login. Silakan coba lagi nanti';
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Terlalu banyak percobaan login. Silakan coba lagi nanti'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            break;
+          default:
+            errorMessage = 'Terjadi kesalahan. Silakan coba lagi';
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Terjadi kesalahan: ${e.message}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+        }
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Terjadi kesalahan yang tidak terduga';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Terjadi kesalahan yang tidak terduga: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
+    } finally {
+      setState(() => isLoading = false);
     }
   }
 
@@ -73,9 +233,9 @@ class AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final title = widget.isSignIn ? 'Sign In' : 'Sign Up';
-    final welcomeText = widget.isSignIn ? 'Welcome back!' : 'Sign Up';
-    final instructionText = widget.isSignIn ? 'Please sign in to your account' : 'Create Your Account';
+    final title = widget.isSignIn ? 'Masuk' : 'Daftar';
+    final welcomeText = widget.isSignIn ? 'Selamat datang kembali!' : 'Daftar';
+    final instructionText = widget.isSignIn ? 'Silakan masuk ke akun Anda' : 'Buat Akun Anda';
 
     return Scaffold(
       appBar: AppBar(
@@ -106,7 +266,7 @@ class AuthScreenState extends State<AuthScreen> {
                   SizedBox(height: screenSize.height * 0.01),
                   _buildInputField('Email', 'Email', false, emailController, emailError),
                   SizedBox(height: screenSize.height * 0.01),
-                  _buildInputField('Password', 'Password', true, passwordController, passwordError),
+                  _buildInputField('Password', 'Kata Sandi', true, passwordController, passwordError),
                   if (!widget.isSignIn) ...[
                     SizedBox(height: screenSize.height * 0.02), // Additional height for sign-up
                   ],
@@ -114,10 +274,13 @@ class AuthScreenState extends State<AuthScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Forgot Password not yet implemented')),
-                        ),
-                        child: const Text('Forgot Password?'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
+                          );
+                        },
+                        child: const Text('Lupa Kata Sandi?'),
                       ),
                     ),
                   ],
@@ -125,20 +288,22 @@ class AuthScreenState extends State<AuthScreen> {
                   CustomButton(
                     text: title,
                     widthFactor: 1.0,
-                    onPressed: _validateFields,
+                    onPressed: () async {
+                      if (widget.isSignIn) {
+                        await signInWithEmailPassword();
+                      } else {
+                        await signUpWithEmailPassword();
+                      }
+                    },
                   ),
                   SizedBox(height: screenSize.height * 0.01),
                   _buildDivider(),
                   SizedBox(height: screenSize.height * 0.01),
-                  CustomButton(
+                  const CustomButton(
                     widthFactor: 1.0,
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Google sign up is not available yet')),
-                      );
-                    },
+                    onPressed: signInWithGoogle,
                     color: Colors.white,
-                    borderSide: const BorderSide(color: Colors.black, width: 2),
+                    borderSide: BorderSide(color: Colors.black, width: 2),
                     svgIconPath: 'assets/icon/google.svg',
                   ),
                   Row(
@@ -147,7 +312,7 @@ class AuthScreenState extends State<AuthScreen> {
                       Text(widget.isSignIn ? 'Belum punya akun?' : 'Sudah punya akun?', style: const TextStyle(color: Colors.black, fontSize: 16)),
                       TextButton(
                         onPressed: () => _navigateWithoutTransition(context, widget.isSignIn ? '/signup' : '/signin'),
-                        child: Text(widget.isSignIn ? 'Sign Up' : 'Sign In', style: const TextStyle(color: Colors.blue, fontSize: 16)),
+                        child: Text(widget.isSignIn ? 'Daftar' : 'Masuk', style: const TextStyle(color: Colors.blue, fontSize: 16)),
                       ),
                     ],
                   ),
