@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/widgets/custom_button.dart';
+import 'package:down_care/screens/login/forgot_password.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isSignIn;
@@ -20,8 +21,8 @@ class AuthScreenState extends State<AuthScreen> {
 
   void _validateFields() {
     setState(() {
-      emailError = emailController.text.isEmpty ? 'Please enter your email' : null;
-      passwordError = passwordController.text.isEmpty ? 'Please enter your password' : null;
+      emailError = emailController.text.isEmpty ? 'Silakan masukkan email Anda' : null;
+      passwordError = passwordController.text.isEmpty ? 'Silakan masukkan kata sandi Anda' : null;
     });
 
     if (emailError == null && passwordError == null) {
@@ -52,7 +53,7 @@ class AuthScreenState extends State<AuthScreen> {
       maxLines: isPassword ? 1 : null, // Ensure maxLines is 1 for password fields
       onChanged: (value) {
         setState(() {
-          error = value.isEmpty ? 'Please enter your ${labelText.toLowerCase()}' : null;
+          error = value.isEmpty ? 'Silakan masukkan ${labelText.toLowerCase()}' : null;
         });
       },
     );
@@ -73,9 +74,9 @@ class AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final title = widget.isSignIn ? 'Sign In' : 'Sign Up';
-    final welcomeText = widget.isSignIn ? 'Welcome back!' : 'Sign Up';
-    final instructionText = widget.isSignIn ? 'Please sign in to your account' : 'Create Your Account';
+    final title = widget.isSignIn ? 'Masuk' : 'Daftar';
+    final welcomeText = widget.isSignIn ? 'Selamat datang kembali!' : 'Daftar';
+    final instructionText = widget.isSignIn ? 'Silakan masuk ke akun Anda' : 'Buat Akun Anda';
 
     return Scaffold(
       appBar: AppBar(
@@ -106,7 +107,7 @@ class AuthScreenState extends State<AuthScreen> {
                   SizedBox(height: screenSize.height * 0.01),
                   _buildInputField('Email', 'Email', false, emailController, emailError),
                   SizedBox(height: screenSize.height * 0.01),
-                  _buildInputField('Password', 'Password', true, passwordController, passwordError),
+                  _buildInputField('Password', 'Kata Sandi', true, passwordController, passwordError),
                   if (!widget.isSignIn) ...[
                     SizedBox(height: screenSize.height * 0.02), // Additional height for sign-up
                   ],
@@ -114,10 +115,13 @@ class AuthScreenState extends State<AuthScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Forgot Password not yet implemented')),
-                        ),
-                        child: const Text('Forgot Password?'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
+                          );
+                        },
+                        child: const Text('Lupa Kata Sandi?'),
                       ),
                     ),
                   ],
@@ -134,7 +138,7 @@ class AuthScreenState extends State<AuthScreen> {
                     widthFactor: 1.0,
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Google sign up is not available yet')),
+                        const SnackBar(content: Text('Pendaftaran Google belum tersedia')),
                       );
                     },
                     color: Colors.white,
@@ -147,7 +151,7 @@ class AuthScreenState extends State<AuthScreen> {
                       Text(widget.isSignIn ? 'Belum punya akun?' : 'Sudah punya akun?', style: const TextStyle(color: Colors.black, fontSize: 16)),
                       TextButton(
                         onPressed: () => _navigateWithoutTransition(context, widget.isSignIn ? '/signup' : '/signin'),
-                        child: Text(widget.isSignIn ? 'Sign Up' : 'Sign In', style: const TextStyle(color: Colors.blue, fontSize: 16)),
+                        child: Text(widget.isSignIn ? 'Daftar' : 'Masuk', style: const TextStyle(color: Colors.blue, fontSize: 16)),
                       ),
                     ],
                   ),
