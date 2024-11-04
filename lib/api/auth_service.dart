@@ -14,6 +14,24 @@ class AuthService {
     return userCredential; // Return the UserCredential for further use if needed
   }
 
+  Future<bool> isEmailRegistered(String email) async {
+  try {
+    // Attempt to create a user with the given email and a dummy password
+    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: email,
+      password: 'dummyPassword', // Use a temporary password
+    );
+    // If the user is created successfully, delete it
+    await FirebaseAuth.instance.currentUser ?.delete();
+    return false; // Email is not registered
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'email-already-in-use') {
+      return true; // Email is already registered
+    }
+    return false; // Other errors (e.g., invalid email format)
+  }
+}
+
   Future<void> signUpWithEmailPassword(String email, String password, String name) async {
     final url = Uri.parse('https://api-f3eusviapa-uc.a.run.app/start/register');
     final headers = {'Content-Type': 'application/json'};

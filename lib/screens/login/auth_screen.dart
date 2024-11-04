@@ -64,6 +64,18 @@ class AuthScreenState extends State<AuthScreen> {
   Future<void> signUpWithEmailPassword() async {
     final name = _extractNameFromEmail(emailController.text);
     try {
+      // Check if the email is already registered
+      final isEmailRegistered = await _authService.isEmailRegistered(emailController.text);
+
+      if (isEmailRegistered) {
+        emailError = 'Email sudah terdaftar, silahkan gunakan email lain';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Email sudah terdaftar, silahkan gunakan email lain'), backgroundColor: Colors.red),
+        );
+        return; // Exit the method if the email is already registered
+      }
+
+      // Proceed with sign-up if email is not registered
       await _authService.signUpWithEmailPassword(emailController.text, passwordController.text, name);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -84,38 +96,93 @@ class AuthScreenState extends State<AuthScreen> {
 
   // Sign In with email and password
   Future<void> signInWithEmailPassword() async {
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      setState(() => emailError = 'Please enter your email.');
-      setState(() => passwordError = 'Please enter your password.');
+    // Reset previous errors
+    setState(() {
+      emailError = null;
+      passwordError = null;
+      errorMessage = null;
+    });
+
+    // Validate inputs
+    if (emailController.text.isEmpty) {
+      setState(() => emailError = 'Silakan masukkan email Anda');
+      return;
+    }
+    if (passwordController.text.isEmpty) {
+      setState(() => passwordError = 'Silakan masukkan kata sandi Anda');
       return;
     }
 
-    setState(() {
-      isLoading = true;
-      errorMessage = null;
-    });
+    setState(() => isLoading = true);
 
     try {
       UserCredential userCredential = await _authService.signInWithEmailPassword(
         emailController.text,
         passwordController.text,
       );
+
       String? idToken = await userCredential.user?.getIdToken();
-      if (idToken != null) await _authService.callLoginApi(emailController.text, passwordController.text, idToken);
+      if (idToken != null) {
+        await _authService.callLoginApi(emailController.text, passwordController.text, idToken);
+      }
+
       setState(() => isSignIn = true);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MainScreen()),
-      );
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
-        if (e.code == 'user-not-found') {
-          emailError = 'No user found for that email.';
-        } else if (e.code == 'wrong-password') {
-          passwordError = 'Wrong password provided for that user.';
-        } else {
-          errorMessage = 'An error occurred. Please try again.';
+        switch (e.code) {
+          case 'invalid-credential':
+            emailError = 'Email atau kata sandi salah';
+            passwordError = 'Email atau kata sandi salah';
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Email atau kata sandi salah'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            break;
+          case 'invalid-email':
+            emailError = 'Format email tidak valid';
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Format email tidak valid'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            break;
+          case 'too-many-requests':
+            errorMessage = 'Terlalu banyak percobaan login. Silakan coba lagi nanti';
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Terlalu banyak percobaan login. Silakan coba lagi nanti'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            break;
+          default:
+            errorMessage = 'Terjadi kesalahan. Silakan coba lagi';
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Terjadi kesalahan: ${e.message}'),
+                backgroundColor: Colors.red,
+              ),
+            );
         }
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Terjadi kesalahan yang tidak terduga';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Terjadi kesalahan yang tidak terduga: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       });
     } finally {
       setState(() => isLoading = false);
