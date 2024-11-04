@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../widgets/form_kids.dart';
-import './kids_detail_screen.dart';
+import '../../../widgets/form_kids.dart';
+import 'kids_detail_screen.dart';
 
 class KidEditScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();

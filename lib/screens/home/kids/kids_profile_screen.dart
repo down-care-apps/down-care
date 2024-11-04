@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:down_care/widgets/card_kids.dart';
-import './kids_add_screen.dart';
+import 'kids_add_screen.dart';
 
 class KidsProfileScreen extends StatelessWidget {
   @override

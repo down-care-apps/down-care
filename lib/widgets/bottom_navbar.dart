@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../screens/home/home_screen.dart';
-import '../screens/progress/progress_screen.dart';
 import '../screens/camera_screen.dart';
-import '../screens/kids/kids_profile_screen.dart';
-import '../screens/settings/settings_screen.dart';
+import '../screens/profile/profile_screen.dart';
 
 class BottomNavBar extends StatefulWidget {
+  const BottomNavBar({super.key});
+
   @override
   _BottomNavBarState createState() => _BottomNavBarState();
 }
@@ -13,67 +15,59 @@ class BottomNavBar extends StatefulWidget {
 class _BottomNavBarState extends State<BottomNavBar> {
   int _currentIndex = 0;
 
-  // List of all the screens
   final List<Widget> _screens = [
     HomeScreen(),
-    ProgressScreen(),
-    // Instead of using the CameraScreen here, we'll navigate to it
-    Container(), // Placeholder for camera, we will handle the navigation
-    KidsProfileScreen(),
-    SettingsScreen(),
+    const SizedBox.shrink(), // Empty placeholder for camera tab
+    ProfileScreen(),
   ];
 
   void _onTabTapped(int index) {
-    if (index == 2) {
-      // Navigate to full-screen camera when the Camera tab is tapped
+    if (index == 1) {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => CameraScreen(), // Full-screen camera
-        ),
+        MaterialPageRoute(builder: (_) => CameraScreen()),
       );
     } else {
-      setState(() {
-        _currentIndex = index;
-      });
+      setState(() => _currentIndex = index);
     }
+  }
+
+  BottomNavigationBarItem _buildNavItem(String assetPath, String label, int index) {
+    return BottomNavigationBarItem(
+      icon: SvgPicture.asset(
+        assetPath,
+        color: _currentIndex == index ? Colors.white : Colors.white54,
+      ),
+      label: label,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _currentIndex != 2
-          ? _screens[_currentIndex]
-          : null, // Do not show anything for camera
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped, // Handles tab selection
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+      body: _screens[_currentIndex],
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          splashFactory: NoSplash.splashFactory, // Remove default splash effect
+        ),
+        child: SizedBox(
+          height: 64,
+          child: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Theme.of(context).primaryColor,
+            currentIndex: _currentIndex,
+            onTap: _onTabTapped,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.white54,
+            selectedLabelStyle: GoogleFonts.leagueSpartan(fontWeight: FontWeight.w500, fontSize: 12),
+            unselectedLabelStyle: GoogleFonts.leagueSpartan(fontWeight: FontWeight.w500, fontSize: 12),
+            items: [
+              _buildNavItem('assets/icon/home.svg', 'Beranda', 0),
+              _buildNavItem('assets/icon/camera.svg', 'Pindai', 1),
+              _buildNavItem('assets/icon/profile-circle.svg', 'Profil', 2),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Progress',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.camera_alt),
-            label: 'Camera',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.child_care),
-            label: 'Kids Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
+        ),
       ),
     );
   }

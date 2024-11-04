@@ -32,9 +32,15 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/app_icon.png
-    - assets/logo_blue.png
-    - assets/icon/google.svg
+    - assets/icon/
+    - assets/
+    # - assets/icon/home.svg
+    # - assets/icon/camera.svg
+    # - assets/icon/profile-circle.svg
+    # - assets/icon/trend-up.svg
+    # - assets/icon/calendar.svg
+    # - assets/icon/map.svg
+    # - assets/icon/kids.svg
 
 flutter_launcher_icons:
   android: "launcher_icon"

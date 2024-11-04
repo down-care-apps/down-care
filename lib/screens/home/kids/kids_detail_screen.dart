@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './kids_edit_screen.dart';
+import 'kids_edit_screen.dart';
 
 class KidDetailScreen extends StatelessWidget {
   void _showDeleteConfirmationDialog(BuildContext context) {
