@@ -26,7 +26,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -36,7 +35,6 @@ class HomeScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // const SizedBox(height: 24),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
                     child: SectionTitle(title: 'Artikel Menarik', seeAll: true),
@@ -81,38 +79,7 @@ class HomeScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 34,
-                    backgroundColor: Colors.grey[300],
-                    child: const Icon(Icons.person, color: Colors.white, size: 24),
-                  ),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          style: GoogleFonts.leagueSpartan(fontSize: 20, color: Colors.black),
-                          children: const [
-                            TextSpan(text: 'Hello,', style: TextStyle(fontWeight: FontWeight.w300)),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      RichText(
-                        text: TextSpan(
-                          style: GoogleFonts.leagueSpartan(fontSize: 20, color: Colors.black),
-                          children: const [
-                            TextSpan(text: 'Muhammad Iqbal', style: TextStyle(fontWeight: FontWeight.w600)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+              _buildProfileCard(),
               SvgPicture.asset('assets/icon/notification.svg', width: 28, height: 28),
             ],
           ),
@@ -130,6 +97,57 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildProfileCard() {
+    return FutureBuilder<Map<String, dynamic>>(
+      future: UserService().getCurrentUserData(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return const Text('Error loading user data');
+        } else {
+          final user = snapshot.data!;
+          final username = user['displayName'] as String? ?? 'Unknown User';
+          final avatarUrl = user['photoURL'] as String? ?? '';
+
+          return Row(
+            children: [
+              CircleAvatar(
+                radius: 34,
+                backgroundColor: Colors.grey[300],
+                backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                child: avatarUrl.isEmpty ? const Icon(Icons.person, color: Colors.white, size: 24) : null,
+              ),
+              const SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      style: GoogleFonts.leagueSpartan(fontSize: 20, color: Colors.black),
+                      children: const [
+                        TextSpan(text: 'Hello,', style: TextStyle(fontWeight: FontWeight.w300)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  RichText(
+                    text: TextSpan(
+                      style: GoogleFonts.leagueSpartan(fontSize: 20, color: Colors.black),
+                      children: [
+                        TextSpan(text: username, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        }
+      },
     );
   }
 
