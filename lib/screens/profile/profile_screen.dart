@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:down_care/api/logoutApi.dart';
+import 'package:down_care/api/user_api.dart';
 import 'package:down_care/screens/profile/profile_menu_item.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:down_care/widgets/custom_button.dart';
@@ -25,13 +27,27 @@ class ProfileScreen extends StatelessWidget {
                         backgroundImage: AssetImage('assets/avatar.png'),
                       ),
                       const SizedBox(height: 10),
-                      Text(
-                        'Muhammad Iqbal Makmur',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                        ),
+                      FutureBuilder<Map<String, dynamic>>(
+                        future: UserService().getCurrentUserData(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return const Text('Error loading user data');
+                          } else {
+                            final user = snapshot.data!;
+                            final username = user['displayName'] as String? ?? 'Unknown User';
+
+                            return Text(
+                              username,
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                              ),
+                            );
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -191,9 +207,9 @@ class ProfileScreen extends StatelessWidget {
                     widthFactor: 0.4,
                     heightFactor: 0.05,
                     text: 'Keluar',
-                    onPressed: () {
-                      // Perform logout action here
+                    onPressed: () async {
                       Navigator.pop(context); // Close the modal
+                      await logoutUser(context); // Perform logout action here
                     },
                     color: Colors.red[400],
                   ),
