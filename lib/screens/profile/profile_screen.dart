@@ -22,11 +22,6 @@ class ProfileScreen extends StatelessWidget {
                 Center(
                   child: Column(
                     children: [
-                      const CircleAvatar(
-                        radius: 50,
-                        backgroundImage: AssetImage('assets/avatar.png'),
-                      ),
-                      const SizedBox(height: 10),
                       FutureBuilder<Map<String, dynamic>>(
                         future: UserService().getCurrentUserData(),
                         builder: (context, snapshot) {
@@ -36,15 +31,26 @@ class ProfileScreen extends StatelessWidget {
                             return const Text('Error loading user data');
                           } else {
                             final user = snapshot.data!;
+                            final avatarUrl = user['photoURL'] as String? ?? '';
                             final username = user['displayName'] as String? ?? 'Unknown User';
 
-                            return Text(
-                              username,
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                              ),
+                            return Column(
+                              children: [
+                                CircleAvatar(
+                                  radius: 50,
+                                  backgroundImage:
+                                      avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : const AssetImage('assets/avatar.png') as ImageProvider,
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  username,
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                                  ),
+                                ),
+                              ],
                             );
                           }
                         },

@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: Colors.white,
       ),
-      initialRoute: '/main',
+      initialRoute: '/',
       routes: {
         '/': (context) => const Welcome(),
         '/signin': (context) => const SignInScreen(),
