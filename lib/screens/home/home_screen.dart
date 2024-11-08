@@ -1,3 +1,4 @@
+import 'package:down_care/api/articles_service.dart';
 import 'package:down_care/api/user_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -15,12 +16,12 @@ class Article {
 }
 
 class HomeScreen extends StatelessWidget {
-  final List<Article> articles = [
-    Article(title: 'Article 1', imageUrl: 'https://via.placeholder.com/250'),
-    Article(title: 'Article 2', imageUrl: 'https://via.placeholder.com/250'),
-    Article(title: 'Article 3', imageUrl: 'https://via.placeholder.com/250'),
-    // Add more articles as needed
-  ];
+  // final List<Article> articles = [
+  //   Article(title: 'Article 1', imageUrl: 'https://via.placeholder.com/250'),
+  //   Article(title: 'Article 2', imageUrl: 'https://via.placeholder.com/250'),
+  //   Article(title: 'Article 3', imageUrl: 'https://via.placeholder.com/250'),
+  //   // Add more articles as needed
+  // ];
   HomeScreen({super.key});
 
   @override
@@ -182,27 +183,42 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildArticleList() {
-    return SizedBox(
-      height: 190,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.zero,
-        itemCount: articles.length < 3 ? articles.length : 3,
-        itemBuilder: (context, index) {
-          return Container(
-            margin: EdgeInsets.only(left: index == 0 ? 16 : 0),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 4.0),
-              child: ArticleCard(
-                title: articles[index].title,
-                imageUrl: articles[index].imageUrl,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
+  return FutureBuilder(
+    future: ArticlesService().getAllArticles(), // Adjusted to call the correct method
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return const Text('Error loading articles');
+      } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
+        return const Text('No articles found');
+      } else {
+        final articles = snapshot.data as List<Map<String, dynamic>>;
+
+        return SizedBox(
+          height: 190,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.zero,
+            itemCount: articles.length < 3 ? articles.length : 3,
+            itemBuilder: (context, index) {
+              return Container(
+                margin: EdgeInsets.only(left: index == 0 ? 16 : 0),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: ArticleCard(
+                    title: articles[index]['title'] ?? 'No Title', // Ensure title is not null
+                    imageUrl: articles[index]['thumbnailUrl'] ?? 'https://picsum.photos/200/300?grayscale', // Ensure thumbnailUrl is not null
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      }
+    },
+  );
+}
 
   Widget _buildDownSyndromeMenu() {
     return const Row(

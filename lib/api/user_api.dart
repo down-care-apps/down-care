@@ -22,6 +22,9 @@ class UserService {
     try {
       // Get the ID token
       final token = await user.getIdToken();
+      if (token == null) {
+        throw Exception('Failed to get ID token');
+      }
 
       // Make API request
       final response = await http.get(
@@ -39,6 +42,23 @@ class UserService {
       } else {
         throw Exception('Failed to fetch user data: ${response.statusCode}');
       }
+    } catch (e) {
+      throw Exception('Error fetching user data: ${e.toString()}');
+    }
+  }
+
+  Future<String> getTokenUser() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No authenticated user found');
+    }
+
+    try {
+      final token = await user.getIdToken();
+      if (token == null) {
+        throw Exception('Failed to get ID token');
+      }
+      return token;
     } catch (e) {
       throw Exception('Error fetching user data: ${e.toString()}');
     }
