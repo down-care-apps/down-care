@@ -4,23 +4,25 @@ import 'package:flutter_svg/flutter_svg.dart';
 class CustomButton extends StatelessWidget {
   final double widthFactor;
   final double heightFactor;
-  final String? text; 
+  final String? text;
   final VoidCallback onPressed;
   final Color? color;
   final BorderSide? borderSide;
-  final String? svgIconPath; 
+  final String? svgIconPath;
   final Color textColor;
+  final IconData? icon;
 
   const CustomButton({
     super.key,
-    this.widthFactor = 0.5, 
-    this.heightFactor = 0.055, 
-    this.text, 
+    this.widthFactor = 0.5,
+    this.heightFactor = 0.055,
+    this.text,
     required this.onPressed,
-    this.color, 
-    this.borderSide, 
-    this.svgIconPath, 
+    this.color,
+    this.borderSide,
+    this.svgIconPath,
     this.textColor = Colors.white,
+    this.icon,
   });
 
   @override
@@ -40,38 +42,30 @@ class CustomButton extends StatelessWidget {
           ),
         ),
         onPressed: onPressed,
-        child: svgIconPath == null
-            ? (text != null
-                ? Text(
-                    text!,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 20,
-                      fontFamily: 'League Spartan',
-                      fontWeight: FontWeight.w500,
-                      height: 1.2,
-                    ),
-                  )
-                : null)
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(svgIconPath!, height: 24, width: 24),
-                  if (text != null) ...[
-                    const SizedBox(width: 8),
-                    Text(
-                      text!,
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 20,
-                        fontFamily: 'League Spartan',
-                        fontWeight: FontWeight.w500,
-                        height: 1.2,
-                      ),
-                    ),
-                  ],
-                ],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, color: textColor),
+              const SizedBox(width: 8),
+            ],
+            if (svgIconPath != null) ...[
+              SvgPicture.asset(svgIconPath!, height: 24, width: 24),
+              const SizedBox(width: 8),
+            ],
+            if (text != null)
+              Text(
+                text!,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 16,
+                  fontFamily: 'League Spartan',
+                  fontWeight: FontWeight.w500,
+                  height: 1.2,
+                ),
               ),
+          ],
+        ),
       ),
     );
   }
