@@ -1,9 +1,15 @@
+import 'package:down_care/screens/profile/about_app/about_app.dart';
+import 'package:down_care/screens/profile/change_password/change_password.dart';
+import 'package:down_care/screens/profile/delete_account/delete_account.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/api/logoutApi.dart';
 import 'package:down_care/api/user_api.dart';
 import 'package:down_care/screens/profile/profile_menu_item.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:down_care/widgets/custom_button.dart';
+import 'package:down_care/screens/profile/update_profil/update_profile.dart';
+import 'package:down_care/utils/transition.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -22,9 +28,25 @@ class ProfileScreen extends StatelessWidget {
                 Center(
                   child: Column(
                     children: [
-                      const CircleAvatar(
-                        radius: 50,
-                        backgroundImage: AssetImage('assets/avatar.png'),
+                      FutureBuilder<Map<String, dynamic>>(
+                        future: UserService().getCurrentUserData(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return const Text('Error loading user data');
+                          } else {
+                            final user = snapshot.data!;
+                            final profileUrl = user['photoURL'] as String? ?? '';
+
+                            return CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.grey[300],
+                              backgroundImage: profileUrl.isNotEmpty ? NetworkImage(profileUrl) : null,
+                              child: profileUrl.isEmpty ? const Icon(Icons.person, color: Colors.white, size: 40) : null,
+                            );
+                          }
+                        },
                       ),
                       const SizedBox(height: 10),
                       FutureBuilder<Map<String, dynamic>>(
@@ -58,36 +80,35 @@ class ProfileScreen extends StatelessWidget {
                   title: "Akun",
                   items: [
                     ProfileMenuItem(
-                      icon: Icons.person,
+                      svgPath: "assets/icon/profile.svg",
                       text: "Perbarui Profil",
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          createRoute(const UpdateProfileScreen()),
+                        );
+                      },
                     ),
                     ProfileMenuItem(
-                      icon: Icons.lock,
+                      // icon: Icons.lock,
+                      svgPath: "assets/icon/key.svg",
                       text: "Ubah Kata Sandi",
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          createRoute(const ChangePasswordScreen()),
+                        );
+                      },
                     ),
                     ProfileMenuItem(
                       icon: Icons.delete_outline,
                       text: "Hapus Akun",
-                      onTap: () {},
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                _buildSection(
-                  context,
-                  title: "Notifikasi",
-                  items: [
-                    ProfileMenuItem(
-                      icon: Icons.notifications,
-                      text: "Notifikasi Aplikasi",
-                      onTap: () {},
-                    ),
-                    ProfileMenuItem(
-                      icon: Icons.email,
-                      text: "Notifikasi Email",
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          createRoute(const DeleteAccountScreen()),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -99,14 +120,11 @@ class ProfileScreen extends StatelessWidget {
                     ProfileMenuItem(
                       icon: Icons.info_outline,
                       text: "Tentang Aplikasi",
-                      onTap: () {},
-                    ),
-                    ProfileMenuItem(
-                      icon: Icons.logout,
-                      text: "Keluar",
-                      textColor: Colors.red,
                       onTap: () {
-                        _showLogoutConfirmation(context);
+                        Navigator.push(
+                          context,
+                          createRoute(const AboutAppScreen()),
+                        );
                       },
                     ),
                   ],
@@ -114,6 +132,18 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16.0),
+        color: Colors.white,
+        child: CustomButton(
+          text: 'Keluar',
+          color: Colors.red[600],
+          onPressed: () {
+            _showLogoutConfirmation(context);
+          },
+          icon: Icons.logout,
         ),
       ),
     );
@@ -172,12 +202,13 @@ class ProfileScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Logout',
+                'Keluar',
                 style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                    color: Theme.of(context).colorScheme.primary),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                  color: Colors.red[600],
+                ),
               ),
               const SizedBox(height: 10),
               Text(
@@ -211,7 +242,7 @@ class ProfileScreen extends StatelessWidget {
                       Navigator.pop(context); // Close the modal
                       await logoutUser(context); // Perform logout action here
                     },
-                    color: Colors.red[400],
+                    color: Colors.red[600],
                   ),
                 ],
               ),
