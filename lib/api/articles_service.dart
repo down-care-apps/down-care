@@ -17,14 +17,9 @@ class ArticlesService {
   ArticlesService._internal();
 
   Future<List<dynamic>> getAllArticles() async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      throw Exception('Please Login');
-    }
-
     try {
-      final token = await user.getIdToken();
+      final userService = UserService();
+      final token = await userService.getTokenUser();
 
       final response = await http.get(
         Uri.parse('https://api-f3eusviapa-uc.a.run.app/articles/'),
