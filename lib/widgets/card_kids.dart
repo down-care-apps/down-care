@@ -6,8 +6,10 @@ class KidsCard extends StatelessWidget {
   final String profession;
   final String age;
   final String imageUrl;
+  final String id;
 
   KidsCard({
+    required this.id,
     required this.name,
     required this.profession,
     required this.age,
@@ -65,7 +67,7 @@ class KidsCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    age,
+                    age as String,
                     style: const TextStyle(
                       color: Colors.grey,
                     ),
@@ -77,7 +79,7 @@ class KidsCard extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => KidDetailScreen(),
+                          builder: (context) => KidDetailScreen(id: id),
                         ),
                       ); // Navigate to KidDetailsScreen
                     },

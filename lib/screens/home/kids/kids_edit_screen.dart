@@ -5,6 +5,10 @@ import 'kids_detail_screen.dart';
 class KidEditScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
+  final String id; // Child ID passed from the previous screen
+
+  KidEditScreen({required this.id});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +35,7 @@ class KidEditScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => KidDetailScreen(),
+                        builder: (context) => KidDetailScreen(id: id,),
                       ),
                     );
                   }
