@@ -1,3 +1,5 @@
+import 'package:down_care/main.dart';
+import 'package:down_care/screens/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/widgets/custom_button.dart';
@@ -29,6 +31,27 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       emailController.text = userData['email'] ?? '';
       phoneController.text = userData['phoneNumber'] ?? '';
     });
+  }
+
+  Future<void> _updateProfile(String email, String name, String phoneNumber) async {
+    email = emailController.text;
+    name = usernameController.text;
+    phoneNumber = phoneController.text;
+
+    try {
+      await UserService().updateUser(email, name, phoneNumber);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile updated successfully'), backgroundColor: Colors.green),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainScreen()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating profile: $e'), backgroundColor: Colors.red),
+      );
+    }
   }
 
   @override
@@ -79,6 +102,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               text: 'Update Profile',
               onPressed: () {
                 // Handle the update profile logic here
+                _updateProfile(emailController.text, usernameController.text, phoneController.text);
               },
             ),
           ),
