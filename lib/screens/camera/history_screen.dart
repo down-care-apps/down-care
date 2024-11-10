@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:down_care/screens/camera/camera_screen.dart'; // Import CameraScreen to navigate to it
-import 'package:camera/camera.dart'; // Import the camera package
-import 'package:down_care/widgets/scan_history_card.dart'; // Import ScanHistoryCard
+import 'package:down_care/screens/camera/camera_screen.dart';
+import 'package:camera/camera.dart';
+import 'package:down_care/widgets/scan_history_card.dart';
+import 'package:down_care/screens/camera/history_detail_screen.dart';
+import 'package:down_care/utils/transition.dart';
+import 'package:down_care/models/scan_history.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -13,13 +16,9 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   void _openCamera() async {
     try {
-      // Get a list of available cameras
       final cameras = await availableCameras();
-
-      // Select the first camera
       final firstCamera = cameras.first;
 
-      // Navigate to TakePictureScreen, passing the first camera
       if (!mounted) return;
       Navigator.push(
         context,
@@ -32,8 +31,31 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
+  void _navigateToDetail(ScanHistory scanHistory) {
+    Navigator.push(
+      context,
+      createRoute(HistoryDetailPage(scanHistory: scanHistory)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    List<ScanHistory> scanHistories = [
+      ScanHistory(
+        name: 'Scan 1',
+        date: '2023-01-01',
+        result: '70',
+        thumbnailUrl: 'https://via.placeholder.com/100',
+      ),
+      ScanHistory(
+        name: 'Scan 2',
+        date: '2023-01-02',
+        result: '10',
+        thumbnailUrl: 'https://via.placeholder.com/100',
+      ),
+      // Add more ScanHistory objects as needed
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -55,23 +77,16 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
         ],
       ),
-      body: ListView(
+      body: ListView.builder(
         padding: const EdgeInsets.all(8),
-        children: const [
-          ScanHistoryCard(
-            name: 'Scan 1',
-            date: '2023-01-01',
-            result: 'Positive',
-            thumbnailUrl: 'https://via.placeholder.com/100',
-          ),
-          ScanHistoryCard(
-            name: 'Scan 2',
-            date: '2023-01-02',
-            result: 'Negative',
-            thumbnailUrl: 'https://via.placeholder.com/100',
-          ),
-          // Add more ScanHistoryCard widgets here
-        ],
+        itemCount: scanHistories.length,
+        itemBuilder: (context, index) {
+          final scanHistory = scanHistories[index];
+          return ScanHistoryCard(
+            scanHistory: scanHistory,
+            onTap: () => _navigateToDetail(scanHistory),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _openCamera,
