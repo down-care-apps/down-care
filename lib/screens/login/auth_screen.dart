@@ -33,18 +33,27 @@ class AuthScreenState extends State<AuthScreen> {
   @override
   void initState() {
     super.initState();
-    _checkAuthentication();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAuthentication();
+    });
   }
 
-  // Cek User Authentication
+// Cek User Authentication
   Future<void> _checkAuthentication() async {
+    // Ensure the context is still valid
+    if (!mounted) return;
+
     User? user = FirebaseAuth.instance.currentUser;
 
+    // Check if the user is logged in
     if (user != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MainScreen()),
-      );
+      // Ensure navigation is only triggered if the context is valid and not already navigating
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+      }
     }
   }
 
