@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../screens/home/home_screen.dart';
-import '../screens/camera_screen.dart';
+import '../screens/camera/history_screen.dart';
 import '../screens/profile/profile_screen.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -17,19 +17,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   final List<Widget> _screens = [
     HomeScreen(),
-    const SizedBox.shrink(), // Empty placeholder for camera tab
+    HistoryPage(),
     ProfileScreen(),
   ];
 
   void _onTabTapped(int index) {
-    if (index == 1) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => CameraScreen()),
-      );
-    } else {
-      setState(() => _currentIndex = index);
-    }
+    setState(() => _currentIndex = index);
   }
 
   BottomNavigationBarItem _buildNavItem(String assetPath, String label, int index) {
@@ -48,7 +41,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       body: _screens[_currentIndex],
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
-          splashFactory: NoSplash.splashFactory, // Remove default splash effect
+          splashFactory: NoSplash.splashFactory,
         ),
         child: SizedBox(
           height: 64,
