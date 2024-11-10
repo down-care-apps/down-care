@@ -29,7 +29,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     setState(() {
       usernameController.text = userData['displayName'] ?? 'Unknown User';
       emailController.text = userData['email'] ?? '';
-      phoneController.text = userData['phoneNumber'] ?? '';
+      phoneController.text = userData['phoneNumber'] ?? '+62';
     });
   }
 

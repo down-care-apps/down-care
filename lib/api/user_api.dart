@@ -63,6 +63,23 @@ class UserService {
     }
   }
 
+  String formatPhoneNumber(String phoneNumber) {
+    // Remove any leading and trailing spaces
+    phoneNumber = phoneNumber.trim();
+
+    // If the phone number doesn't start with '+', add the default country code '+62'
+    if (!phoneNumber.startsWith('+')) {
+      phoneNumber = '+62' + phoneNumber;
+    }
+
+    // Validate the final phone number format
+    if (phoneNumber.startsWith('+') && phoneNumber.length >= 10 && phoneNumber.length <= 15) {
+      return phoneNumber;
+    } else {
+      throw Exception("Nomor telepon harus berformat awal + (e.g., +628123456789).");
+    }
+  }
+
   Future<void> updateUser(String? email, String? name, String? phoneNumber) async {
     final user = FirebaseAuth.instance.currentUser;
 
@@ -73,6 +90,7 @@ class UserService {
     try {
       final String id = user.uid;
       final String? token = await user.getIdToken();
+      final String? formattedPhoneNumber = phoneNumber != null ? formatPhoneNumber(phoneNumber) : null;
 
       // Define the API URL
       final Uri url = Uri.parse('https://api-f3eusviapa-uc.a.run.app/users/$id');
@@ -87,7 +105,7 @@ class UserService {
         body: jsonEncode({
           'displayName': name,
           'email': email,
-          'phoneNumber': phoneNumber,
+          'phoneNumber': formattedPhoneNumber,
         }),
       );
 
