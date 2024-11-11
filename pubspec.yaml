@@ -1,6 +1,6 @@
 name: down_care
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
@@ -12,7 +12,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   google_fonts: ^4.0.4
   flutter_svg: ^1.0.0
-  camera: ^0.11.0+2 
+  camera: ^0.11.0+2
   image_picker: ^0.8.4+4
   flutter_map: ^7.0.2
   latlong2: ^0.9.1
@@ -38,6 +38,10 @@ flutter:
   assets:
     - assets/icon/
     - assets/
+    - assets/dr-okkian.jpg
+    - assets/trisomi21.jpeg
+    - assets/Mosaik.jpg
+    - assets/Translokasi.jpg
     # - assets/icon/home.svg
     # - assets/icon/camera.svg
     # - assets/icon/profile-circle.svg
@@ -52,7 +56,7 @@ flutter_launcher_icons:
   image_path: "assets/app_icon.png"
   adaptive_icon_background: "assets/app_icon.png"
   adaptive_icon_foreground: "assets/app_icon.png"
-  
+
 flutter_native_splash:
   color: "#2D60FF"
   image: assets/logo.png

@@ -35,18 +35,24 @@ class ScanHistoryCard extends StatelessWidget {
             offset: const Offset(0, 2),
           ),
         ],
-        
       ),
       child: Row(
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              thumbnailUrl,
-              width: 100,
-              height: 75,
-              fit: BoxFit.cover,
-            ),
+            child: thumbnailUrl.startsWith('assets/')
+                ? Image.asset(
+                    thumbnailUrl, // Menggunakan gambar dari assets
+                    width: 100,
+                    height: 75,
+                    fit: BoxFit.cover,
+                  )
+                : Image.network(
+                    thumbnailUrl, // Jika bukan asset, gunakan Image.network
+                    width: 100,
+                    height: 75,
+                    fit: BoxFit.cover,
+                  ),
           ),
           const SizedBox(width: 12),
           Expanded(

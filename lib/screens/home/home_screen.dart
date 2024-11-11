@@ -6,6 +6,9 @@ import 'package:down_care/widgets/scan_history_card.dart';
 import 'package:down_care/screens/home/home_widgets/section_title.dart';
 import 'package:down_care/screens/home/home_widgets/syndrome_type_card.dart';
 import 'package:down_care/screens/home/home_widgets/article_card.dart';
+import 'package:down_care/screens/home/article/article_trisomi21.dart';
+import 'package:down_care/screens/home/article/article_mosaik.dart';
+import 'package:down_care/screens/home/article/article_translokasi.dart';
 
 class Article {
   final String title;
@@ -16,7 +19,7 @@ class Article {
 
 class HomeScreen extends StatelessWidget {
   final List<Article> articles = [
-    Article(title: 'Article 1', imageUrl: 'https://via.placeholder.com/250'),
+    Article(title: 'Article 12', imageUrl: 'assets/dr-okkian.jpg'),
     Article(title: 'Article 2', imageUrl: 'https://via.placeholder.com/250'),
     Article(title: 'Article 3', imageUrl: 'https://via.placeholder.com/250'),
     // Add more articles as needed
@@ -49,7 +52,7 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: _buildDownSyndromeMenu(),
+                    child: _buildDownSyndromeMenu(context),
                   ),
                   const SizedBox(height: 24),
                   const Padding(
@@ -204,15 +207,48 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDownSyndromeMenu() {
-    return const Row(
+  Widget _buildDownSyndromeMenu(BuildContext context) {
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(child: SyndromeTypeCard(name: 'Trisomi 21', imageUrl: 'https://via.placeholder.com/250')),
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ArticleScreen()),
+              );
+            },
+            child: SyndromeTypeCard(name: 'Trisomi 21', imageUrl: 'assets/trisomi21.jpeg'),
+          ),
+        ),
         SizedBox(width: 8),
-        Expanded(child: SyndromeTypeCard(name: 'Mosaik', imageUrl: 'https://via.placeholder.com/250')),
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ArticleMosaikScreen()),
+              );
+            },
+            child: SyndromeTypeCard(name: 'Mosaik', imageUrl: 'assets/Mosaik.jpg'),
+          ),
+        ),
         SizedBox(width: 8),
-        Expanded(child: SyndromeTypeCard(name: 'Translokasi', imageUrl: 'https://via.placeholder.com/250')),
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ArticleTranslokasi()),
+              );
+            },
+            child: SyndromeTypeCard(
+              name: 'Mosaik',
+              imageUrl: 'assets/Translokasi.jpg',
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -220,11 +256,11 @@ class HomeScreen extends StatelessWidget {
   Widget _buildScanHistoryList() {
     return const Column(
       children: [
-        ScanHistoryCard(name: 'Scan_1', date: '1 September 2024', result: '70%', thumbnailUrl: 'https://via.placeholder.com/250'),
+        ScanHistoryCard(name: 'Scan_1', date: '1 September 2024', result: '70%', thumbnailUrl: 'assets/trisomi21.jpeg'),
         SizedBox(height: 8),
-        ScanHistoryCard(name: 'Scan_2', date: '1 September 2024', result: '70%', thumbnailUrl: 'https://via.placeholder.com/250'),
+        ScanHistoryCard(name: 'Scan_2', date: '1 September 2024', result: '70%', thumbnailUrl: 'assets/trisomi21.jpeg'),
         SizedBox(height: 8),
-        ScanHistoryCard(name: 'Scan_3', date: '1 September 2024', result: '70%', thumbnailUrl: 'https://via.placeholder.com/250'),
+        ScanHistoryCard(name: 'Scan_3', date: '1 September 2024', result: '70%', thumbnailUrl: 'assets/trisomi21.jpeg'),
       ],
     );
   }

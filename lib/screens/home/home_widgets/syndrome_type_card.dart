@@ -29,20 +29,25 @@ class SyndromeTypeCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Image section
           ClipRRect(
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(12.0),
               topRight: Radius.circular(12.0),
             ),
-            child: Image.network(
-              imageUrl,
-              width: double.infinity,
-              height: 80,
-              fit: BoxFit.cover,
-            ),
+            child: imageUrl.startsWith('http') || imageUrl.startsWith('https')
+                ? Image.network(
+                    imageUrl,
+                    width: double.infinity,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    imageUrl,
+                    width: double.infinity,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  ),
           ),
-          // Name section
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
