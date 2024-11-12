@@ -1,57 +1,57 @@
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 
+class GoogleSignInService {
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-Future<void> signInWithBackend(String googleToken) async {
-  final url = Uri.parse('https://api-f3eusviapa-uc.a.run.app/start/google'); // Ganti dengan URL backend
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-  try {
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'token': googleToken}),
-    );
+      // If user cancels the sign-in flow
+      if (googleUser == null) {
+        throw Exception('Sign in aborted by user');
+      }
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final String firebaseToken = data['firebaseToken'];
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-      // Gunakan custom token dari Firebase untuk login
-      await FirebaseAuth.instance.signInWithCustomToken(firebaseToken);
-      print("User signed in successfully!");
-    } else {
-      print("Sign-in failed: ${response.body}");
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in to Firebase with the Google credential
+      return await _auth.signInWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      print('FirebaseAuth error: ${e.message}');
+      rethrow;
+    } catch (e) {
+      if (e.toString().contains('network_error')) {
+        throw Exception('Network error occurred. Please check your connection.');
+      } else if (e.toString().contains('sign_in_failed')) {
+        // Handle specific error codes
+        final errorMessage = e.toString();
+        if (errorMessage.contains('10:')) {
+          throw Exception('Developer error: Check your Google Sign-In configuration');
+        } else if (errorMessage.contains('12501')) {
+          throw Exception('Google Sign-In was canceled');
+        } else if (errorMessage.contains('12502')) {
+          throw Exception('Google Play Services update required');
+        }
+      }
+      print('Google Sign-In error: $e');
+      rethrow;
     }
-  } catch (error) {
-    print("Error signing in with backend: $error");
   }
-}
 
-
-final GoogleSignIn _googleSignIn = GoogleSignIn(
-  clientId: "1073969707112-9ab195guuaid8dvqi4vmg6tcunvc9ipj.apps.googleusercontent.com",
-  scopes: [
-    'email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-  ],
-);
-
-Future<void> signInWithGoogle() async {
-  try {
-    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-    if (googleUser == null) {
-      print("User cancelled sign in");
-      return;
-    }
-
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-    final String googleToken = googleAuth.idToken!;
-
-    // Kirim token Google ke backend untuk mendapatkan token Firebase
-    await signInWithBackend(googleToken);
-  } catch (error) {
-    print("Google Sign-In error: $error");
+  Future<void> signOut() async {
+    await Future.wait([
+      _auth.signOut(),
+      _googleSignIn.signOut(),
+    ]);
   }
 }

@@ -23,6 +23,7 @@ class AuthScreenState extends State<AuthScreen> {
   final AuthService _authService = AuthService();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final GoogleSignInService _googleSignInService = GoogleSignInService();
 
   String? emailError;
   String? passwordError;
@@ -198,6 +199,34 @@ class AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  Future<void> _signInWithGoogle() async {
+    try {
+      final user = await _googleSignInService.signInWithGoogle();
+
+      if (user != null && mounted) {
+        // Navigate to main screen and remove all previous routes
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => MainScreen()),
+          (route) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Gagal masuk dengan Google'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal masuk dengan Google, $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   void _navigateWithoutTransition(BuildContext context, String routeName) {
     Navigator.pushReplacement(
       context,
@@ -307,11 +336,11 @@ class AuthScreenState extends State<AuthScreen> {
                   SizedBox(height: screenSize.height * 0.01),
                   _buildDivider(),
                   SizedBox(height: screenSize.height * 0.01),
-                  const CustomButton(
+                  CustomButton(
                     widthFactor: 1.0,
-                    onPressed: signInWithGoogle,
+                    onPressed: _signInWithGoogle,
                     color: Colors.white,
-                    borderSide: BorderSide(color: Colors.black, width: 2),
+                    borderSide: const BorderSide(color: Colors.black, width: 2),
                     svgIconPath: 'assets/icon/google.svg',
                   ),
                   Row(
