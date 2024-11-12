@@ -1,11 +1,14 @@
+import 'package:camera/camera.dart';
+import 'package:down_care/api/image_camera_services.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter/scheduler.dart';
 
 class DisplayPictureScreen extends StatefulWidget {
   final String imagePath;
+  final XFile image;
 
-  const DisplayPictureScreen({super.key, required this.imagePath});
+  const DisplayPictureScreen({super.key, required this.imagePath, required this.image});
 
   @override
   _DisplayPictureScreenState createState() => _DisplayPictureScreenState();
@@ -15,6 +18,7 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> with Single
   late AnimationController _controller;
   late Animation<double> _animation;
   double _percentage = 0.0;
+  String? _image;
 
   @override
   void initState() {
@@ -38,9 +42,18 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> with Single
     // Placeholder for ML model result
     final result = 100.0; // Replace this with actual ML model result later
     _controller.forward(from: 0.0);
+    final String? scanImage = await _savedImage(result);
     setState(() {
       _percentage = result;
+      _image = scanImage;
     });
+  }
+
+  Future<String?> _savedImage(result) async {
+    final XFile image = widget.image;
+    final File savedFile = await ImageCameraServices().saveImageLocally(image);
+    final String? firebaseUrl = await ImageCameraServices().uploadToFirebaseStorage(savedFile);
+    await ImageCameraServices().uploadImageToServer(firebaseUrl!, result);
   }
 
   @override

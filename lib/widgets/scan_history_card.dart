@@ -68,7 +68,7 @@ class ScanHistoryCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Hasil: ${scanHistory.result}',
+                    'Hasil: ${scanHistory.result}%',
                     style: GoogleFonts.leagueSpartan(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,

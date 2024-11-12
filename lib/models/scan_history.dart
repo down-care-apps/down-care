@@ -10,4 +10,13 @@ class ScanHistory {
     required this.result,
     required this.thumbnailUrl,
   });
+
+  factory ScanHistory.fromJson(Map<String, dynamic> json) {
+    return ScanHistory(
+      name: json['title'] ?? 'Unknown',
+      date: json['createdAt'] ?? '',
+      result: json['result'].toString() ?? '0',
+      thumbnailUrl: json['imageURL'] ?? '',
+    );
+  }
 }

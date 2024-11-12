@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:down_care/models/scan_history.dart'; // Import the model
 
 class HistoryDetailPage extends StatelessWidget {
+  // final ScanHistory scanHistory;
   final ScanHistory scanHistory;
 
   const HistoryDetailPage({
