@@ -33,18 +33,27 @@ class AuthScreenState extends State<AuthScreen> {
   @override
   void initState() {
     super.initState();
-    _checkAuthentication();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAuthentication();
+    });
   }
 
-  // Cek User Authentication
+// Cek User Authentication
   Future<void> _checkAuthentication() async {
+    // Ensure the context is still valid
+    if (!mounted) return;
+
     User? user = FirebaseAuth.instance.currentUser;
 
+    // Check if the user is logged in
     if (user != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MainScreen()),
-      );
+      // Ensure navigation is only triggered if the context is valid and not already navigating
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+      }
     }
   }
 
@@ -202,9 +211,8 @@ class AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Widget _buildInputField(String labelText, String hintText, bool isPassword, TextEditingController controller, String? error) {
+  Widget _buildInputField(String hintText, bool isPassword, TextEditingController controller, String? error) {
     return InputField(
-      labelText: labelText,
       hintText: hintText,
       isPassword: isPassword,
       controller: controller,
@@ -212,7 +220,7 @@ class AuthScreenState extends State<AuthScreen> {
       maxLines: isPassword ? 1 : null, // Ensure maxLines is 1 for password fields
       onChanged: (value) {
         setState(() {
-          error = value.isEmpty ? 'Please enter your ${labelText.toLowerCase()}' : null;
+          error = value.isEmpty ? 'Please enter your ${hintText.toLowerCase()}' : null;
         });
       },
     );
@@ -264,9 +272,9 @@ class AuthScreenState extends State<AuthScreen> {
                   SizedBox(height: screenSize.height * 0.01),
                   Text(instructionText, style: const TextStyle(color: Colors.black, fontSize: 16)),
                   SizedBox(height: screenSize.height * 0.01),
-                  _buildInputField('Email', 'Email', false, emailController, emailError),
+                  _buildInputField('Email', false, emailController, emailError),
                   SizedBox(height: screenSize.height * 0.01),
-                  _buildInputField('Password', 'Kata Sandi', true, passwordController, passwordError),
+                  _buildInputField('Kata Sandi', true, passwordController, passwordError),
                   if (!widget.isSignIn) ...[
                     SizedBox(height: screenSize.height * 0.02), // Additional height for sign-up
                   ],

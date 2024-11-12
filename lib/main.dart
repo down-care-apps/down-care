@@ -13,9 +13,9 @@ import 'package:down_care/screens/home/kids/kids_profile_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform, // Use the generated options
+    options: DefaultFirebaseOptions.currentPlatform,
   );
 
   runApp(const MyApp());
@@ -26,6 +26,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check if a user is already logged in
+    User? user = FirebaseAuth.instance.currentUser;
+
     return MaterialApp(
       title: 'DownCare App',
       theme: ThemeData(
@@ -36,7 +39,7 @@ class MyApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: Colors.white,
       ),
-      initialRoute: '/main',
+      initialRoute: user != null ? '/main' : '/', // Navigate to MainScreen if user is logged in
       routes: {
         '/': (context) => const Welcome(),
         '/signin': (context) => const SignInScreen(),

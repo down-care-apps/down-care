@@ -1,14 +1,16 @@
+import 'package:down_care/api/articles_service.dart';
 import 'package:down_care/api/user_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:down_care/utils/transition.dart';
 import 'package:down_care/widgets/scan_history_card.dart';
 import 'package:down_care/screens/home/home_widgets/section_title.dart';
 import 'package:down_care/screens/home/home_widgets/syndrome_type_card.dart';
 import 'package:down_care/screens/home/home_widgets/article_card.dart';
-import 'package:down_care/screens/home/article/article_trisomi21.dart';
-import 'package:down_care/screens/home/article/article_mosaik.dart';
-import 'package:down_care/screens/home/article/article_translokasi.dart';
+import 'package:down_care/screens/camera/history_detail_screen.dart';
+
+import '../../models/scan_history.dart';
 
 class Article {
   final String title;
@@ -18,12 +20,12 @@ class Article {
 }
 
 class HomeScreen extends StatelessWidget {
-  final List<Article> articles = [
-    Article(title: 'Article 12', imageUrl: 'assets/dr-okkian.jpg'),
-    Article(title: 'Article 2', imageUrl: 'https://via.placeholder.com/250'),
-    Article(title: 'Article 3', imageUrl: 'https://via.placeholder.com/250'),
-    // Add more articles as needed
-  ];
+  // final List<Article> articles = [
+  //   Article(title: 'Article 1', imageUrl: 'https://via.placeholder.com/250'),
+  //   Article(title: 'Article 2', imageUrl: 'https://via.placeholder.com/250'),
+  //   Article(title: 'Article 3', imageUrl: 'https://via.placeholder.com/250'),
+  //   // Add more articles as needed
+  // ];
   HomeScreen({super.key});
 
   @override
@@ -62,7 +64,7 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: _buildScanHistoryList(),
+                    child: _buildScanHistoryList(context),
                   ),
                 ],
               )
@@ -185,25 +187,40 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildArticleList() {
-    return SizedBox(
-      height: 190,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.zero,
-        itemCount: articles.length < 3 ? articles.length : 3,
-        itemBuilder: (context, index) {
-          return Container(
-            margin: EdgeInsets.only(left: index == 0 ? 16 : 0),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 4.0),
-              child: ArticleCard(
-                title: articles[index].title,
-                imageUrl: articles[index].imageUrl,
-              ),
+    return FutureBuilder(
+      future: ArticlesService().getAllArticles(), // Adjusted to call the correct method
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return const Text('Error loading articles');
+        } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
+          return const Text('No articles found');
+        } else {
+          final articles = snapshot.data as List<Map<String, dynamic>>;
+
+          return SizedBox(
+            height: 190,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.zero,
+              itemCount: articles.length < 3 ? articles.length : 3,
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: EdgeInsets.only(left: index == 0 ? 16 : 0),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 4.0),
+                    child: ArticleCard(
+                      title: articles[index]['title'] ?? 'No Title', // Ensure title is not null
+                      imageUrl: articles[index]['thumbnailUrl'] ?? 'https://picsum.photos/200/300?grayscale', // Ensure thumbnailUrl is not null
+                    ),
+                  ),
+                );
+              },
             ),
           );
-        },
-      ),
+        }
+      },
     );
   }
 
@@ -253,15 +270,45 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildScanHistoryList() {
-    return const Column(
-      children: [
-        ScanHistoryCard(name: 'Scan_1', date: '1 September 2024', result: '70%', thumbnailUrl: 'assets/trisomi21.jpeg'),
-        SizedBox(height: 8),
-        ScanHistoryCard(name: 'Scan_2', date: '1 September 2024', result: '70%', thumbnailUrl: 'assets/trisomi21.jpeg'),
-        SizedBox(height: 8),
-        ScanHistoryCard(name: 'Scan_3', date: '1 September 2024', result: '70%', thumbnailUrl: 'assets/trisomi21.jpeg'),
-      ],
+  Widget _buildScanHistoryList(BuildContext context) {
+    List<ScanHistory> scanHistories = [
+      ScanHistory(
+        name: 'Scan_1',
+        date: '1 September 2024',
+        result: '70%',
+        thumbnailUrl: 'https://via.placeholder.com/250',
+      ),
+      ScanHistory(
+        name: 'Scan_2',
+        date: '1 September 2024',
+        result: '70%',
+        thumbnailUrl: 'https://via.placeholder.com/250',
+      ),
+      ScanHistory(
+        name: 'Scan_3',
+        date: '1 September 2024',
+        result: '70%',
+        thumbnailUrl: 'https://via.placeholder.com/250',
+      ),
+    ];
+
+    return Column(
+      children: scanHistories.map((scanHistory) {
+        return Column(
+          children: [
+            ScanHistoryCard(
+              scanHistory: scanHistory,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  createRoute(HistoryDetailPage(scanHistory: scanHistory)),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        );
+      }).toList(),
     );
   }
 }
