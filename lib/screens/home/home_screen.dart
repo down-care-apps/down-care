@@ -1,5 +1,8 @@
 import 'package:down_care/api/articles_service.dart';
 import 'package:down_care/api/user_api.dart';
+import 'package:down_care/screens/home/article/article_mosaik.dart';
+import 'package:down_care/screens/home/article/article_translokasi.dart';
+import 'package:down_care/screens/home/article/article_trisomi21.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
