@@ -1,4 +1,5 @@
 import 'package:down_care/api/articles_service.dart';
+import 'package:down_care/api/image_camera_services.dart';
 import 'package:down_care/api/user_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,6 +10,7 @@ import 'package:down_care/screens/home/home_widgets/section_title.dart';
 import 'package:down_care/screens/home/home_widgets/syndrome_type_card.dart';
 import 'package:down_care/screens/home/home_widgets/article_card.dart';
 import 'package:down_care/screens/camera/history_detail_screen.dart';
+// import 'package:down_care/screens/cahistory_detail_page.dart';
 
 import '../../models/scan_history.dart';
 
@@ -238,44 +240,50 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildScanHistoryList(BuildContext context) {
-    List<ScanHistory> scanHistories = [
-      ScanHistory(
-        name: 'Scan_1',
-        date: '1 September 2024',
-        result: '70%',
-        thumbnailUrl: 'https://via.placeholder.com/250',
-      ),
-      ScanHistory(
-        name: 'Scan_2',
-        date: '1 September 2024',
-        result: '70%',
-        thumbnailUrl: 'https://via.placeholder.com/250',
-      ),
-      ScanHistory(
-        name: 'Scan_3',
-        date: '1 September 2024',
-        result: '70%',
-        thumbnailUrl: 'https://via.placeholder.com/250',
-      ),
-    ];
+    final futureScan = ImageCameraServices().getAllScan();
 
-    return Column(
-      children: scanHistories.map((scanHistory) {
-        return Column(
-          children: [
-            ScanHistoryCard(
-              scanHistory: scanHistory,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  createRoute(HistoryDetailPage(scanHistory: scanHistory)),
-                );
-              },
+    return FutureBuilder(
+      future: futureScan,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Display a loading spinner while waiting for data
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          // Display an error message if something goes wrong
+          return Center(
+            child: Text(
+              'Tidak ada riwayat pemindaian tersedia. Silahkan scan gambar terlebih dahulu.',
             ),
-            const SizedBox(height: 8),
-          ],
-        );
-      }).toList(),
+          );
+        } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          // If data is successfully fetched and not empty
+          final scanHistories = snapshot.data!;
+
+          return Column(
+            children: scanHistories.map((scanHistory) {
+              return Column(
+                children: [
+                  ScanHistoryCard(
+                    scanHistory: scanHistory,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        createRoute(HistoryDetailPage(scanHistory: scanHistory)),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              );
+            }).toList(),
+          );
+        } else {
+          // Display a message if the data is empty
+          return const Center(
+            child: Text('Tidak ada riwayat pemindaian tersedia.'),
+          );
+        }
+      },
     );
   }
 }

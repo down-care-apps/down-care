@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:down_care/api/image_camera_services.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart'; // Import the camera package
 import 'package:image_picker/image_picker.dart'; // Import ImagePicker for uploading images
@@ -65,12 +68,12 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
   }
 
   void _uploadImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       if (!mounted) return;
       await Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => DisplayPictureScreen(imagePath: pickedFile.path),
+          builder: (context) => DisplayPictureScreen(imagePath: pickedFile.path, image: pickedFile,)
         ),
       );
     }
@@ -79,11 +82,12 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
   void _takePicture() async {
     try {
       await _initializeControllerFuture;
-      final image = await _controller.takePicture();
+      final XFile image = await _controller.takePicture();
+
       if (!mounted) return;
       await Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => DisplayPictureScreen(imagePath: image.path),
+          builder: (context) => DisplayPictureScreen(imagePath: image.path, image: image,),
         ),
       );
     } catch (e) {

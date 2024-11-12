@@ -1,3 +1,4 @@
+import 'package:down_care/api/image_camera_services.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/screens/camera/camera_screen.dart';
 import 'package:camera/camera.dart';
@@ -55,6 +56,7 @@ class _HistoryPageState extends State<HistoryPage> {
       ),
       // Add more ScanHistory objects as needed
     ];
+    final futureScan = ImageCameraServices().getAllScan();
 
     return Scaffold(
       appBar: AppBar(
@@ -77,15 +79,38 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
         ],
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(8),
-        itemCount: scanHistories.length,
-        itemBuilder: (context, index) {
-          final scanHistory = scanHistories[index];
-          return ScanHistoryCard(
-            scanHistory: scanHistory,
-            onTap: () => _navigateToDetail(scanHistory),
-          );
+      body: FutureBuilder<List<ScanHistory>>(
+        future: futureScan,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: Text(
+                  'Tidak ada riwayat pemindaian tersedia. Silahkan scan gambar terlebih dahulu.',  
+                ),
+              ),
+            );
+          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            final scanHistories = snapshot.data!;
+            return ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: scanHistories.length,
+              itemBuilder: (context, index) {
+                final scanHistory = scanHistories[index];
+                return ScanHistoryCard(
+                  scanHistory: scanHistory,
+                  onTap: () => _navigateToDetail(scanHistory),
+                );
+              },
+            );
+          } else {
+            return const Center(
+              child: Text('Tidak ada riwayat pemindaian tersedia.'),
+            );
+          }
         },
       ),
       floatingActionButton: FloatingActionButton(
