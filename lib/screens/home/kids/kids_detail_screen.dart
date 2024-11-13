@@ -1,13 +1,47 @@
 import 'package:down_care/api/childrens_service.dart';
+import 'package:down_care/screens/home/kids/kids_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'kids_edit_screen.dart';
 
-class KidDetailScreen extends StatelessWidget {
-  final String id; // Child ID passed from the previous screen
+class KidDetailScreen extends StatefulWidget {
+  final String id;
 
-  KidDetailScreen({required this.id}); // Constructor to accept the ID
+  KidDetailScreen({required this.id});
 
-    void _showDeleteConfirmationDialog(BuildContext context) {
+  @override
+  _KidDetailScreenState createState() => _KidDetailScreenState();
+}
+
+class _KidDetailScreenState extends State<KidDetailScreen> {
+  final ChildrensService childrensService = ChildrensService();
+  late Future<Map<String, dynamic>> futureChild;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshData();
+  }
+
+  void _refreshData() {
+    setState(() {
+      futureChild = childrensService.getChildrenById(widget.id);
+    });
+  }
+
+  Future<void> _navigateToEditScreen() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => KidEditScreen(id: widget.id),
+      ),
+    );
+
+    if (result == true) {
+      _refreshData();
+    }
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -18,19 +52,26 @@ class KidDetailScreen extends StatelessWidget {
             TextButton(
               child: const Text('Batal'),
               onPressed: () {
-                Navigator.of(context).pop(); // Menutup modal
+                Navigator.of(context).pop();
               },
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: const Text('Hapus', style: TextStyle(color: Colors.white)),
-              onPressed: () {
-                // Lakukan penghapusan data di sini
-                Navigator.of(context).pop(); // Menutup modal
-                // Aksi setelah profil dihapus
+              onPressed: () async {
+                await childrensService.deleteProfileChildren(widget.id);
+                Navigator.of(context).pop(); // Close dialog
+
+                // Return to profile screen with refresh flag
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => KidsProfileScreen()),
+                );
+
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Profil telah dihapus'),
+                  const SnackBar(
+                    content: Text('Profil Anak telah dihapus'),
+                    backgroundColor: Colors.green,
                   ),
                 );
               },
@@ -52,19 +93,18 @@ class KidDetailScreen extends StatelessWidget {
         centerTitle: true,
         backgroundColor: const Color(0xFF2260FF),
       ),
-      body: FutureBuilder<List<dynamic>>(
-        future: ChildrensService().getChildrenById(id), // Fetching data
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: futureChild,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator()); // Loading indicator
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}')); // Error message
+            return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No data found')); // No data message
+            return const Center(child: Text('No data found'));
           }
 
-          // Assuming the data is in the first element of the list
-          final childData = snapshot.data![0];
+          final childData = snapshot.data!;
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
@@ -73,7 +113,7 @@ class KidDetailScreen extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage: NetworkImage(childData['imageUrl'] ?? 'https://example.com/default_image.jpg'), // Use imageUrl from the fetched data
+                    backgroundImage: NetworkImage('https://example.com/default_image.jpg'),
                   ),
                   const SizedBox(height: 16.0),
                   Text(
@@ -95,40 +135,40 @@ class KidDetailScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Jenis Kelamin',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 4.0),
+                              const SizedBox(height: 4.0),
                               Text(childData['gender'] ?? 'N/A'),
-                              SizedBox(height: 8.0),
-                              Text(
+                              const SizedBox(height: 8.0),
+                              const Text(
                                 'Umur',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 4.0),
+                              const SizedBox(height: 4.0),
                               Text('${childData['age'] ?? 'N/A'} Tahun'),
-                              SizedBox(height: 8.0),
-                              Text(
+                              const SizedBox(height: 8.0),
+                              const Text(
                                 'Tinggi Badan',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 4.0),
+                              const SizedBox(height: 4.0),
                               Text('${childData['height'] ?? 'N/A'} cm'),
-                              SizedBox(height: 8.0),
-                              Text(
+                              const SizedBox(height: 8.0),
+                              const Text(
                                 'Berat Badan',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 4.0),
+                              const SizedBox(height: 4.0),
                               Text('${childData['weight'] ?? 'N/A'} Kg'),
-                              SizedBox(height: 8.0),
-                              Text(
+                              const SizedBox(height: 8.0),
+                              const Text(
                                 'Tanggal Lahir',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 4.0),
-                              Text(childData['dateBirthday'].toString() ?? 'N/A'),
+                              const SizedBox(height: 4.0),
+                              Text(childData['dateBirthday'].toString()),
                             ],
                           ),
                         ),
@@ -139,14 +179,7 @@ class KidDetailScreen extends StatelessWidget {
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.edit, size: 20),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => KidEditScreen(id: id,),
-                                    ),
-                                  );
-                                },
+                                onPressed: _navigateToEditScreen,
                               ),
                               IconButton(
                                 icon: const Icon(Icons.delete, size: 20),

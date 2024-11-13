@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Import intl package for date formatting
+import 'package:intl/intl.dart';
 import 'package:down_care/widgets/input_field.dart';
-import 'package:down_care/screens/home/progress/detail_progress.dart'; // Import the DetailProgress screen
+import 'package:down_care/screens/home/progress/detail_progress.dart';
+import 'package:down_care/api/childrens_service.dart';
 
 class ProgressScreen extends StatefulWidget {
   @override
@@ -9,7 +10,9 @@ class ProgressScreen extends StatefulWidget {
 }
 
 class _ProgressScreenState extends State<ProgressScreen> {
+  final ChildrensService _childrensService = ChildrensService();
   String? selectedKid;
+  Map<String, dynamic>? selectedKidData;
   DateTime selectedDate = DateTime.now();
   final TextEditingController weightController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
@@ -17,7 +20,42 @@ class _ProgressScreenState extends State<ProgressScreen> {
   final TextEditingController cognitiveController = TextEditingController();
   final TextEditingController mentalController = TextEditingController();
 
-  final List<String> kidsProfiles = ['Kid 1', 'Kid 2', 'Kid 3']; // Example profiles
+  List<Map<String, dynamic>> children = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadChildren();
+  }
+
+  Future<void> _loadChildren() async {
+    try {
+      final List<dynamic> data = await _childrensService.getAllChildrens();
+      setState(() {
+        children = List<Map<String, dynamic>>.from(data);
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load children: $e')),
+      );
+    }
+  }
+
+  Future<void> _loadChildDetails(String childId) async {
+    try {
+      final data = await _childrensService.getChildrenById(childId);
+      setState(() {
+        selectedKidData = data;
+        // Pre-fill the form with existing data if available
+        weightController.text = data['weight']?.toString() ?? '';
+        heightController.text = data['height']?.toString() ?? '';
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load child details: $e')),
+      );
+    }
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -26,17 +64,20 @@ class _ProgressScreenState extends State<ProgressScreen> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != selectedDate)
+    if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
       });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Progress Tracker", style: const TextStyle(color: Colors.white, fontSize: 24)),
+        title: const Text("Progress Tracker", 
+          style: TextStyle(color: Colors.white, fontSize: 24)
+        ),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.primary,
         leading: IconButton(
@@ -51,15 +92,22 @@ class _ProgressScreenState extends State<ProgressScreen> {
           children: [
             DropdownButtonFormField<String>(
               value: selectedKid,
-              hint: Text('Select Kid Profile'),
-              items: kidsProfiles.map((String profile) {
+              hint: const Text('Select Kid Profile'),
+              items: children.map((child) {
                 return DropdownMenuItem<String>(
-                  value: profile,
+                  value: child['id'].toString(),
                   child: Row(
                     children: [
-                      CircleAvatar(child: Text(profile[0])), // Placeholder for profile pic
-                      SizedBox(width: 8),
-                      Text(profile),
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          child['imageUrl'] ?? 'https://example.com/default_image.jpg'
+                        ),
+                        child: child['imageUrl'] == null 
+                          ? Text(child['name']?[0] ?? '?') 
+                          : null,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(child['name'] ?? 'Unnamed Child'),
                     ],
                   ),
                 );
@@ -67,11 +115,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
               onChanged: (String? newValue) {
                 setState(() {
                   selectedKid = newValue;
+                  if (newValue != null) {
+                    _loadChildDetails(newValue);
+                  }
                 });
               },
-              // decoration: InputDecoration(
-              //   suffixIcon: Icon(Icons.arrow_drop_down_outlined),
-              // ),
             ),
             if (selectedKid != null) ...[
               TextButton(
@@ -79,14 +127,16 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DetailProgress(kidProfile: selectedKid!),
+                      builder: (context) => DetailProgress(kidProfile: selectedKidData!['name']),
                     ),
                   );
                 },
-                child: Text('View Details'),
+                child: const Text('View Details'),
               ),
-              SizedBox(height: 16),
-              Text('Date', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              const Text('Date', 
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+              ),
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -105,60 +155,90 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.calendar_today, color: Colors.black.withOpacity(0.6)),
+                      icon: Icon(Icons.calendar_today, 
+                        color: Colors.black.withOpacity(0.6)
+                      ),
                       onPressed: () => _selectDate(context),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 16),
-              Text('Weight', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              const Text('Weight', 
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+              ),
               InputField(
-                labelText: 'Weight',
+                // labelText: 'Weight',
                 hintText: 'Enter weight',
                 controller: weightController,
                 keyboardType: TextInputType.number,
               ),
-              SizedBox(height: 16),
-              Text('Height', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              const Text('Height', 
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+              ),
               InputField(
-                labelText: 'Height',
+                // labelText: 'Height',
                 hintText: 'Enter height',
                 controller: heightController,
                 keyboardType: TextInputType.number,
               ),
-              SizedBox(height: 16),
-              Text('Motoric Growth', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              const Text('Motoric Growth', 
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+              ),
               InputField(
-                labelText: 'Motoric Growth',
+                // labelText: 'Motoric Growth',
                 hintText: 'Enter motoric growth',
                 controller: motoricController,
               ),
-              SizedBox(height: 16),
-              Text('Cognitive Growth', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              const Text('Cognitive Growth', 
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+              ),
               InputField(
-                labelText: 'Cognitive Growth',
+                // labelText: 'Cognitive Growth',
                 hintText: 'Enter cognitive growth',
                 controller: cognitiveController,
               ),
-              SizedBox(height: 16),
-              Text('Mental Condition', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              const Text('Mental Condition', 
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+              ),
               InputField(
-                labelText: 'Mental Condition',
+                // labelText: 'Mental Condition',
                 hintText: 'Enter mental condition',
                 controller: mentalController,
               ),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  // Submit the progress
-                },
-                child: Text('Submit'),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  onPressed: () {
+                    // Submit the progress
+                  },
+                  child: const Text('Submit'),
+                ),
               ),
             ],
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    weightController.dispose();
+    heightController.dispose();
+    motoricController.dispose();
+    cognitiveController.dispose();
+    mentalController.dispose();
+    super.dispose();
   }
 }

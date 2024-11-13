@@ -3,13 +3,43 @@ import 'package:down_care/screens/home/kids/kids_add_screen.dart';
 import 'package:down_care/widgets/card_kids.dart';
 import 'package:flutter/material.dart';
 
+class KidsProfileScreen extends StatefulWidget {
+  @override
+  _KidsProfileScreenState createState() => _KidsProfileScreenState();
+}
 
-class KidsProfileScreen extends StatelessWidget {
+class _KidsProfileScreenState extends State<KidsProfileScreen> {
+  late Future<List<dynamic>> futureChildren;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshData();
+  }
+
+  void _refreshData() {
+    setState(() {
+      futureChildren = ChildrensService().getAllChildrens();
+    });
+  }
+
+  Future<void> _navigateToAddScreen() async {
+    // Wait for the result from KidAddScreen
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => KidAddScreen(),
+      ),
+    );
+
+    // Refresh the data when returning from KidAddScreen
+    if (result == true) {
+      _refreshData();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Create a future to fetch all children
-    final futureChildren = ChildrensService().getAllChildrens();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -20,36 +50,28 @@ class KidsProfileScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF2260FF),
       ),
       body: FutureBuilder(
-        future: futureChildren, // Use the future here
+        future: futureChildren,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator()); // Center loading indicator
+            return const Center(child: CircularProgressIndicator());
           } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
             return Center(
               child: Column(
                 children: [
-                  Text('Tidak ada data anak'), // Show message if no data
-                  // "Tambah" button at the bottom
+                  Text('Tidak ada data anak'),
                   Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => KidAddScreen(),
-                          ),
-                        );
-                      },
+                      onPressed: _navigateToAddScreen,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2260FF), // Button background color
-                        padding: const EdgeInsets.symmetric(horizontal: 54.0, vertical: 16.0), // Adjust button padding
+                        backgroundColor: const Color(0xFF2260FF),
+                        padding: const EdgeInsets.symmetric(horizontal: 54.0, vertical: 16.0),
                       ),
                       child: const Text(
                         'Tambah',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white, // Button text color
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -76,34 +98,26 @@ class KidsProfileScreen extends StatelessWidget {
                       return KidsCard(
                         id: child['id'].toString(),
                         name: child['name'] ?? 'No Name',
-                        profession: 'Professional Doctor', // Adjust if dynamic
-                        age: child['age'].toString() + ' tahun' ?? 'N/A', // Assuming age is part of your data
-                        imageUrl: child['imageUrl'] ?? 'https://example.com/image.jpg', // Replace with actual image URL field
+                        profession: 'Professional Doctor',
+                        age: child['age'].toString() + ' tahun' ?? 'N/A',
+                        imageUrl: child['imageUrl'] ?? 'https://example.com/image.jpg',
                       );
                     },
                   ),
                 ),
-                // "Tambah" button at the bottom
                 Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => KidAddScreen(),
-                        ),
-                      );
-                    },
+                    onPressed: _navigateToAddScreen,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2260FF), // Button background color
-                      padding: const EdgeInsets.symmetric(horizontal: 54.0, vertical: 16.0), // Adjust button padding
+                      backgroundColor: const Color(0xFF2260FF),
+                      padding: const EdgeInsets.symmetric(horizontal: 54.0, vertical: 16.0),
                     ),
                     child: const Text(
                       'Tambah',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white, // Button text color
+                        color: Colors.white,
                       ),
                     ),
                   ),
