@@ -1,6 +1,9 @@
 import 'package:down_care/api/articles_service.dart';
 import 'package:down_care/api/image_camera_services.dart';
 import 'package:down_care/api/user_api.dart';
+import 'package:down_care/screens/home/article/article_mosaik.dart';
+import 'package:down_care/screens/home/article/article_translokasi.dart';
+import 'package:down_care/screens/home/article/article_trisomi21.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -56,7 +59,7 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: _buildDownSyndromeMenu(),
+                    child: _buildDownSyndromeMenu(context),
                   ),
                   const SizedBox(height: 24),
                   const Padding(
@@ -226,15 +229,48 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDownSyndromeMenu() {
-    return const Row(
+  Widget _buildDownSyndromeMenu(BuildContext context) {
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(child: SyndromeTypeCard(name: 'Trisomi 21', imageUrl: 'https://via.placeholder.com/250')),
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ArticleScreen()),
+              );
+            },
+            child: SyndromeTypeCard(name: 'Trisomi 21', imageUrl: 'assets/trisomi21.jpeg'),
+          ),
+        ),
         SizedBox(width: 8),
-        Expanded(child: SyndromeTypeCard(name: 'Mosaik', imageUrl: 'https://via.placeholder.com/250')),
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ArticleMosaikScreen()),
+              );
+            },
+            child: SyndromeTypeCard(name: 'Mosaik', imageUrl: 'assets/Mosaik.jpg'),
+          ),
+        ),
         SizedBox(width: 8),
-        Expanded(child: SyndromeTypeCard(name: 'Translokasi', imageUrl: 'https://via.placeholder.com/250')),
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ArticleTranslokasi()),
+              );
+            },
+            child: SyndromeTypeCard(
+              name: 'Mosaik',
+              imageUrl: 'assets/Translokasi.jpg',
+            ),
+          ),
+        ),
       ],
     );
   }
