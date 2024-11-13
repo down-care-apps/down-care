@@ -1,14 +1,31 @@
 import 'package:flutter/material.dart';
 
-class KidsForm extends StatelessWidget {
+class KidsForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
+  final TextEditingController nameController;
+  String? genderController;
+  final TextEditingController heightController;
+  final TextEditingController weightController;
+  final TextEditingController birthDateController;
+  final Function(String?) onGenderChanged;
 
-  KidsForm({required this.formKey});
-
+  KidsForm({
+    required this.formKey,
+    required this.nameController,
+    required this.genderController,
+    required this.heightController,
+    required this.weightController,
+    required this.birthDateController,
+    required this.onGenderChanged,
+  });
+  @override
+  _KidsFormState createState() => _KidsFormState();
+}
+class _KidsFormState extends State<KidsForm>{
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: formKey,
+      key: widget.formKey,
       child: ListView(
         children: [
           const Text(
@@ -17,6 +34,7 @@ class KidsForm extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           TextFormField(
+            controller: widget.nameController,
             decoration: const InputDecoration(
               filled: true,
               fillColor: Color(0xFFECF1FF),
@@ -34,55 +52,47 @@ class KidsForm extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Umur',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          TextFormField(
-            decoration: const InputDecoration(
-              filled: true,
-              fillColor: Color(0xFFECF1FF),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                borderSide: BorderSide.none,
-              ),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Masukan Umur';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-          const Text(
             'Jenis Kelamin',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          TextFormField(
-            decoration: const InputDecoration(
-              filled: true,
-              fillColor: Color(0xFFECF1FF),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                borderSide: BorderSide.none,
+          Row(
+            children: [
+              Radio<String>(
+                value: 'Laki-laki',
+                activeColor: const Color(0xFF2260FF),
+                groupValue: widget.genderController,
+                onChanged: (value) {
+                  setState(() {
+                    widget.genderController = value;
+                    widget.onGenderChanged(value);
+                  });
+                },
               ),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Masukan jenis kelamin';
-              }
-              return null;
-            },
+              const Text('Laki-laki'),
+              Radio<String>(
+                value: 'Perempuan',
+                activeColor: const Color(0xFF2260FF),
+                groupValue: widget.genderController,
+                onChanged: (value) {
+                  setState(() {
+                    widget.genderController = value;
+                    widget.onGenderChanged(value);
+                  });
+                },
+              ),
+              const Text('Perempuan'),
+            ],
           ),
           const SizedBox(height: 16),
           const Text(
-            'Tinggi Badan',
+            'Tinggi Badan (cm)',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           TextFormField(
+            controller: widget.heightController,
+            keyboardType: TextInputType.number,
             decoration: const InputDecoration(
               filled: true,
               fillColor: Color(0xFFECF1FF),
@@ -100,11 +110,13 @@ class KidsForm extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Berat Badan',
+            'Berat Badan (kg)',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           TextFormField(
+            controller: widget.weightController,
+            keyboardType: TextInputType.number,
             decoration: const InputDecoration(
               filled: true,
               fillColor: Color(0xFFECF1FF),
@@ -127,6 +139,7 @@ class KidsForm extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           TextFormField(
+            controller: widget.birthDateController,
             decoration: const InputDecoration(
               filled: true,
               fillColor: Color(0xFFECF1FF),
