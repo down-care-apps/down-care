@@ -1,3 +1,4 @@
+import 'package:down_care/api/childrens_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -8,6 +9,9 @@ class DetailProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final ChildrensService childrensService = ChildrensService();
+    // final kidProfile = childrensService.getChildrenById(id);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
