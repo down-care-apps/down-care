@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/screens/home/progress/detail_progress.dart';
 import 'package:down_care/api/childrens_service.dart';
@@ -13,14 +12,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
   final ChildrensService _childrensService = ChildrensService();
   String? selectedKid;
   Map<String, dynamic>? selectedKidData;
-  DateTime selectedDate = DateTime.now();
+  String? selectedMonth;
   final TextEditingController weightController = TextEditingController();
   final TextEditingController heightController = TextEditingController();
-  final TextEditingController motoricController = TextEditingController();
-  final TextEditingController cognitiveController = TextEditingController();
-  final TextEditingController mentalController = TextEditingController();
+  final TextEditingController importantNoteController = TextEditingController();
 
   List<Map<String, dynamic>> children = [];
+  List<String> months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
   @override
   void initState() {
@@ -46,7 +44,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
       final data = await _childrensService.getChildrenById(childId);
       setState(() {
         selectedKidData = data;
-        // Pre-fill the form with existing data if available
         weightController.text = data['weight']?.toString() ?? '';
         heightController.text = data['height']?.toString() ?? '';
       });
@@ -57,27 +54,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
     }
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Progress Tracker", 
-          style: TextStyle(color: Colors.white, fontSize: 24)
-        ),
+        title: const Text("Progress Tracker", style: TextStyle(color: Colors.white, fontSize: 24)),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.primary,
         leading: IconButton(
@@ -99,12 +80,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   child: Row(
                     children: [
                       CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          child['imageUrl'] ?? 'https://example.com/default_image.jpg'
-                        ),
-                        child: child['imageUrl'] == null 
-                          ? Text(child['name']?[0] ?? '?') 
-                          : null,
+                        backgroundImage: NetworkImage(child['imageUrl'] ?? 'https://example.com/default_image.jpg'),
+                        child: child['imageUrl'] == null ? Text(child['name']?[0] ?? '?') : null,
                       ),
                       const SizedBox(width: 8),
                       Text(child['name'] ?? 'Unnamed Child'),
@@ -134,81 +111,42 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 child: const Text('View Details'),
               ),
               const SizedBox(height: 16),
-              const Text('Date', 
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
-              ),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondary,
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                        child: Text(
-                          DateFormat('d MMMM yyyy').format(selectedDate),
-                          style: TextStyle(color: Colors.black.withOpacity(0.6)),
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.calendar_today, 
-                        color: Colors.black.withOpacity(0.6)
-                      ),
-                      onPressed: () => _selectDate(context),
-                    ),
-                  ],
-                ),
+              const Text('Month', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              DropdownButtonFormField<String>(
+                value: selectedMonth,
+                hint: const Text('Select Month'),
+                items: months.map((month) {
+                  return DropdownMenuItem<String>(
+                    value: month,
+                    child: Text(month),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedMonth = newValue;
+                  });
+                },
               ),
               const SizedBox(height: 16),
-              const Text('Weight', 
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
-              ),
+              const Text('Weight', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               InputField(
-                // labelText: 'Weight',
                 hintText: 'Enter weight',
                 controller: weightController,
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 16),
-              const Text('Height', 
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
-              ),
+              const Text('Height', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               InputField(
-                // labelText: 'Height',
                 hintText: 'Enter height',
                 controller: heightController,
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 16),
-              const Text('Motoric Growth', 
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
-              ),
+              const Text('Catatan Penting', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               InputField(
-                // labelText: 'Motoric Growth',
-                hintText: 'Enter motoric growth',
-                controller: motoricController,
-              ),
-              const SizedBox(height: 16),
-              const Text('Cognitive Growth', 
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
-              ),
-              InputField(
-                // labelText: 'Cognitive Growth',
-                hintText: 'Enter cognitive growth',
-                controller: cognitiveController,
-              ),
-              const SizedBox(height: 16),
-              const Text('Mental Condition', 
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
-              ),
-              InputField(
-                // labelText: 'Mental Condition',
-                hintText: 'Enter mental condition',
-                controller: mentalController,
+                hintText: 'Masukkan catatan penting',
+                controller: importantNoteController,
+                maxLines: 5,
               ),
               const SizedBox(height: 16),
               SizedBox(
@@ -236,9 +174,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
   void dispose() {
     weightController.dispose();
     heightController.dispose();
-    motoricController.dispose();
-    cognitiveController.dispose();
-    mentalController.dispose();
+    importantNoteController.dispose();
     super.dispose();
   }
 }
