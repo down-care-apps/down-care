@@ -42,18 +42,21 @@ class _DisplayPictureScreenState extends State<DisplayPictureScreen> with Single
     // Placeholder for ML model result
     final result = 100.0; // Replace this with actual ML model result later
     _controller.forward(from: 0.0);
-    final String? scanImage = await _savedImage(result);
+    final Map<String, dynamic>? scanImage = await _savedImage(result);
     setState(() {
-      _percentage = result;
-      _image = scanImage;
+      _percentage = scanImage!['confidence']['down_syndrome'] * 100;
+      _image = scanImage['landmarks_url'];
     });
   }
 
-  Future<String?> _savedImage(result) async {
+  Future<Map<String, dynamic>?> _savedImage(result) async {
     final XFile image = widget.image;
     final File savedFile = await ImageCameraServices().saveImageLocally(image);
     final String? firebaseUrl = await ImageCameraServices().uploadToFirebaseStorage(savedFile);
-    await ImageCameraServices().uploadImageToServer(firebaseUrl!, result);
+    final Map<String, dynamic>? resultScan = await ImageCameraServices().uploadImageToMachineLearning(firebaseUrl!);
+    await ImageCameraServices().uploadImageToServer(firebaseUrl!, resultScan);
+
+    return resultScan;
   }
 
   @override
