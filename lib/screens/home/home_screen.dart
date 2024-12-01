@@ -193,12 +193,12 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildArticleList() {
     return FutureBuilder(
-      future: ArticlesService().getAllArticles(), // Adjusted to call the correct method
+      future: ArticlesService().getArticles(limit: 3),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return const Text('Error loading articles');
+          return Text('Error loading articles ${snapshot.error}');
         } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
           return const Text('No articles found');
         } else {
