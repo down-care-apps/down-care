@@ -1,3 +1,5 @@
+import 'package:down_care/screens/home/article/article_list.dart';
+import 'package:down_care/utils/transition.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -19,8 +21,9 @@ class SectionTitle extends StatelessWidget {
         if (seeAll)
           GestureDetector(
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Redirecting to list artikel page...')),
+              Navigator.push(
+                context,
+                createRoute(const ArticleListPage()),
               );
             },
             child: Row(
