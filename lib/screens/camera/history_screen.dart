@@ -89,7 +89,7 @@ class _HistoryPageState extends State<HistoryPage> {
               padding: const EdgeInsets.all(8.0),
               child: Center(
                 child: Text(
-                  'Tidak ada riwayat pemindaian tersedia. Silahkan scan gambar terlebih dahulu.',  
+                  'Tidak ada riwayat pemindaian tersedia. Silahkan scan gambar terlebih dahulu.',
                 ),
               ),
             );

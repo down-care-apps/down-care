@@ -2,10 +2,10 @@ import 'package:camera/camera.dart';
 import 'package:down_care/api/user_api.dart';
 import 'package:down_care/models/scan_history.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:image_picker/image_picker.dart';
@@ -40,7 +40,6 @@ class ImageCameraServices {
     final user = FirebaseAuth.instance.currentUser;
     final idToken = await UserService().getTokenUser();
 
-
     final response = await http.post(Uri.parse('https://api-f3eusviapa-uc.a.run.app/camera/'),
         headers: {
           'Content-Type': 'application/json',
@@ -73,34 +72,57 @@ class ImageCameraServices {
     }
   }
 
-  Future<List<ScanHistory>> getAllScan() async {
-  final user = FirebaseAuth.instance.currentUser;
-  final idToken = await UserService().getTokenUser();
+  Future<List<ScanHistory>> getAllScan({int? limit}) async {
+    try {
+      final userService = UserService();
+      final token = await userService.getTokenUser();
+      const String apiUrl = 'https://api-f3eusviapa-uc.a.run.app/camera/';
 
-  final response = await http.get(
-    Uri.parse('https://api-f3eusviapa-uc.a.run.app/camera/'),
-    headers: {
-      'Authorization': 'Bearer $idToken',
-      'Content-Type': 'application/json',
-    },
-  );
+      final uri = Uri.parse(apiUrl).replace(
+        queryParameters: limit != null ? {'limit': '$limit'} : null,
+      );
 
-  try {
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
 
-      // Ensure data is in list format and map to ScanHistory objects
-      if (data is List) {
-        return data.map((item) => ScanHistory.fromJson(item)).toList();
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        if (data.isEmpty) {
+          throw Exception('No scan history found');
+        }
+
+        List<ScanHistory> scanHistories = data.map((item) => ScanHistory.fromJson(item)).toList();
+
+        scanHistories.sort((a, b) {
+          final dateA = _parseCustomDate(a.date);
+          final dateB = _parseCustomDate(b.date);
+          return dateB.compareTo(dateA); // Descending order
+        });
+
+        if (limit != null) {
+          return scanHistories.take(limit).toList();
+        }
+
+        return scanHistories;
       } else {
-        throw Exception('Unexpected data format');
+        throw Exception('Failed to fetch scan history: ${response.statusCode}');
       }
-    } else {
-      throw Exception('Failed to fetch scan result: ${response.statusCode}');
+    } catch (e) {
+      throw Exception('Error fetching scan history: ${e.toString()}');
     }
-  } catch (e) {
-    throw Exception('Error fetching scan: $e');
   }
-}
 
+  DateTime _parseCustomDate(String dateString) {
+    try {
+      return DateFormat('yyyy-MM-dd').parse(dateString);
+    } catch (e) {
+      throw FormatException('Invalid date format: $dateString');
+    }
+  }
 }

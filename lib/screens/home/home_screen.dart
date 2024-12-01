@@ -13,9 +13,6 @@ import 'package:down_care/screens/home/home_widgets/section_title.dart';
 import 'package:down_care/screens/home/home_widgets/syndrome_type_card.dart';
 import 'package:down_care/screens/home/home_widgets/article_card.dart';
 import 'package:down_care/screens/camera/history_detail_screen.dart';
-// import 'package:down_care/screens/cahistory_detail_page.dart';
-
-import '../../models/scan_history.dart';
 
 class Article {
   final String title;
@@ -25,13 +22,7 @@ class Article {
 }
 
 class HomeScreen extends StatelessWidget {
-  // final List<Article> articles = [
-  //   Article(title: 'Article 1', imageUrl: 'https://via.placeholder.com/250'),
-  //   Article(title: 'Article 2', imageUrl: 'https://via.placeholder.com/250'),
-  //   Article(title: 'Article 3', imageUrl: 'https://via.placeholder.com/250'),
-  //   // Add more articles as needed
-  // ];
-  HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +55,7 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: SectionTitle(title: 'Riwayat Pemindaian'),
+                    child: SectionTitle(title: 'Riwayat Pemindaian Terbaru'),
                   ),
                   const SizedBox(height: 8),
                   Padding(
@@ -238,34 +229,34 @@ class HomeScreen extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ArticleScreen()),
+                MaterialPageRoute(builder: (context) => const ArticleScreen()),
               );
             },
-            child: SyndromeTypeCard(name: 'Trisomi 21', imageUrl: 'assets/trisomi21.jpeg'),
+            child: const SyndromeTypeCard(name: 'Trisomi 21', imageUrl: 'assets/trisomi21.jpeg'),
           ),
         ),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Expanded(
           child: GestureDetector(
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ArticleMosaikScreen()),
+                MaterialPageRoute(builder: (context) => const ArticleMosaikScreen()),
               );
             },
-            child: SyndromeTypeCard(name: 'Mosaik', imageUrl: 'assets/Mosaik.jpg'),
+            child: const SyndromeTypeCard(name: 'Mosaik', imageUrl: 'assets/Mosaik.jpg'),
           ),
         ),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Expanded(
           child: GestureDetector(
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ArticleTranslokasi()),
+                MaterialPageRoute(builder: (context) => const ArticleTranslokasi()),
               );
             },
-            child: SyndromeTypeCard(
+            child: const SyndromeTypeCard(
               name: 'Mosaik',
               imageUrl: 'assets/Translokasi.jpg',
             ),
@@ -276,7 +267,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildScanHistoryList(BuildContext context) {
-    final futureScan = ImageCameraServices().getAllScan();
+    final futureScan = ImageCameraServices().getAllScan(limit: 3);
 
     return FutureBuilder(
       future: futureScan,
@@ -286,7 +277,7 @@ class HomeScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           // Display an error message if something goes wrong
-          return Center(
+          return const Center(
             child: Text(
               'Tidak ada riwayat pemindaian tersedia. Silahkan scan gambar terlebih dahulu.',
             ),
