@@ -12,11 +12,15 @@ class ScanHistory {
   });
 
   factory ScanHistory.fromJson(Map<String, dynamic> json) {
+    // Convert result to percentage
+    double resultPercent = double.tryParse(json['result'].toString() ?? '0') ?? 0;
+    String percentageString = (resultPercent * 100).toString();
+
     return ScanHistory(
       name: json['title'] ?? 'Unknown',
       date: json['createdAt'] ?? '',
-      result: json['result'].toString() ?? '0',
-      thumbnailUrl: json['imageURL'] ?? '',
+      result: percentageString,
+      thumbnailUrl: json['imageScan'] ?? '',
     );
   }
 }
