@@ -28,18 +28,59 @@ class ImageCameraServices {
     try {
       final ref = _storage.ref().child('images/${DateTime.now().millisecondsSinceEpoch}.jpg');
 
+      // Mengunggah file ke Firebase Storage
       final uploadTask = await ref.putFile(imageFile);
-  
-      return await uploadTask.ref.getDownloadURL();
+
+      // Mengatur akses file menjadi publik
+      await ref.updateMetadata(SettableMetadata(
+        cacheControl: 'public, max-age=31536000',
+      ));
+
+      // Mendapatkan URL unduhan publik
+      return await ref.getDownloadURL();
     } catch (e) {
       throw Exception('Failed to upload to Firebase Storage: $e');
     }
   }
 
-  Future<String?> uploadImageToServer(String imageURL, result) async {
+  Future<Map<String, dynamic>> uploadImageToMachineLearning(String imageURL) async {
     final user = FirebaseAuth.instance.currentUser;
     final idToken = await UserService().getTokenUser();
 
+    try {
+      final response = await http.post(
+        Uri.parse('https://flask-cloud-run-1073969707112.us-central1.run.app/api/analyze'),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': 'Bearer $idToken',
+        },
+        body: {
+          'image_url': imageURL,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+
+        return {
+          "confidence": responseData['confidence'],
+          "label": responseData['label'],
+          "landmarks_url": responseData['landmarks_url'],
+          "message": responseData['message'],
+        };
+      } else {
+        print(imageURL);
+        throw Exception("Failed to analyze image. Status code: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error: $e");
+      throw Exception("An error occurred while analyzing the image.");
+    }
+  }
+
+  Future<String?> uploadImageToServer(String imageURL, result_scan) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final idToken = await UserService().getTokenUser();
 
     final response = await http.post(Uri.parse('https://api-f3eusviapa-uc.a.run.app/camera/'),
         headers: {
@@ -49,7 +90,8 @@ class ImageCameraServices {
         body: jsonEncode({
           'userID': user!.uid,
           'imageURL': imageURL,
-          'result': result,
+          'result': result_scan['confidence']['down_syndrome'],
+          'imageScan': result_scan['landmarks_url'],
         }));
 
     try {
@@ -74,33 +116,32 @@ class ImageCameraServices {
   }
 
   Future<List<ScanHistory>> getAllScan() async {
-  final user = FirebaseAuth.instance.currentUser;
-  final idToken = await UserService().getTokenUser();
+    final user = FirebaseAuth.instance.currentUser;
+    final idToken = await UserService().getTokenUser();
 
-  final response = await http.get(
-    Uri.parse('https://api-f3eusviapa-uc.a.run.app/camera/'),
-    headers: {
-      'Authorization': 'Bearer $idToken',
-      'Content-Type': 'application/json',
-    },
-  );
+    final response = await http.get(
+      Uri.parse('https://api-f3eusviapa-uc.a.run.app/camera/'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+    );
 
-  try {
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
+    try {
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
 
-      // Ensure data is in list format and map to ScanHistory objects
-      if (data is List) {
-        return data.map((item) => ScanHistory.fromJson(item)).toList();
+        // Ensure data is in list format and map to ScanHistory objects
+        if (data is List) {
+          return data.map((item) => ScanHistory.fromJson(item)).toList();
+        } else {
+          throw Exception('Unexpected data format');
+        }
       } else {
-        throw Exception('Unexpected data format');
+        throw Exception('Failed to fetch scan result: ${response.statusCode}');
       }
-    } else {
-      throw Exception('Failed to fetch scan result: ${response.statusCode}');
+    } catch (e) {
+      throw Exception('Error fetching scan: $e');
     }
-  } catch (e) {
-    throw Exception('Error fetching scan: $e');
   }
-}
-
 }
