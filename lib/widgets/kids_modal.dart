@@ -1,0 +1,147 @@
+import 'package:down_care/widgets/bottom_navbar.dart';
+import 'package:flutter/material.dart';
+import 'package:down_care/widgets/custom_button.dart';
+
+class KidsProfileModal extends StatelessWidget {
+  final Future<List<Map<String, dynamic>>> Function() fetchChildrens;
+  final Function(Map<String, dynamic>) onSelectChild;
+
+  const KidsProfileModal({
+    super.key,
+    required this.fetchChildrens,
+    required this.onSelectChild,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: fetchChildrens(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              'Error: ${snapshot.error}',
+              style: const TextStyle(
+                color: Colors.red,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Inter',
+              ),
+            ),
+          );
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(
+            child: Text(
+              'Tidak ada data anak',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+                fontFamily: 'Inter',
+              ),
+            ),
+          );
+        } else {
+          List<Map<String, dynamic>> childrens = snapshot.data!;
+          return Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, -4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Pilih Profil Anak',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor,
+                    fontFamily: 'Inter',
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: childrens.length,
+                  separatorBuilder: (_, __) => const Divider(
+                    color: Colors.grey,
+                    height: 1,
+                  ),
+                  itemBuilder: (context, index) {
+                    final child = childrens[index];
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                      leading: CircleAvatar(
+                        radius: 24,
+                        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
+                        child: Text(
+                          (child['name'] ?? 'N/A').substring(0, 1),
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                      ),
+                      title: Text(
+                        child['name'] ?? 'No Name',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                      subtitle: Text(
+                        '${child['age'] ?? '?'} tahun',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      onTap: () {
+                        onSelectChild(child);
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                CustomButton(
+                  text: 'Lewati',
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BottomNavBar(initialIndex: 1),
+                      ),
+                    );
+                  },
+                  widthFactor: 1.0,
+                  color: Colors.red,
+                  textColor: Colors.white,
+                ),
+              ],
+            ),
+          );
+        }
+      },
+    );
+  }
+}

@@ -2,7 +2,6 @@ import 'package:camera/camera.dart';
 import 'package:down_care/api/user_api.dart';
 import 'package:down_care/models/scan_history.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -78,11 +77,13 @@ class ImageCameraServices {
     }
   }
 
-  Future<String?> uploadImageToServer(String imageURL, result_scan) async {
+  Future<Map<String, dynamic>> uploadImageToServer(String imageURL, result_scan) async {
     final user = FirebaseAuth.instance.currentUser;
     final idToken = await UserService().getTokenUser();
 
-    final response = await http.post(Uri.parse('https://api-f3eusviapa-uc.a.run.app/camera/'),
+    try {
+      final response = await http.post(
+        Uri.parse('https://api-f3eusviapa-uc.a.run.app/camera/'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $idToken',
@@ -92,26 +93,17 @@ class ImageCameraServices {
           'imageURL': imageURL,
           'result': result_scan['confidence']['down_syndrome'],
           'imageScan': result_scan['landmarks_url'],
-        }));
+        }),
+      );
 
-    try {
-      switch (response.statusCode) {
-        case 201:
-          return json.decode(response.body);
-        case 404:
-          throw Exception('User not found: ${response.body}');
-        case 400:
-          throw Exception('Bad request: ${response.body}');
-        case 401:
-          throw Exception('Unauthorized request. Please log in again.');
-        case 500:
-          throw Exception('Server error: ${response.body}');
-        default:
-          throw Exception('Failed to save image. Status code: ${response.statusCode}, Response: ${response.body}');
+      if (response.statusCode == 201) {
+        return json.decode(response.body) as Map<String, dynamic>;
+      } else {
+        throw Exception('Failed to upload image to server: ${response.body}');
       }
     } catch (e) {
-      // Catch and rethrow the error for further handling if needed
-      throw Exception('Error save image: $e');
+      print("Error uploading to server: $e");
+      throw Exception("Failed to upload image and results to server: $e");
     }
   }
 

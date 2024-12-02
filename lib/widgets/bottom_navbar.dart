@@ -6,20 +6,28 @@ import '../screens/camera/history_screen.dart';
 import '../screens/profile/profile_screen.dart';
 
 class BottomNavBar extends StatefulWidget {
-  const BottomNavBar({super.key});
+  final int initialIndex;
+
+  const BottomNavBar({super.key, this.initialIndex = 0});
 
   @override
   _BottomNavBarState createState() => _BottomNavBarState();
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-  int _currentIndex = 0;
+  late int _currentIndex;
 
   final List<Widget> _screens = [
     HomeScreen(),
-    HistoryPage(),
-    ProfileScreen(),
+    const HistoryPage(),
+    const ProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex; // Initialize the current index
+  }
 
   void _onTabTapped(int index) {
     setState(() => _currentIndex = index);
