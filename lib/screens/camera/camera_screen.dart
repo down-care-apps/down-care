@@ -4,7 +4,7 @@ import 'package:down_care/api/image_camera_services.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart'; // Import the camera package
 import 'package:image_picker/image_picker.dart'; // Import ImagePicker for uploading images
-import 'analysis_screen.dart'; // Import the analysis screen
+import 'analysis/analysis_screen.dart'; // Import the analysis screen
 import 'dart:async'; // For Timer
 import 'package:flutter_svg/flutter_svg.dart';
 
