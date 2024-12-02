@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:down_care/screens/camera/analysis/error_message.dart';
 import 'package:down_care/screens/camera/analysis/loading_indicator.dart';
 import 'package:down_care/screens/camera/analysis/result_card.dart';
+import 'package:down_care/screens/camera/history_screen.dart';
 import 'package:down_care/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +28,8 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
   String? _landmarkUrl;
   bool _isLoading = true;
   String? _errorMessage;
+  String? _firebaseUrl;
+  Map<String, dynamic>? _resultScan;
 
   @override
   void initState() {
@@ -43,9 +46,11 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
     try {
       final Map<String, dynamic>? scanImage = await _savedImage();
 
-      if (scanImage != null && scanImage['confidence'] != null) {
-        final double targetPercentage = double.parse(scanImage['confidence']['down_syndrome'].toString());
-        final String? landmarkUrl = scanImage['landmarks_url'];
+      if (scanImage != null && scanImage['resultScan']['confidence'] != null) {
+        _firebaseUrl = scanImage['firebaseUrl'];
+        _resultScan = scanImage['resultScan'];
+        final double targetPercentage = double.parse(scanImage['resultScan']['confidence']['down_syndrome'].toString());
+        final String? landmarkUrl = scanImage['resultScan']['landmarks_url'];
 
         setState(() {
           _landmarkUrl = landmarkUrl;
@@ -79,8 +84,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
 
       if (firebaseUrl != null) {
         final Map<String, dynamic> resultScan = await ImageCameraServices().uploadImageToMachineLearning(firebaseUrl);
-        await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan);
-        return resultScan;
+        return {'resultScan': resultScan, 'firebaseUrl': firebaseUrl};  
       } else {
         throw Exception("Gagal mengunggah gambar ke Firebase");
       }
@@ -124,7 +128,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
                         padding: const EdgeInsets.all(16.0),
                         child: CustomButton(
                           text: 'Simpan',
-                          onPressed: () => _showKidsProfileModal(context),
+                          onPressed: () => _showKidsProfileModal(context, _firebaseUrl!, _resultScan!),
                           widthFactor: 1.0,
                           color: Theme.of(context).primaryColor,
                           textColor: Colors.white,
@@ -136,7 +140,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
     );
   }
 
-  void _showKidsProfileModal(BuildContext context) async {
+  void _showKidsProfileModal(BuildContext context, String firebaseUrl, Map<String, dynamic> resultScan) async {
     final kidsProvider = Provider.of<KidsProvider>(context, listen: false);
 
     // Fetch kids data if not already loaded
@@ -178,7 +182,8 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
             }
 
             return KidsProfileModal(
-              onSelectChild: (child) {
+              onSelectChild: (child) async {
+                await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan, child['id']);
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

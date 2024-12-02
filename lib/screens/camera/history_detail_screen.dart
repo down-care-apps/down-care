@@ -1,3 +1,4 @@
+import 'package:down_care/api/childrens_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:down_care/models/scan_history.dart'; // Import the model
@@ -11,10 +12,41 @@ class HistoryDetailPage extends StatelessWidget {
     required this.scanHistory,
   });
 
+  Future<String> _fetchChildrenName(String childrenId) async {
+    try {
+      final children = await ChildrensService().getChildrenById(childrenId);
+      return children['name'] ?? 'Unknown';
+    } catch (e) {
+      return 'Error fetching name';
+    }
+  }
+
+  Widget _buildChildrenName(String childrenId) {
+    return FutureBuilder<String>(
+      future: _fetchChildrenName(childrenId),
+      builder: (context, snapshot) {
+        if (snapshot.hasError || !snapshot.hasData) {
+          return const Text(
+            'Uknown Name',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+          );
+        }
+        return Text(
+          snapshot.data!,
+          style: GoogleFonts.leagueSpartan(
+            fontSize: 18,
+            fontWeight: FontWeight.w400,
+          ),
+        );
+      },
+    );
+  } 
+  
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    
 
     // Parse the result to an integer and handle any parsing errors gracefully
     int resultValue = int.tryParse(scanHistory.result.replaceAll('%', '')) ?? 0;
@@ -79,6 +111,26 @@ class HistoryDetailPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
+                'Nama Anak:',
+                style: GoogleFonts.leagueSpartan(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[700],
+                ),
+              ),
+            ),
+            _buildChildrenName(scanHistory.childrenId),
+            // Text(
+            //   scanHistory.childrenId,
+            //   style: GoogleFonts.leagueSpartan(
+            //     fontSize: 18,
+            //     fontWeight: FontWeight.w400,
+            //   ),
+            // ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(
                 'Hasil:',
                 style: GoogleFonts.leagueSpartan(
                   fontSize: 16,
@@ -101,3 +153,5 @@ class HistoryDetailPage extends StatelessWidget {
     );
   }
 }
+
+

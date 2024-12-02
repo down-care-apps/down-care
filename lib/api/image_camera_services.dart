@@ -77,7 +77,7 @@ class ImageCameraServices {
     }
   }
 
-  Future<Map<String, dynamic>> uploadImageToServer(String imageURL, result_scan) async {
+  Future<Map<String, dynamic>> uploadImageToServer(String imageURL, result_scan, childrenId) async {
     final user = FirebaseAuth.instance.currentUser;
     final idToken = await UserService().getTokenUser();
 
@@ -90,6 +90,7 @@ class ImageCameraServices {
         },
         body: jsonEncode({
           'userID': user!.uid,
+          'childrenId': childrenId,
           'imageURL': imageURL,
           'result': result_scan['confidence']['down_syndrome'],
           'imageScan': result_scan['landmarks_url'],
