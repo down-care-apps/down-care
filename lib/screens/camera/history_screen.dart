@@ -6,6 +6,8 @@ import 'package:down_care/widgets/scan_history_card.dart';
 import 'package:down_care/screens/camera/history_detail_screen.dart';
 import 'package:down_care/utils/transition.dart';
 import 'package:down_care/models/scan_history.dart';
+import 'package:intl/intl.dart';
+
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -41,21 +43,21 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<ScanHistory> scanHistories = [
-      ScanHistory(
-        name: 'Scan 1',
-        date: '2023-01-01',
-        result: '70',
-        thumbnailUrl: 'https://via.placeholder.com/100',
-      ),
-      ScanHistory(
-        name: 'Scan 2',
-        date: '2023-01-02',
-        result: '10',
-        thumbnailUrl: 'https://via.placeholder.com/100',
-      ),
-      // Add more ScanHistory objects as needed
-    ];
+    // List<ScanHistory> scanHistories = [
+    //   ScanHistory(
+    //     name: 'Scan 1',
+    //     date: '2023-01-01',
+    //     result: '70',
+    //     thumbnailUrl: 'https://via.placeholder.com/100',
+    //   ),
+    //   ScanHistory(
+    //     name: 'Scan 2',
+    //     date: '2023-01-02',
+    //     result: '10',
+    //     thumbnailUrl: 'https://via.placeholder.com/100',
+    //   ),
+    //   // Add more ScanHistory objects as needed
+    // ];
     final futureScan = ImageCameraServices().getAllScan();
 
     return Scaffold(
@@ -94,7 +96,12 @@ class _HistoryPageState extends State<HistoryPage> {
               ),
             );
           } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            final scanHistories = snapshot.data!;
+            final dateFormat = DateFormat('dd-MM-yyyy HH:mm');
+            final scanHistories = snapshot.data!..sort((a, b) {
+              DateTime dateA = dateFormat.parse(a.date);
+              DateTime dateB = dateFormat.parse(b.date);
+              return dateB.compareTo(dateA); // Urutkan dari terbaru
+            });
             return ListView.builder(
               padding: const EdgeInsets.all(8),
               itemCount: scanHistories.length,
