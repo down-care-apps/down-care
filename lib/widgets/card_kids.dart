@@ -3,7 +3,6 @@ import '../screens/home/kids/kids_detail_screen.dart';
 
 class KidsCard extends StatelessWidget {
   final String name;
-  final String profession;
   final String age;
   final String imageUrl;
   final String id;
@@ -11,7 +10,6 @@ class KidsCard extends StatelessWidget {
   KidsCard({
     required this.id,
     required this.name,
-    required this.profession,
     required this.age,
     required this.imageUrl,
   });
@@ -35,8 +33,7 @@ class KidsCard extends StatelessWidget {
             // Image/Avatar on the left
             CircleAvatar(
               radius: 30,
-              backgroundImage:
-                  NetworkImage(imageUrl), // Use imageUrl from parameters
+              backgroundImage: NetworkImage(imageUrl), // Use imageUrl from parameters
             ),
             const SizedBox(width: 16.0), // Space between avatar and text
             // Information Column
@@ -44,19 +41,6 @@ class KidsCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Row for the icon and title
-                  Row(
-                    children: [
-                      const Icon(Icons.verified,
-                          color: Colors.blue), // Your custom icon
-                      const SizedBox(width: 5.0),
-                      Text(
-                        profession,
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4.0),
                   // Name and age
                   Text(
                     name,

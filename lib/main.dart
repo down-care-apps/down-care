@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import './firebase_options.dart';
-import 'package:flutter/material.dart';
+import './providers/kids_provider.dart';
 import 'package:down_care/screens/login/sign_up_screen.dart';
 import 'package:down_care/screens/login/sign_in_screen.dart';
 import 'package:down_care/screens/login/welcome.dart';
@@ -10,6 +12,8 @@ import 'package:down_care/screens/home/maps/maps_screen.dart';
 import 'package:down_care/screens/home/progress/progress_screen.dart';
 import 'package:down_care/screens/home/reminder/reminder_page.dart';
 import 'package:down_care/screens/home/kids/kids_profile_screen.dart';
+import 'package:down_care/screens/home/kids/kids_add_screen.dart';
+import 'package:down_care/screens/home/kids/kids_detail_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +22,14 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => KidsProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -49,6 +60,8 @@ class MyApp extends StatelessWidget {
         '/progress': (context) => ProgressScreen(),
         '/reminder': (context) => const ReminderPage(),
         '/kidsProfile': (context) => KidsProfileScreen(),
+        '/addKid': (context) => KidAddScreen(),
+        '/kidDetails': (context) => KidDetailScreen(id: ''), // ID will be passed via arguments
       },
       debugShowCheckedModeBanner: false,
     );
@@ -61,8 +74,8 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BottomNavBar(),
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Use defined color
+      body: const BottomNavBar(),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     );
   }
 }

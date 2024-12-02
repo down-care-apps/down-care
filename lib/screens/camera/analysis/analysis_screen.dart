@@ -1,0 +1,197 @@
+import 'dart:io';
+import 'package:camera/camera.dart';
+import 'package:down_care/screens/camera/analysis/error_message.dart';
+import 'package:down_care/screens/camera/analysis/loading_indicator.dart';
+import 'package:down_care/screens/camera/analysis/result_card.dart';
+import 'package:down_care/widgets/custom_button.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:down_care/providers/kids_provider.dart';
+import 'package:down_care/widgets/kids_modal.dart';
+import 'package:down_care/api/image_camera_services.dart';
+
+class DisplayPictureScreen extends StatefulWidget {
+  final String imagePath;
+  final XFile image;
+
+  const DisplayPictureScreen({super.key, required this.imagePath, required this.image});
+
+  @override
+  DisplayPictureScreenState createState() => DisplayPictureScreenState();
+}
+
+class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  double _percentage = 0.0;
+  String? _landmarkUrl;
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 3),
+      vsync: this,
+    );
+
+    _fetchAnalysisResult();
+  }
+
+  Future<void> _fetchAnalysisResult() async {
+    try {
+      final Map<String, dynamic>? scanImage = await _savedImage();
+
+      if (scanImage != null && scanImage['confidence'] != null) {
+        final double targetPercentage = double.parse(scanImage['confidence']['down_syndrome'].toString());
+        final String? landmarkUrl = scanImage['landmarks_url'];
+
+        setState(() {
+          _landmarkUrl = landmarkUrl;
+          _animation = Tween<double>(begin: 0, end: targetPercentage).animate(_controller)
+            ..addListener(() {
+              setState(() {
+                _percentage = _animation.value * 100;
+              });
+            });
+        });
+
+        _controller.forward(from: 0.0);
+      } else {
+        throw Exception("Respon dari layanan analisis tidak valid");
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = "Terjadi kesalahan: $e";
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<Map<String, dynamic>?> _savedImage() async {
+    try {
+      final File savedFile = await ImageCameraServices().saveImageLocally(widget.image);
+      final String? firebaseUrl = await ImageCameraServices().uploadToFirebaseStorage(savedFile);
+
+      if (firebaseUrl != null) {
+        final Map<String, dynamic> resultScan = await ImageCameraServices().uploadImageToMachineLearning(firebaseUrl);
+        await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan);
+        return resultScan;
+      } else {
+        throw Exception("Gagal mengunggah gambar ke Firebase");
+      }
+    } catch (e) {
+      throw Exception("Kesalahan saat menyimpan gambar: $e");
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Hasil Analisis', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        leading: IconButton(icon: const Icon(Icons.arrow_back_ios, color: Colors.white), onPressed: () => Navigator.of(context).pop()),
+        centerTitle: true,
+        backgroundColor: Theme.of(context).primaryColor,
+      ),
+      body: _isLoading
+          ? const LoadingIndicator(message: 'Sedang memproses gambar Anda...')
+          : _errorMessage != null
+              ? ErrorMessage(error: _errorMessage!)
+              : Stack(
+                  children: [
+                    SingleChildScrollView(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ResultCard(
+                        landmarkUrl: _landmarkUrl ?? '',
+                        imagePath: widget.imagePath,
+                        percentage: _percentage,
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: CustomButton(
+                          text: 'Simpan',
+                          onPressed: () => _showKidsProfileModal(context),
+                          widthFactor: 1.0,
+                          color: Theme.of(context).primaryColor,
+                          textColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+    );
+  }
+
+  void _showKidsProfileModal(BuildContext context) async {
+    final kidsProvider = Provider.of<KidsProvider>(context, listen: false);
+
+    // Fetch kids data if not already loaded
+    if (kidsProvider.kidsList.isEmpty && !kidsProvider.isLoading) {
+      await kidsProvider.fetchKids();
+    }
+
+    if (!mounted) return;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return Consumer<KidsProvider>(
+          builder: (context, kidsProvider, child) {
+            if (kidsProvider.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (kidsProvider.error != null) {
+              return Center(
+                child: Text(
+                  'Error: ${kidsProvider.error}',
+                  style: const TextStyle(color: Colors.red),
+                ),
+              );
+            }
+
+            final childrens = kidsProvider.kidsList;
+            if (childrens.isEmpty) {
+              return const Center(
+                child: Text(
+                  'Tidak ada data anak',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              );
+            }
+
+            return KidsProfileModal(
+              onSelectChild: (child) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Foto berhasil disimpan ke profil ${child['name']}'),
+                    backgroundColor: Colors.green,
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+}
