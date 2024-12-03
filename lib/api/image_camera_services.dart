@@ -80,6 +80,7 @@ class ImageCameraServices {
   Future<Map<String, dynamic>> uploadImageToServer(String imageURL, result_scan, childrenId) async {
     final user = FirebaseAuth.instance.currentUser;
     final idToken = await UserService().getTokenUser();
+    childrenId = childrenId ?? 'Unkkown ';
 
     try {
       final response = await http.post(

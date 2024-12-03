@@ -1,4 +1,3 @@
-import 'package:down_care/api/image_camera_services.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/screens/camera/camera_screen.dart';
 import 'package:camera/camera.dart';
@@ -6,8 +5,9 @@ import 'package:down_care/widgets/scan_history_card.dart';
 import 'package:down_care/screens/camera/history_detail_screen.dart';
 import 'package:down_care/utils/transition.dart';
 import 'package:down_care/models/scan_history.dart';
-import 'package:intl/intl.dart';
-
+import 'package:provider/provider.dart';
+import 'package:down_care/providers/scan_history_provider.dart';
+import 'package:down_care/widgets/skeleton_scan_history_card.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -17,6 +17,14 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch scan history when the page is initialized
+    final scanHistoryProvider = Provider.of<ScanHistoryProvider>(context, listen: false);
+    scanHistoryProvider.fetchScanHistory();
+  }
+
   void _openCamera() async {
     try {
       final cameras = await availableCameras();
@@ -43,23 +51,6 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    // List<ScanHistory> scanHistories = [
-    //   ScanHistory(
-    //     name: 'Scan 1',
-    //     date: '2023-01-01',
-    //     result: '70',
-    //     thumbnailUrl: 'https://via.placeholder.com/100',
-    //   ),
-    //   ScanHistory(
-    //     name: 'Scan 2',
-    //     date: '2023-01-02',
-    //     result: '10',
-    //     thumbnailUrl: 'https://via.placeholder.com/100',
-    //   ),
-    //   // Add more ScanHistory objects as needed
-    // ];
-    final futureScan = ImageCameraServices().getAllScan();
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -81,27 +72,34 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
         ],
       ),
-      body: FutureBuilder<List<ScanHistory>>(
-        future: futureScan,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
+      body: Consumer<ScanHistoryProvider>(
+        builder: (context, scanHistoryProvider, child) {
+          // Check loading state
+          if (scanHistoryProvider.isLoading) {
+            return ListView.builder(
+              itemCount: 5, // Display 5 skeleton cards as placeholders
+              itemBuilder: (context, index) {
+                return const SkeletonScanHistoryCard(); // Show skeleton
+              },
+            );
+          }
+
+          // Check for error state
+          if (scanHistoryProvider.errorMessage.isNotEmpty) {
+            return const Padding(
+              padding: EdgeInsets.all(8.0),
               child: Center(
                 child: Text(
-                  'Tidak ada riwayat pemindaian tersedia. Silahkan scan gambar terlebih dahulu.',  
+                  'Tidak ada riwayat pemindaian tersedia. Silahkan scan gambar terlebih dahulu.',
                 ),
               ),
             );
-          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            final dateFormat = DateFormat('dd-MM-yyyy HH:mm');
-            final scanHistories = snapshot.data!..sort((a, b) {
-              DateTime dateA = dateFormat.parse(a.date);
-              DateTime dateB = dateFormat.parse(b.date);
-              return dateB.compareTo(dateA); // Urutkan dari terbaru
-            });
+          }
+
+          // If there is scan history data, display it
+          if (scanHistoryProvider.scanHistories.isNotEmpty) {
+            final scanHistories = scanHistoryProvider.scanHistories;
+
             return ListView.builder(
               padding: const EdgeInsets.all(8),
               itemCount: scanHistories.length,
@@ -114,6 +112,7 @@ class _HistoryPageState extends State<HistoryPage> {
               },
             );
           } else {
+            // No data available
             return const Center(
               child: Text('Tidak ada riwayat pemindaian tersedia.'),
             );

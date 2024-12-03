@@ -3,7 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:down_care/screens/camera/analysis/error_message.dart';
 import 'package:down_care/screens/camera/analysis/loading_indicator.dart';
 import 'package:down_care/screens/camera/analysis/result_card.dart';
-import 'package:down_care/screens/camera/history_screen.dart';
+import 'package:down_care/widgets/bottom_navbar.dart';
 import 'package:down_care/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -84,7 +84,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
 
       if (firebaseUrl != null) {
         final Map<String, dynamic> resultScan = await ImageCameraServices().uploadImageToMachineLearning(firebaseUrl);
-        return {'resultScan': resultScan, 'firebaseUrl': firebaseUrl};  
+        return {'resultScan': resultScan, 'firebaseUrl': firebaseUrl};
       } else {
         throw Exception("Gagal mengunggah gambar ke Firebase");
       }
@@ -184,12 +184,10 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
             return KidsProfileModal(
               onSelectChild: (child) async {
                 await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan, child['id']);
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Foto berhasil disimpan ke profil ${child['name']}'),
-                    backgroundColor: Colors.green,
-                    duration: const Duration(seconds: 2),
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const BottomNavBar(initialIndex: 1),
                   ),
                 );
               },

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/kids_provider.dart';
+import 'package:down_care/providers/kids_provider.dart';
 import 'custom_button.dart';
 import 'bottom_navbar.dart';
 

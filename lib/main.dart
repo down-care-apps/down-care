@@ -1,3 +1,4 @@
+import 'package:down_care/providers/scan_history_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -26,6 +27,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => KidsProvider()),
+        ChangeNotifierProvider(create: (_) => ScanHistoryProvider()),
       ],
       child: const MyApp(),
     ),
