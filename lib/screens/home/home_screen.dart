@@ -1,6 +1,7 @@
 import 'package:down_care/api/articles_service.dart';
 import 'package:down_care/api/image_camera_services.dart';
 import 'package:down_care/api/user_api.dart';
+import 'package:down_care/providers/scan_history_provider.dart';
 import 'package:down_care/screens/home/article/article_mosaik.dart';
 import 'package:down_care/screens/home/article/article_translokasi.dart';
 import 'package:down_care/screens/home/article/article_trisomi21.dart';
@@ -13,9 +14,8 @@ import 'package:down_care/screens/home/home_widgets/section_title.dart';
 import 'package:down_care/screens/home/home_widgets/syndrome_type_card.dart';
 import 'package:down_care/screens/home/home_widgets/article_card.dart';
 import 'package:down_care/screens/camera/history_detail_screen.dart';
-// import 'package:down_care/screens/cahistory_detail_page.dart';
-
-import '../../models/scan_history.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class Article {
   final String title;
@@ -64,7 +64,7 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: SectionTitle(title: 'Riwayat Pemindaian'),
+                    child: SectionTitle(title: 'Riwayat Pemindaian Terbaru'),
                   ),
                   const SizedBox(height: 8),
                   Padding(
@@ -276,50 +276,31 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildScanHistoryList(BuildContext context) {
-    final futureScan = ImageCameraServices().getAllScan();
+    final scanHistoryProvider = Provider.of<ScanHistoryProvider>(context);
 
-    return FutureBuilder(
-      future: futureScan,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // Display a loading spinner while waiting for data
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          // Display an error message if something goes wrong
-          return Center(
-            child: Text(
-              'Tidak ada riwayat pemindaian tersedia. Silahkan scan gambar terlebih dahulu.',
-            ),
-          );
-        } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-          // If data is successfully fetched and not empty
-          final scanHistories = snapshot.data!;
-
-          return Column(
-            children: scanHistories.map((scanHistory) {
-              return Column(
-                children: [
-                  ScanHistoryCard(
-                    scanHistory: scanHistory,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        createRoute(HistoryDetailPage(scanHistory: scanHistory)),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                ],
+    return scanHistoryProvider.isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : scanHistoryProvider.errorMessage.isNotEmpty
+            ? Center(
+                child: Text(scanHistoryProvider.errorMessage),
+              )
+            : Column(
+                children: scanHistoryProvider.latestScanHistories.map((scanHistory) {
+                  return Column(
+                    children: [
+                      ScanHistoryCard(
+                        scanHistory: scanHistory,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            createRoute(HistoryDetailPage(scanHistory: scanHistory)),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                  );
+                }).toList(),
               );
-            }).toList(),
-          );
-        } else {
-          // Display a message if the data is empty
-          return const Center(
-            child: Text('Tidak ada riwayat pemindaian tersedia.'),
-          );
-        }
-      },
-    );
   }
 }
