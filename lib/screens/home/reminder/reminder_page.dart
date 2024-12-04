@@ -1,3 +1,4 @@
+import 'package:down_care/api/reminderServices.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
@@ -19,6 +20,19 @@ class _ReminderPageState extends State<ReminderPage> {
   List<Reminder> _getAllReminders() {
     return _reminders.entries.expand((entry) => entry.value.map((r) => r.copyWith(date: entry.key))).toList()
       ..sort((a, b) => a.getDateTime().compareTo(b.getDateTime()));
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchAllReminders() async {
+    // Get all reminders
+
+    final reminderData = await ReminderServices().getAllReminders();
+    return reminderData;
+  }
+
+  @override
+  void initState() {
+    _fetchAllReminders();
+    super.initState();
   }
 
   @override
@@ -115,68 +129,108 @@ class _ReminderPageState extends State<ReminderPage> {
   }
 
   Widget _buildRemindersList() {
-    return ListView(
-      children: _getAllReminders().map((reminder) {
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ReminderDetailPage(reminder: reminder),
-              ),
-            );
-          },
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: Offset(0, 3),
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: _fetchAllReminders(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('Saat ini belum ada pengingat. Silahkan tambah pengingat.'));
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Saat ini pengingat sedang error.'));
+        } else {
+          final reminders = snapshot.data!;
+          return ListView.builder(
+            itemCount: reminders.length,
+            itemBuilder: (context, index) {
+              final reminder = reminders[index];
+              String parsedDate;
+              String parsedTime;
+              // Parse the date string to a DateTime object
+              try {
+                List<String> dateParts = reminder['date'].split(' ')[0].split('-');
+                int year = int.parse(dateParts[0]);
+                int month = int.parse(dateParts[1]);
+                int day = int.parse(dateParts[2]);
+                parsedDate = '$day-$month-$year';
+              } catch (e) {
+                parsedDate = 'Unknown Date'; // Handle invalid date format
+              }
+
+              // Parse the time string to a TimeOfDay object
+              try {
+                String timeString = reminder['time'];
+                List<String> timeParts = timeString.split('(')[1].split(':');
+                int hour = int.parse(timeParts[0]);
+                int minute = int.parse(timeParts[1].split(')')[0]);
+                parsedTime = '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+              } catch (e) {
+                parsedTime = 'Unknown Time'; // Handle invalid time format
+              }
+
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ReminderDetailPage(reminder: Reminder.fromJson(reminder)),
+                    ),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: ListTile(
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(reminder['title']),
+                        Text(
+                          parsedDate, // Ensure `date` is a formatted string
+                          style: TextStyle(
+                            fontSize: 12.0,
+                            color: Colors.black.withOpacity(0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                    subtitle: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            reminder['description'],
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Text(
+                          parsedTime, // Ensure `time` is a formatted string
+                          style: TextStyle(
+                            fontSize: 12.0,
+                            color: Colors.black.withOpacity(0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ],
-            ),
-            child: ListTile(
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(reminder.title),
-                  Text(
-                    DateFormat('d MMM yyyy').format(reminder.date),
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      color: Colors.black.withOpacity(0.6),
-                    ),
-                  ),
-                ],
-              ),
-              subtitle: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      reminder.description,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Text(
-                    reminder.time.format(context),
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      color: Colors.black.withOpacity(0.6),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      }).toList(),
+              );
+            },
+          );
+        }
+      },
     );
   }
 }

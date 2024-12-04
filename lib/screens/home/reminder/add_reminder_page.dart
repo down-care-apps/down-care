@@ -1,3 +1,5 @@
+import 'package:down_care/api/reminderServices.dart';
+import 'package:down_care/screens/home/reminder/reminder_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'reminder.dart';
@@ -18,6 +20,7 @@ class _AddReminderPageState extends State<AddReminderPage> {
   final _descriptionController = TextEditingController();
   late DateTime _selectedDate;
   TimeOfDay _selectedTime = TimeOfDay.now();
+  final ReminderServices _reminderServices = ReminderServices();
 
   @override
   void initState() {
@@ -83,7 +86,35 @@ class _AddReminderPageState extends State<AddReminderPage> {
                       time: _selectedTime,
                       date: _selectedDate,
                     );
-                    Navigator.pop(context, newReminder);
+                    try {
+                      // Save the reminder
+                      final savedReminder = _reminderServices.createReminder(newReminder.toJson()); 
+
+                      // Show a success Snackbar
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('Pengingat berhasil ditambahkan!'),
+                          duration: const Duration(seconds: 2), 
+                          backgroundColor: Colors.green,// Customize the duration
+                        ),
+                      );
+
+                      // Navigate to the ReminderPage
+                      Navigator.pop(context);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => ReminderPage()),
+                      );
+                    } catch (e) {
+                      // Show error Snackbar in case of failure
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('Gagal menambahkan pengingat. Silahkan coba lagi.'),
+                          backgroundColor: Colors.red, // Error color
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
+                    }
                   }
                 },
                 child: const Text('Add Reminder'),

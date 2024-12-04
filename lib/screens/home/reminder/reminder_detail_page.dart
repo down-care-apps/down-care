@@ -9,6 +9,8 @@ class ReminderDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final parsedTime = reminder.stringTime(reminder.time);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reminder Details', style: TextStyle(color: Colors.white, fontSize: 24)),
@@ -26,9 +28,9 @@ class ReminderDetailPage extends StatelessWidget {
           children: [
             Text(reminder.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16.0),
-            Text(DateFormat('d MMM yyyy').format(reminder.date)),
+            Text(DateFormat('dd-MM-yyyy').format(reminder.date)),
             const SizedBox(height: 8.0),
-            Text(reminder.time.format(context)),
+            Text(parsedTime),
             const SizedBox(height: 16.0),
             Text(reminder.description),
           ],
