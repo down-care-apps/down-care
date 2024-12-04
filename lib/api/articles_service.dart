@@ -44,7 +44,7 @@ class ArticlesService {
         data.sort((a, b) {
           final dateA = _parseCustomDate(a['date']); // Use custom date parsing
           final dateB = _parseCustomDate(b['date']);
-          return dateA.compareTo(dateB); // Sort in descending order
+          return dateB.compareTo(dateA); // Sort in descending order
         });
 
         // Return limited results if limit is specified
