@@ -132,6 +132,7 @@ class AuthScreenState extends State<AuthScreen> {
       );
 
       String? idToken = await userCredential.user?.getIdToken();
+      print('ID Token: $idToken');
       if (idToken != null) {
         await _authService.callLoginApi(emailController.text, passwordController.text, idToken);
       }

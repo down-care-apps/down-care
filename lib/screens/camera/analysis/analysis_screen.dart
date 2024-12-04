@@ -183,13 +183,23 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
 
             return KidsProfileModal(
               onSelectChild: (child) async {
-                await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan, child['id']);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const BottomNavBar(initialIndex: 1),
-                  ),
-                );
+                if (child == null) {
+                  await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan, null);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const BottomNavBar(initialIndex: 1),
+                    ),
+                  );
+                }else{
+                  await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan, child['id']);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const BottomNavBar(initialIndex: 1),
+                    ),
+                  );
+                }
               },
             );
           },

@@ -123,12 +123,7 @@ class KidsProfileModal extends StatelessWidget {
               CustomButton(
                 text: 'Lewati',
                 onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const BottomNavBar(initialIndex: 1),
-                    ),
-                  );
+                  onSelectChild({});
                 },
                 widthFactor: 1.0,
                 color: Colors.red,

@@ -13,12 +13,11 @@ class HistoryDetailPage extends StatelessWidget {
   });
 
   Future<String> _fetchChildrenName(String childrenId) async {
-    try {
-      final children = await ChildrensService().getChildrenById(childrenId);
-      return children['name'] ?? 'Unknown';
-    } catch (e) {
-      return 'Error fetching name';
+    if (childrenId.isEmpty) {
+      return 'Foto ini belum disimpan pada anak';
     }
+    final children = await ChildrensService().getChildrenById(childrenId);
+    return children['name'] ?? 'Unknown';
   }
 
   Widget _buildChildrenName(String childrenId) {
@@ -27,7 +26,7 @@ class HistoryDetailPage extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasError || !snapshot.hasData) {
           return const Text(
-            'Uknown Name',
+            'Foto ini belum disimpan pada anak',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
           );
         }
@@ -40,13 +39,12 @@ class HistoryDetailPage extends StatelessWidget {
         );
       },
     );
-  } 
-  
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
 
     // Parse the result to an integer and handle any parsing errors gracefully
     int resultValue = int.tryParse(scanHistory.result.replaceAll('%', '')) ?? 0;
@@ -153,5 +151,3 @@ class HistoryDetailPage extends StatelessWidget {
     );
   }
 }
-
-
