@@ -90,10 +90,10 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
                   itemBuilder: (context, index) {
                     final kid = kidsProvider.kidsList[index];
                     return KidsCard(
-                      id: kid['id'].toString(),
-                      name: kid['name'] ?? 'No Name',
-                      age: '${kid['age'] ?? 'N/A'} tahun',
-                      imageUrl: kid['imageUrl'] ?? 'https://example.com/default_image.jpg',
+                      id: kid.id.toString(),
+                      name: kid.name,
+                      age: '${kid.age} tahun',
+                      imageUrl: 'https://example.com/default_image.jpg',
                     );
                   },
                 ),

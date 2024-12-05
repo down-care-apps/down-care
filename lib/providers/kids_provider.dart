@@ -1,18 +1,19 @@
+import 'package:down_care/models/children_model.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/api/childrens_service.dart';
 
-class KidsProvider extends ChangeNotifier {
+class KidsProvider with ChangeNotifier {
+  List<ChildrenModel> _kidsList = [];
   final ChildrensService _childrensService = ChildrensService();
-  List<Map<String, dynamic>> _kidsList = [];
   bool _isLoading = false;
   String? _error;
 
   // Getters for state
-  List<Map<String, dynamic>> get kidsList => _kidsList;
+  List<ChildrenModel> get kidsList => _kidsList;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  // Fetch all kids
+  // Method to fetch all kids
   Future<void> fetchKids() async {
     _isLoading = true;
     _error = null;
@@ -20,7 +21,7 @@ class KidsProvider extends ChangeNotifier {
 
     try {
       final data = await _childrensService.getAllChildrens();
-      _kidsList = data.map((item) => item as Map<String, dynamic>).toList();
+      _kidsList = data.map((item) => ChildrenModel.fromJson(item)).toList();
     } catch (e) {
       _error = "Error fetching kids data: $e";
     } finally {
@@ -29,17 +30,17 @@ class KidsProvider extends ChangeNotifier {
     }
   }
 
-  // Add a new kid
-  Future<void> addKid(Map<String, dynamic> kid) async {
+  // Method to add a new kid
+  Future<void> addKid(ChildrenModel kid) async {
     try {
       final createdKid = await _childrensService.createProfileChildren(
-        kid['name'],
-        kid['weight'],
-        kid['height'],
-        kid['gender'],
-        kid['dateBirthday'],
+        kid.name,
+        kid.weight,
+        kid.height,
+        kid.gender,
+        kid.dateBirthday,
       );
-      _kidsList.add(createdKid!);
+      _kidsList.add(ChildrenModel.fromJson(createdKid!));
       notifyListeners();
     } catch (e) {
       _error = "Error adding kid: $e";
@@ -47,19 +48,19 @@ class KidsProvider extends ChangeNotifier {
     }
   }
 
-  // Update kid profile
-  Future<void> updateKid(String id, Map<String, dynamic> updatedKid) async {
+  // Method to update kid profile
+  Future<void> updateKid(String id, ChildrenModel updatedKid) async {
     try {
       await _childrensService.updateProfileChildren(
         id,
-        updatedKid['name'],
-        updatedKid['weight'],
-        updatedKid['height'],
-        updatedKid['gender'],
-        updatedKid['dateBirthday'],
+        updatedKid.name,
+        updatedKid.weight,
+        updatedKid.height,
+        updatedKid.gender,
+        updatedKid.dateBirthday,
       );
 
-      final index = _kidsList.indexWhere((kid) => kid['id'].toString() == id);
+      final index = _kidsList.indexWhere((kid) => kid.id == id);
       if (index != -1) {
         _kidsList[index] = updatedKid;
         notifyListeners();
@@ -70,15 +71,21 @@ class KidsProvider extends ChangeNotifier {
     }
   }
 
-  // Delete a kid
+  // Method to delete a kid
   Future<void> deleteKid(String id) async {
     try {
       await _childrensService.deleteProfileChildren(id);
-      _kidsList.removeWhere((kid) => kid['id'] == id);
+      _kidsList.removeWhere((kid) => kid.id == id);
       notifyListeners();
     } catch (e) {
       _error = "Error deleting kid: $e";
       notifyListeners();
     }
+  }
+
+  // Method to manually set kids list in the provider
+  void setKidsList(List<ChildrenModel> kidsList) {
+    _kidsList = kidsList;
+    notifyListeners();
   }
 }

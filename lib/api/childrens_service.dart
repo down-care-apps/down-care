@@ -76,7 +76,7 @@ class ChildrensService {
           'Content-Type': 'application/json',
         },
       );
-
+      print('Response: ${response.body}');
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
@@ -117,7 +117,8 @@ class ChildrensService {
     }
   }
 
-  Future<Map<String, dynamic>?> updateProfileChildren(String id, String? name, String? weight, String? height, String? gender, String? dateBirthday) async {
+  Future<Map<String, dynamic>?> updateProfileChildren(
+      String id, String? name, String? weight, String? height, String? gender, String? dateBirthday) async {
     try {
       final userService = UserService();
       final token = await userService.getTokenUser();
