@@ -1,5 +1,3 @@
-import 'package:down_care/api/childrens_service.dart';
-
 class ScanHistory {
   final String name;
   final String childrenId;

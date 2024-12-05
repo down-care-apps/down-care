@@ -23,6 +23,9 @@ class HomeScreen extends StatelessWidget {
     // Fetch user data when the screen is built
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     userProvider.fetchCurrentUser();
+    // Fetch scan history data when the screen is built
+    final scanHistoryProvider = Provider.of<ScanHistoryProvider>(context, listen: false);
+    scanHistoryProvider.fetchScanHistory();
 
     return Scaffold(
       body: SafeArea(
