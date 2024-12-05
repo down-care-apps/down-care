@@ -1,10 +1,11 @@
 import 'package:down_care/providers/scan_history_provider.dart';
+import 'package:down_care/providers/user_provider.dart';
+import 'package:down_care/providers/kids_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import './firebase_options.dart';
-import './providers/kids_provider.dart';
 import 'package:down_care/screens/login/sign_up_screen.dart';
 import 'package:down_care/screens/login/sign_in_screen.dart';
 import 'package:down_care/screens/login/welcome.dart';
@@ -28,6 +29,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => KidsProvider()),
         ChangeNotifierProvider(create: (_) => ScanHistoryProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: const MyApp(),
     ),
@@ -61,8 +63,8 @@ class MyApp extends StatelessWidget {
         '/maps': (context) => const MapPage(),
         '/progress': (context) => ProgressScreen(),
         '/reminder': (context) => const ReminderPage(),
-        '/kidsProfile': (context) => KidsProfileScreen(),
-        '/addKid': (context) => KidAddScreen(),
+        '/kidsProfile': (context) => const KidsProfileScreen(),
+        '/addKid': (context) => const KidAddScreen(),
         '/kidDetails': (context) => KidDetailScreen(id: ''), // ID will be passed via arguments
       },
       debugShowCheckedModeBanner: false,

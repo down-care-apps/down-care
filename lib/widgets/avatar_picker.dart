@@ -1,3 +1,4 @@
+import 'package:down_care/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -50,7 +51,7 @@ class _AvatarPickerState extends State<AvatarPicker> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        FutureBuilder<Map<String, dynamic>>(
+        FutureBuilder<UserModel>(
           future: UserService().getCurrentUserData(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -59,7 +60,7 @@ class _AvatarPickerState extends State<AvatarPicker> {
               return const CircleAvatar(radius: 50, backgroundImage: AssetImage('assets/user_icon.png'));
             } else {
               final user = snapshot.data!;
-              final avatarUrl = user['photoURL'] ?? '';
+              final avatarUrl = user.photoURL.isNotEmpty ? user.photoURL : '';
               return CircleAvatar(
                 radius: 50,
                 backgroundImage: _image != null

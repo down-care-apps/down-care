@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:down_care/models/user_model.dart';
 
 class UserService {
   // Singleton pattern
@@ -12,7 +13,7 @@ class UserService {
 
   UserService._internal();
 
-  Future<Map<String, dynamic>> getCurrentUserData() async {
+  Future<UserModel> getCurrentUserData() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       throw Exception('No authenticated user found');
@@ -34,8 +35,8 @@ class UserService {
         },
       );
 
-      if ((await response).statusCode == 200) {
-        return json.decode(response.body);
+      if (response.statusCode == 200) {
+        return UserModel.fromJson(json.decode(response.body));
       } else if (response.statusCode == 404) {
         throw Exception('User not found');
       } else {
