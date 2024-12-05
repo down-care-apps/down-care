@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:down_care/api/user_api.dart';
 import 'package:down_care/models/scan_history.dart';
+import 'package:down_care/screens/camera/analysis/error_message.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:convert';
@@ -57,7 +58,7 @@ class ImageCameraServices {
           'image_url': imageURL,
         },
       );
-
+      // print(response.body);
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
 
@@ -68,12 +69,15 @@ class ImageCameraServices {
           "message": responseData['message'],
         };
       } else {
-        print(imageURL);
-        throw Exception("Failed to analyze image. Status code: ${response.statusCode}");
+        final errorData = jsonDecode(response.body);
+        final ErrorMessage = errorData['error'];
+        print('server error: $ErrorMessage');
+
+        throw ErrorMessage;
       }
     } catch (e) {
       print("Error: $e");
-      throw Exception("An error occurred while analyzing the image.");
+      throw e;
     }
   }
 

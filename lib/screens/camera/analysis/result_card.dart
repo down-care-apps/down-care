@@ -5,83 +5,126 @@ class ResultCard extends StatelessWidget {
   final String landmarkUrl;
   final String imagePath;
   final double percentage;
+  final String label;
 
   const ResultCard({
     super.key,
     required this.landmarkUrl,
     required this.imagePath,
     required this.percentage,
+    required this.label,
   });
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = Theme.of(context).primaryColor;
+    final theme = Theme.of(context);
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        // Image Container with Gradient Overlay
+        Container(
+          height: screenHeight * 0.4,
+          width: screenWidth,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(16.0),
-            child: landmarkUrl.isNotEmpty
-                ? Image.network(
-                    landmarkUrl,
-                    fit: BoxFit.cover,
-                    height: screenHeight * 0.4,
-                    width: double.infinity,
-                  )
-                : Image.file(
-                    File(imagePath),
-                    fit: BoxFit.cover,
-                    height: screenHeight * 0.4,
-                    width: double.infinity,
-                  ),
+            borderRadius: BorderRadius.circular(20),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                landmarkUrl.isNotEmpty
+                    ? Image.network(
+                        landmarkUrl,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.file(
+                        File(imagePath),
+                        fit: BoxFit.cover,
+                      ),
+              ],
+            ),
           ),
         ),
+
         const SizedBox(height: 20),
+
+        // Result Details Container
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
+          width: screenWidth,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
             color: Colors.white,
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
               ),
             ],
-            border: Border.all(
-              color: Colors.grey.withOpacity(0.2),
-              width: 1,
-            ),
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // Result Title
               Text(
                 'Probabilitas Hasil Analisis',
-                style: TextStyle(
-                  fontSize: 20,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: theme.primaryColor,
                   fontWeight: FontWeight.w600,
-                  color: primaryColor,
                 ),
               ),
-              const SizedBox(height: 10),
+
+              const SizedBox(height: 15),
+
+              // Detected Label
               Text(
-                'Kemungkinan Down Syndrome: ${percentage.toStringAsFixed(2)}%',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
+                label,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 15),
+
+              // Confidence Percentage
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: theme.primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'Confidence: ${percentage.toStringAsFixed(2)}%',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.primaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              const SizedBox(height: 10),
-              const Text(
+
+              const SizedBox(height: 15),
+
+              // Disclaimer
+              Text(
                 '*Hasil ini berdasarkan model probabilitas dan bukan diagnosis pasti.',
-                style: TextStyle(
-                  fontSize: 14,
+                style: theme.textTheme.bodySmall?.copyWith(
                   color: Colors.black54,
                   fontStyle: FontStyle.italic,
                 ),
