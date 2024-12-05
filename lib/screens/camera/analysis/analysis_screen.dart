@@ -45,11 +45,14 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
   Future<void> _fetchAnalysisResult() async {
     try {
       final Map<String, dynamic>? scanImage = await _savedImage();
-
+      print('Scan Image Response: $scanImage');
       if (scanImage != null && scanImage['resultScan']['confidence'] != null) {
         _firebaseUrl = scanImage['firebaseUrl'];
         _resultScan = scanImage['resultScan'];
-        final double targetPercentage = double.parse(scanImage['resultScan']['confidence']['down_syndrome'].toString());
+
+        // Extract label and confidence dynamically
+        final String detectedLabel = scanImage['resultScan']['label'].toLowerCase().replaceAll(' ', '_'); // Normalize label for key lookup
+        final double targetPercentage = double.parse(scanImage['resultScan']['confidence'][detectedLabel].toString());
         final String? landmarkUrl = scanImage['resultScan']['landmarks_url'];
 
         setState(() {
@@ -68,7 +71,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
       }
     } catch (e) {
       setState(() {
-        _errorMessage = "Terjadi kesalahan: $e";
+        _errorMessage = "$e";
       });
     } finally {
       setState(() {
@@ -89,7 +92,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
         throw Exception("Gagal mengunggah gambar ke Firebase");
       }
     } catch (e) {
-      throw Exception("Kesalahan saat menyimpan gambar: $e");
+      throw e;
     }
   }
 
@@ -117,6 +120,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
                     SingleChildScrollView(
                       padding: const EdgeInsets.all(16.0),
                       child: ResultCard(
+                        label: _resultScan!['label'],
                         landmarkUrl: _landmarkUrl ?? '',
                         imagePath: widget.imagePath,
                         percentage: _percentage,
@@ -191,7 +195,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
                       builder: (context) => const BottomNavBar(initialIndex: 1),
                     ),
                   );
-                }else{
+                } else {
                   await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan, child['id']);
                   Navigator.pushReplacement(
                     context,
