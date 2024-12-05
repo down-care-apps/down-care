@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:camera/camera.dart';
+import 'package:down_care/providers/scan_history_provider.dart';
 import 'package:down_care/screens/camera/analysis/error_message.dart';
 import 'package:down_care/screens/camera/analysis/loading_indicator.dart';
 import 'package:down_care/screens/camera/analysis/result_card.dart';
@@ -146,6 +147,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
 
   void _showKidsProfileModal(BuildContext context, String firebaseUrl, Map<String, dynamic> resultScan) async {
     final kidsProvider = Provider.of<KidsProvider>(context, listen: false);
+    final scanHistoryProvider = Provider.of<ScanHistoryProvider>(context, listen: false);
 
     // Fetch kids data if not already loaded
     if (kidsProvider.kidsList.isEmpty && !kidsProvider.isLoading) {
@@ -189,21 +191,19 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
               onSelectChild: (child) async {
                 if (child == null) {
                   await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan, null);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const BottomNavBar(initialIndex: 1),
-                    ),
-                  );
                 } else {
                   await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan, child['id']);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const BottomNavBar(initialIndex: 1),
-                    ),
-                  );
                 }
+
+                // Refresh scan history after saving the analysis data
+                await scanHistoryProvider.refreshScanHistory();
+
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const BottomNavBar(initialIndex: 1),
+                  ),
+                );
               },
             );
           },

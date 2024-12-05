@@ -87,7 +87,7 @@ class KidsProfileModal extends StatelessWidget {
                       radius: 24,
                       backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
                       child: Text(
-                        (child['name'] ?? 'N/A').substring(0, 1),
+                        (child.name ?? 'N/A').substring(0, 1),
                         style: TextStyle(
                           color: Theme.of(context).primaryColor,
                           fontWeight: FontWeight.bold,
@@ -96,7 +96,7 @@ class KidsProfileModal extends StatelessWidget {
                       ),
                     ),
                     title: Text(
-                      child['name'] ?? 'No Name',
+                      child.name ?? 'No Name',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -104,7 +104,7 @@ class KidsProfileModal extends StatelessWidget {
                       ),
                     ),
                     subtitle: Text(
-                      '${child['age'] ?? '?'} tahun',
+                      '${child.age ?? '?'} tahun',
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.grey,
@@ -115,7 +115,7 @@ class KidsProfileModal extends StatelessWidget {
                       size: 16,
                       color: Theme.of(context).primaryColor,
                     ),
-                    onTap: () => onSelectChild(child),
+                    onTap: () => onSelectChild(child.toMap()),
                   );
                 },
               ),

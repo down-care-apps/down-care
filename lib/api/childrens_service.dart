@@ -19,14 +19,14 @@ class ChildrensService {
       final user = await userService.getCurrentUserData();
 
       // Ensure 'uid' is present
-      if (user == null || user['uid'] == null) {
+      if (user.id.isEmpty) {
         throw Exception('User not found or UID is missing');
       }
-      final id = user['uid'];
+      final id = user.id;
 
       // Retrieve the token
       final token = await userService.getTokenUser();
-      if (token == null) {
+      if (token.isEmpty) {
         throw Exception('Failed to retrieve user token');
       }
 
@@ -50,7 +50,7 @@ class ChildrensService {
           throw Exception('No childrens found');
         }
       } else {
-        throw Exception('Failed to fetch childrens: ${response}');
+        throw Exception('Failed to fetch childrens: ${response.body}');
       }
     } catch (e) {
       print('Server response error: $e');
@@ -66,7 +66,8 @@ class ChildrensService {
     }
 
     try {
-      final token = await user.getIdToken();
+      final userService = UserService();
+      final token = await userService.getTokenUser();
 
       final response = await http.get(
         Uri.parse('https://api-f3eusviapa-uc.a.run.app/childrens/$id'),
@@ -75,7 +76,7 @@ class ChildrensService {
           'Content-Type': 'application/json',
         },
       );
-
+      print('Response: ${response.body}');
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
@@ -87,28 +88,25 @@ class ChildrensService {
   }
 
   Future<Map<String, dynamic>?> createProfileChildren(name, weight, height, gender, dateBirthday) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      throw Exception('Please Login to create childrens');
-    }
     try {
-      final token = await user.getIdToken();
-      if (token == null) {
-        throw Exception('Failed to retrieve user token');
-      }
+      final userService = UserService();
+      final token = await userService.getTokenUser();
 
-      final response = await http.post(Uri.parse('https://api-f3eusviapa-uc.a.run.app/childrens/'),
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode({
-            'name': name,
-            'gender': gender,
-            'weight': weight,
-            'height': height,
-            'dateBirthday': dateBirthday,
-          }));
+      final response = await http.post(
+        Uri.parse('https://api-f3eusviapa-uc.a.run.app/childrens/'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'name': name,
+          'gender': gender,
+          'weight': weight,
+          'height': height,
+          'dateBirthday': dateBirthday,
+        }),
+      );
+
       if (response.statusCode == 201) {
         return json.decode(response.body);
       } else {
@@ -119,14 +117,12 @@ class ChildrensService {
     }
   }
 
-  Future<Map<String, dynamic>?> updateProfileChildren(String id, String? name, String? weight, String? height, String? gender, String? dateBirthday) async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      throw Exception('Please Login to update childrens');
-    }
-    final token = await UserService().getTokenUser();
-
+  Future<Map<String, dynamic>?> updateProfileChildren(
+      String id, String? name, String? weight, String? height, String? gender, String? dateBirthday) async {
     try {
+      final userService = UserService();
+      final token = await userService.getTokenUser();
+
       final response = await http.put(
         Uri.parse('https://api-f3eusviapa-uc.a.run.app/childrens/$id'),
         headers: {
@@ -145,7 +141,7 @@ class ChildrensService {
       switch (response.statusCode) {
         case 200:
           print('Profile Children updated successfully');
-          break;
+          return json.decode(response.body);
         case 404:
           throw Exception('Profile Children not found: ${response.body}');
         case 400:
@@ -162,14 +158,11 @@ class ChildrensService {
     }
   }
 
-  Future<void> deleteProfileChildren(String id)async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      throw Exception('Please Login to delete childrens');
-    }
-    final token = await UserService().getTokenUser();
-
+  Future<void> deleteProfileChildren(String id) async {
     try {
+      final userService = UserService();
+      final token = await userService.getTokenUser();
+
       final response = await http.delete(
         Uri.parse('https://api-f3eusviapa-uc.a.run.app/childrens/$id'),
         headers: {
@@ -177,8 +170,6 @@ class ChildrensService {
           'Content-Type': 'application/json',
         },
       );
-
-      final refreshChildren = await getAllChildrens();
 
       switch (response.statusCode) {
         case 200:

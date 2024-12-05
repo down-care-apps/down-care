@@ -3,19 +3,23 @@ import 'package:down_care/screens/profile/change_password/change_password.dart';
 import 'package:down_care/screens/profile/delete_account/delete_account.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/api/logoutApi.dart';
-import 'package:down_care/api/user_api.dart';
 import 'package:down_care/screens/profile/profile_menu_item.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:down_care/widgets/custom_button.dart';
 import 'package:down_care/screens/profile/update_profil/update_profile.dart';
 import 'package:down_care/utils/transition.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:down_care/providers/user_provider.dart'; 
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Fetch user data when the screen is built
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.fetchCurrentUser();
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -28,47 +32,38 @@ class ProfileScreen extends StatelessWidget {
                 Center(
                   child: Column(
                     children: [
-                      FutureBuilder<Map<String, dynamic>>(
-                        future: UserService().getCurrentUserData(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                      // Use Consumer to access user data from the provider
+                      Consumer<UserProvider>(
+                        builder: (context, userProvider, child) {
+                          final user = userProvider.user;
+                          if (user == null) {
                             return const CircularProgressIndicator();
-                          } else if (snapshot.hasError) {
-                            return const Text('Error loading user data');
-                          } else {
-                            final user = snapshot.data!;
-                            final profileUrl = user['photoURL'] as String? ?? '';
-
-                            return CircleAvatar(
-                              radius: 50,
-                              backgroundColor: Colors.grey[300],
-                              backgroundImage: profileUrl.isNotEmpty ? NetworkImage(profileUrl) : null,
-                              child: profileUrl.isEmpty ? const Icon(Icons.person, color: Colors.white, size: 40) : null,
-                            );
                           }
+                          final profileUrl = user.photoURL.isNotEmpty ? user.photoURL : '';
+                          return CircleAvatar(
+                            radius: 50,
+                            backgroundColor: Colors.grey[300],
+                            backgroundImage: profileUrl.isNotEmpty ? NetworkImage(profileUrl) : null,
+                            child: profileUrl.isEmpty ? const Icon(Icons.person, color: Colors.white, size: 40) : null,
+                          );
                         },
                       ),
                       const SizedBox(height: 10),
-                      FutureBuilder<Map<String, dynamic>>(
-                        future: UserService().getCurrentUserData(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                      Consumer<UserProvider>(
+                        builder: (context, userProvider, child) {
+                          final user = userProvider.user;
+                          if (user == null) {
                             return const CircularProgressIndicator();
-                          } else if (snapshot.hasError) {
-                            return const Text('Error loading user data');
-                          } else {
-                            final user = snapshot.data!;
-                            final username = user['displayName'] as String? ?? 'Unknown User';
-
-                            return Text(
-                              username,
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                              ),
-                            );
                           }
+                          final username = user.displayName.isNotEmpty ? user.displayName : 'Unknown User';
+                          return Text(
+                            username,
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                            ),
+                          );
                         },
                       ),
                     ],
@@ -90,7 +85,6 @@ class ProfileScreen extends StatelessWidget {
                       },
                     ),
                     ProfileMenuItem(
-                      // icon: Icons.lock,
                       svgPath: "assets/icon/key.svg",
                       text: "Ubah Kata Sandi",
                       onTap: () {

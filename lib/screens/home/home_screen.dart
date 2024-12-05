@@ -1,6 +1,4 @@
 import 'package:down_care/api/articles_service.dart';
-import 'package:down_care/api/image_camera_services.dart';
-import 'package:down_care/api/user_api.dart';
 import 'package:down_care/providers/scan_history_provider.dart';
 import 'package:down_care/screens/home/article/article_mosaik.dart';
 import 'package:down_care/screens/home/article/article_translokasi.dart';
@@ -14,27 +12,21 @@ import 'package:down_care/screens/home/home_widgets/section_title.dart';
 import 'package:down_care/screens/home/home_widgets/syndrome_type_card.dart';
 import 'package:down_care/screens/home/home_widgets/article_card.dart';
 import 'package:down_care/screens/camera/history_detail_screen.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
-class Article {
-  final String title;
-  final String imageUrl;
-
-  Article({required this.title, required this.imageUrl});
-}
+import 'package:down_care/providers/user_provider.dart';
 
 class HomeScreen extends StatelessWidget {
-  // final List<Article> articles = [
-  //   Article(title: 'Article 1', imageUrl: 'https://via.placeholder.com/250'),
-  //   Article(title: 'Article 2', imageUrl: 'https://via.placeholder.com/250'),
-  //   Article(title: 'Article 3', imageUrl: 'https://via.placeholder.com/250'),
-  //   // Add more articles as needed
-  // ];
   HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Fetch user data when the screen is built
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.fetchCurrentUser();
+    // Fetch scan history data when the screen is built
+    final scanHistoryProvider = Provider.of<ScanHistoryProvider>(context, listen: false);
+    scanHistoryProvider.fetchScanHistory();
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -72,7 +64,7 @@ class HomeScreen extends StatelessWidget {
                     child: _buildScanHistoryList(context),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),
@@ -111,52 +103,50 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildProfileCard() {
-    return FutureBuilder<Map<String, dynamic>>(
-      future: UserService().getCurrentUserData(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return const Text('Error loading user data');
-        } else {
-          final user = snapshot.data!;
-          final username = user['displayName'] as String? ?? 'Unknown User';
-          final avatarUrl = user['photoURL'] as String? ?? '';
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) {
+        final user = userProvider.user;
 
-          return Row(
-            children: [
-              CircleAvatar(
-                radius: 34,
-                backgroundColor: Colors.grey[300],
-                backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-                child: avatarUrl.isEmpty ? const Icon(Icons.person, color: Colors.white, size: 24) : null,
-              ),
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      style: GoogleFonts.leagueSpartan(fontSize: 20, color: Colors.black),
-                      children: const [
-                        TextSpan(text: 'Hello,', style: TextStyle(fontWeight: FontWeight.w300)),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  RichText(
-                    text: TextSpan(
-                      style: GoogleFonts.leagueSpartan(fontSize: 20, color: Colors.black),
-                      children: [
-                        TextSpan(text: username, style: const TextStyle(fontWeight: FontWeight.w600)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
+        if (user == null) {
+          return const CircularProgressIndicator();
         }
+
+        final username = user.displayName.isNotEmpty ? user.displayName : 'Unknown User';
+        final avatarUrl = user.photoURL.isNotEmpty ? user.photoURL : '';
+
+        return Row(
+          children: [
+            CircleAvatar(
+              radius: 34,
+              backgroundColor: Colors.grey[300],
+              backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+              child: avatarUrl.isEmpty ? const Icon(Icons.person, color: Colors.white, size: 24) : null,
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    style: GoogleFonts.leagueSpartan(fontSize: 20, color: Colors.black),
+                    children: const [
+                      TextSpan(text: 'Hello,', style: TextStyle(fontWeight: FontWeight.w300)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                RichText(
+                  text: TextSpan(
+                    style: GoogleFonts.leagueSpartan(fontSize: 20, color: Colors.black),
+                    children: [
+                      TextSpan(text: username, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
       },
     );
   }
