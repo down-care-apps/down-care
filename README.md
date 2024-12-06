@@ -7,7 +7,7 @@
 
 ## **Overview**  
 
-The DownCare App is a user-friendly application designed to assist parents in monitoring their children's growth and detecting early signs of Down Syndrome through machine learning and facial analysis. This backend repository provides the core APIs and services for managing child profiles, scanning history, and user authentication.  
+The DownCare App is a user-friendly application designed to assist parents in monitoring their children's growth and detecting early signs of Down Syndrome through machine learning and facial analysis.
 
 ---
 
