@@ -199,11 +199,26 @@ class _ReminderPageState extends State<ReminderPage> {
   }
 
   int _sortReminders(Map<String, dynamic> a, Map<String, dynamic> b) {
+    final currentDateTime = DateTime.now();
     final dateA = _parseDate(a['date']);
     final dateB = _parseDate(b['date']);
-    final timeA = a['time'] ?? '';
-    final timeB = b['time'] ?? '';
-    return dateA.compareTo(dateB) == 0 ? timeA.compareTo(timeB) : dateA.compareTo(dateB);
+    final timeA = _parseTime(a['time']);
+    final timeB = _parseTime(b['time']);
+
+    final dateTimeA = DateTime(dateA.year, dateA.month, dateA.day, timeA.hour, timeA.minute);
+    final dateTimeB = DateTime(dateB.year, dateB.month, dateB.day, timeB.hour, timeB.minute);
+
+    // Check if events are past
+    final isPastA = dateTimeA.isBefore(currentDateTime);
+    final isPastB = dateTimeB.isBefore(currentDateTime);
+
+    // If both are past or both are future, sort by date and time
+    if (isPastA == isPastB) {
+      return dateTimeA.compareTo(dateTimeB);
+    }
+
+    // Move past events to the bottom
+    return isPastA ? 1 : -1;
   }
 
   Widget _buildEmptyState(String message, IconData icon) {

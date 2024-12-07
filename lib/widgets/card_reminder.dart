@@ -11,15 +11,32 @@ class ReminderItem extends StatelessWidget {
   const ReminderItem({required this.reminder, super.key});
 
   DateTime _parseDate(String date) => DateFormat('yyyy-MM-dd').parse(date.split(' ')[0]);
+  DateTime _parseDateTime(String date, String? time) {
+    DateTime parsedDate = DateFormat('yyyy-MM-dd').parse(date.split(' ')[0]);
+
+    if (time != null && time.isNotEmpty) {
+      List<String> timeParts = time.replaceAll('TimeOfDay(', '').replaceAll(')', '').split(':');
+      int hours = int.parse(timeParts[0]);
+      int minutes = int.parse(timeParts[1]);
+      return DateTime(parsedDate.year, parsedDate.month, parsedDate.day, hours, minutes);
+    }
+
+    return DateTime(parsedDate.year, parsedDate.month, parsedDate.day, 23, 59);
+  }
+
+  bool _isPastReminder(String date, String? time) {
+    DateTime reminderDateTime = _parseDateTime(date, time);
+
+    return reminderDateTime.isBefore(DateTime.now());
+  }
 
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting('id');
 
     final reminderDate = _parseDate(reminder['date']);
-    final isPastReminder = reminderDate.isBefore(DateTime.now());
+    final isPastReminder = _isPastReminder(reminder['date'], reminder['time']);
     final dateFormatter = DateFormat('d MMM yyyy', 'id');
-
     Color primaryColor = isPastReminder ? Colors.grey.shade400 : Theme.of(context).colorScheme.primary;
 
     return GestureDetector(
