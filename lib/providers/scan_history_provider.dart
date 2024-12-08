@@ -13,22 +13,35 @@ class ScanHistoryProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
+  Future<void> _safeUpdate(Function() updater) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      updater();
+      notifyListeners();
+    });
+  }
+
   Future<void> fetchScanHistory({bool forceFetch = false}) async {
     if (_isLoading || (_isFetched && !forceFetch)) return;
 
-    _isLoading = true;
-    notifyListeners();
+    _safeUpdate(() {
+      _isLoading = true;
+    });
 
     try {
       final scanHistoryList = await ImageCameraServices().getAllScan();
-      _scanHistories = scanHistoryList;
-      _sortScanHistories();
-      _isFetched = true;
+      _safeUpdate(() {
+        _scanHistories = scanHistoryList;
+        _sortScanHistories();
+        _isFetched = true;
+      });
     } catch (error) {
-      _errorMessage = error.toString();
+      _safeUpdate(() {
+        _errorMessage = error.toString();
+      });
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      _safeUpdate(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -48,6 +61,14 @@ class ScanHistoryProvider extends ChangeNotifier {
       DateTime dateA = dateFormat.parse(a.date);
       DateTime dateB = dateFormat.parse(b.date);
       return dateB.compareTo(dateA);
+    });
+  }
+
+  void clearState() {
+    _safeUpdate(() {
+      _scanHistories = [];
+      _isFetched = false;
+      _errorMessage = '';
     });
   }
 }

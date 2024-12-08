@@ -15,18 +15,27 @@ import 'package:down_care/screens/camera/history_detail_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:down_care/providers/user_provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Fetch user data when the screen is built
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch user data when the screen is initialized
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     userProvider.fetchCurrentUser();
-    // Fetch scan history data when the screen is built
+    // Fetch scan history data when the screen is initialized
     final scanHistoryProvider = Provider.of<ScanHistoryProvider>(context, listen: false);
     scanHistoryProvider.fetchScanHistory();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(

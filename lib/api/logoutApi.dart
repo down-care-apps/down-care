@@ -2,10 +2,17 @@ import 'dart:convert';
 import 'package:down_care/screens/login/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:down_care/providers/scan_history_provider.dart';
 
 Future<void> logoutUser(BuildContext context) async {
   try {
     await FirebaseAuth.instance.signOut(); // Firebase sign out
+
+    // Clear scan history
+    if (context.mounted) {
+      Provider.of<ScanHistoryProvider>(context, listen: false).clearState();
+    }
 
     // Navigate to the Welcome screen and clear the navigation stack
     if (context.mounted) {
