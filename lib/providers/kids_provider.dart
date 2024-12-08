@@ -40,8 +40,25 @@ class KidsProvider with ChangeNotifier {
         kid.gender,
         kid.dateBirthday,
       );
-      _kidsList.add(ChildrenModel.fromJson(createdKid!));
-      notifyListeners();
+
+      if (createdKid != null) {
+        print('Created Kid: $createdKid');
+        final newKid = ChildrenModel(
+          id: createdKid['childrenId'],
+          name: kid.name,
+          age: kid.age,
+          gender: kid.gender,
+          weight: kid.weight,
+          height: kid.height,
+          dateBirthday: kid.dateBirthday,
+        );
+        print('New Kid ID: ${newKid.id}');
+        _kidsList.add(newKid);
+        notifyListeners();
+      } else {
+        _error = "Error adding kid: createdKid is null";
+        notifyListeners();
+      }
     } catch (e) {
       _error = "Error adding kid: $e";
       notifyListeners();

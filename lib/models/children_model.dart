@@ -37,6 +37,7 @@ class ChildrenModel {
       'weight': weight,
       'height': height,
       'dateBirthday': dateBirthday,
+      'age': age,
     };
   }
 

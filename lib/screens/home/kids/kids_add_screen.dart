@@ -1,12 +1,8 @@
 import 'package:down_care/widgets/form_kids.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
-
 import '../../../models/children_model.dart';
 import '../../../providers/kids_provider.dart';
-import '../../../widgets/input_field.dart'; // Assuming InputField is in this location
-import '../../../widgets/custom_button.dart'; // Assuming CustomButton is in this location
 
 class KidAddScreen extends StatefulWidget {
   const KidAddScreen({super.key});

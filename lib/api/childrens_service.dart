@@ -38,7 +38,7 @@ class ChildrensService {
           'Content-Type': 'application/json',
         },
       );
-
+      print('Response all: ${response.body}');
       // Check response status
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
