@@ -4,6 +4,7 @@ import 'package:down_care/providers/kids_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import './firebase_options.dart';
 import 'package:down_care/screens/login/sign_up_screen.dart';
@@ -18,6 +19,7 @@ import 'package:down_care/screens/home/kids/kids_add_screen.dart';
 import 'package:down_care/screens/home/kids/kids_detail_screen.dart';
 
 void main() async {
+  await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(

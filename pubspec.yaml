@@ -32,6 +32,9 @@ dependencies:
   path: ^1.9.0
   provider: ^6.1.2
   shimmer: ^3.0.0
+  google_maps_flutter: ^2.10.0
+  location: ^7.0.1
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
@@ -49,13 +52,7 @@ flutter:
     - assets/trisomi21.jpeg
     - assets/Mosaik.jpg
     - assets/Translokasi.jpg
-    # - assets/icon/home.svg
-    # - assets/icon/camera.svg
-    # - assets/icon/profile-circle.svg
-    # - assets/icon/trend-up.svg
-    # - assets/icon/calendar.svg
-    # - assets/icon/map.svg
-    # - assets/icon/kids.svg
+    - .env
 
 flutter_launcher_icons:
   android: "launcher_icon"
