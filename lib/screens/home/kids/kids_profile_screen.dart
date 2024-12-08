@@ -1,3 +1,4 @@
+import 'package:down_care/utils/transition.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:down_care/providers/kids_provider.dart';
@@ -15,43 +16,52 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Always refetch the data when the screen is loaded
     context.read<KidsProvider>().fetchKids();
   }
 
   Future<void> _navigateToAddScreen(BuildContext context) async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => KidAddScreen()),
+      MaterialPageRoute(builder: (context) => const KidAddScreen()),
     );
+
     if (result == true) {
-      context.read<KidsProvider>().fetchKids(); // Fetch the updated data
+      context.read<KidsProvider>().fetchKids();
     }
+  }
+
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Tidak ada data anak',
+            style: TextStyle(fontSize: 16),
+          ),
+          SizedBox(height: 24),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil Anak', style: TextStyle(color: Colors.white, fontSize: 24)),
-        centerTitle: true,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      appBar: _buildAppBar(),
       body: Consumer<KidsProvider>(
         builder: (context, kidsProvider, child) {
-          // Fetch data if it's not already fetched
+          // Automatically fetch data if needed
           if (kidsProvider.kidsList.isEmpty && !kidsProvider.isLoading && kidsProvider.error == null) {
             kidsProvider.fetchKids();
           }
 
+          // Handle loading state
           if (kidsProvider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
+          // Handle error state
           if (kidsProvider.error != null) {
             return Center(
               child: Text(
@@ -61,58 +71,48 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
             );
           }
 
+          // Handle empty state
           if (kidsProvider.kidsList.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Tidak ada data anak'),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () => _navigateToAddScreen(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2260FF),
-                      padding: const EdgeInsets.symmetric(horizontal: 54.0, vertical: 16.0),
-                    ),
-                    child: const Text('Tambah', style: TextStyle(fontSize: 16, color: Colors.white)),
-                  ),
-                ],
-              ),
-            );
+            return _buildEmptyState();
           }
 
-          return Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(16.0),
-                  itemCount: kidsProvider.kidsList.length,
-                  itemBuilder: (context, index) {
-                    final kid = kidsProvider.kidsList[index];
-                    return KidsCard(
-                      id: kid.id.toString(),
-                      name: kid.name,
-                      age: '${kid.age} tahun',
-                      imageUrl: 'https://example.com/default_image.jpg',
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: ElevatedButton(
-                  onPressed: () => _navigateToAddScreen(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2260FF),
-                    padding: const EdgeInsets.symmetric(horizontal: 54.0, vertical: 16.0),
-                  ),
-                  child: const Text('Tambah', style: TextStyle(fontSize: 16, color: Colors.white)),
-                ),
-              ),
-            ],
-          );
+          // Build list of kids
+          return _buildKidsList(kidsProvider);
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.of(context).push(createRoute(const KidAddScreen())),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: Text('Profil Anak', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
+      centerTitle: true,
+      backgroundColor: Colors.white,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.primary),
+        onPressed: () => Navigator.pop(context),
+      ),
+    );
+  }
+
+  Widget _buildKidsList(KidsProvider kidsProvider) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
+      itemCount: kidsProvider.kidsList.length,
+      itemBuilder: (context, index) {
+        final kid = kidsProvider.kidsList[index];
+        return KidsCard(
+          id: kid.id.toString(),
+          name: kid.name,
+          age: '${kid.age} tahun',
+          imageUrl: 'https://example.com/default_image.jpg',
+        );
+      },
     );
   }
 }
