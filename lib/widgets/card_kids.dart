@@ -7,7 +7,8 @@ class KidsCard extends StatelessWidget {
   final String imageUrl;
   final String id;
 
-  KidsCard({
+  const KidsCard({
+    super.key,
     required this.id,
     required this.name,
     required this.age,
@@ -16,76 +17,82 @@ class KidsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.blue, // Blue color for the bottom border
-            width: 2.0, // Border thickness
+    return GestureDetector(
+      onTap: () => _navigateToDetails(context),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              _buildAvatar(),
+              const SizedBox(width: 16.0),
+              _buildKidInfo(context),
+              const SizedBox(width: 8.0),
+              _buildCalendarIcon(context),
+            ],
           ),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image/Avatar on the left
-            CircleAvatar(
-              radius: 30,
-              backgroundImage: NetworkImage(imageUrl), // Use imageUrl from parameters
+    );
+  }
+
+  Widget _buildAvatar() {
+    return CircleAvatar(
+      radius: 30,
+      backgroundImage: NetworkImage(imageUrl),
+      backgroundColor: Colors.blue.shade50,
+    );
+  }
+
+  Widget _buildKidInfo(BuildContext context) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            name,
+            style: const TextStyle(
+              color: Colors.black87,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(width: 16.0), // Space between avatar and text
-            // Information Column
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Name and age
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      color: Colors.blue,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    age as String,
-                    style: const TextStyle(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 8.0),
-                  // Info Button
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => KidDetailScreen(id: id),
-                        ),
-                      ); // Navigate to KidDetailsScreen
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      side: const BorderSide(color: Colors.blue),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(38.0),
-                      ),
-                    ),
-                    child: const Text(
-                      'Info',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                  ),
-                ],
-              ),
+          ),
+          Text(
+            age,
+            style: TextStyle(
+              color: Colors.grey.shade600,
             ),
-            // Calendar Icon on the right
-            const Icon(Icons.calendar_today, color: Colors.blue),
-          ],
-        ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalendarIcon(BuildContext context) {
+    return Icon(
+      Icons.arrow_forward_ios_rounded,
+      color: Colors.black.withOpacity(0.5),
+    );
+  }
+
+  void _navigateToDetails(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => KidDetailScreen(id: id),
       ),
     );
   }
