@@ -1,14 +1,17 @@
 import 'package:down_care/api/childrens_service.dart';
+import 'package:down_care/api/progressServices.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class DetailProgress extends StatelessWidget {
-  final String kidProfile;
+  Map<String, dynamic> kidProfile;
+  final progressKid = ProgressServices();
 
   DetailProgress({required this.kidProfile});
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -30,12 +33,12 @@ class DetailProgress extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  child: Text(kidProfile[0]), // Placeholder for profile pic
+                  child: Text(kidProfile['name'][0]), // Placeholder for profile pic
                   radius: 30,
                 ),
                 SizedBox(width: 16),
                 Text(
-                  kidProfile,
+                  kidProfile['name'],
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -310,7 +313,7 @@ class DetailProgress extends StatelessWidget {
                       DataCell(
                         Align(
                           alignment: Alignment.centerRight,
-                          child: Text('7 Tahun'),
+                          child: Text(kidProfile['age'].toString() + ' tahun'),
                         ),
                       ),
                     ],
@@ -321,7 +324,7 @@ class DetailProgress extends StatelessWidget {
                       DataCell(
                         Align(
                           alignment: Alignment.centerRight,
-                          child: Text('Laki-Laki'),
+                          child: Text(kidProfile['gender']),
                         ),
                       ),
                     ],
@@ -332,7 +335,7 @@ class DetailProgress extends StatelessWidget {
                       DataCell(
                         Align(
                           alignment: Alignment.centerRight,
-                          child: Text('150 cm'),
+                          child: Text(kidProfile['height']),
                         ),
                       ),
                     ],
@@ -344,7 +347,7 @@ class DetailProgress extends StatelessWidget {
                         Align(
                           alignment: Alignment.centerRight,
                           child: Text(
-                            '38 Kg',
+                            kidProfile['weight'],
                             style: TextStyle(color: Colors.blueGrey),
                           ),
                         ),
@@ -357,7 +360,7 @@ class DetailProgress extends StatelessWidget {
                       DataCell(
                         Align(
                           alignment: Alignment.centerRight,
-                          child: Text('25 Maret 2017'),
+                          child: Text(kidProfile['dateBirthday']),
                         ),
                       ),
                     ],
@@ -410,3 +413,4 @@ class DetailProgress extends StatelessWidget {
     );
   }
 }
+

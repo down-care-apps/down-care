@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class ArticleDetailPage extends StatelessWidget {
   final String title;
   final String imageUrl;
+  final String content;
 
   const ArticleDetailPage({
     Key? key,
     required this.title,
     required this.imageUrl,
+    required this.content,
   }) : super(key: key);
 
   @override
@@ -45,7 +47,7 @@ class ArticleDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Detail artikel',
+              content,
               style: TextStyle(fontSize: 16),
             ),
           ],

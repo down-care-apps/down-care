@@ -5,11 +5,13 @@ import 'package:down_care/screens/home/article/article_menarik.dart'; // Import 
 class ArticleCard extends StatelessWidget {
   final String title;
   final String imageUrl;
+  final String content;
 
   const ArticleCard({
     Key? key,
     required this.title,
     required this.imageUrl,
+    required this.content,
   }) : super(key: key);
 
   @override
@@ -22,6 +24,7 @@ class ArticleCard extends StatelessWidget {
             builder: (context) => ArticleDetailPage(
               title: title,
               imageUrl: imageUrl,
+              content: content,
             ),
           ),
         );

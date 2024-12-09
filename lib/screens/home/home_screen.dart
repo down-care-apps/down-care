@@ -216,7 +216,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.only(bottom: 4.0),
                     child: ArticleCard(
                       title: articles[index]['title'] ?? 'No Title', // Ensure title is not null
-                      imageUrl: articles[index]['thumbnailUrl'] ?? 'https://picsum.photos/200/300?grayscale', // Ensure thumbnailUrl is not null
+                      imageUrl: articles[index]['thumbnailURL'], // Ensure thumbnailUrl is not null
+                      content: articles[index]['content'] ?? 'No Content', // Ensure note is not null
                     ),
                   ),
                 );

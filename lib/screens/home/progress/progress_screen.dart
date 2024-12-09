@@ -1,3 +1,4 @@
+import 'package:down_care/api/progressServices.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/screens/home/progress/detail_progress.dart';
@@ -104,7 +105,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DetailProgress(kidProfile: selectedKidData!['name']),
+                      builder: (context) => DetailProgress(kidProfile: selectedKidData!),
                     ),
                   );
                 },
@@ -157,7 +158,17 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
+                    await ProgressServices()
+                        .createProgress(selectedKidData, heightController.text, weightController.text, selectedMonth, importantNoteController.text);
+                    await _loadChildDetails(selectedKidData!['id'].toString());
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DetailProgress(kidProfile: selectedKidData!,)),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Progress berhasil disimpan'), backgroundColor: Colors.green),
+                    );
                     // Submit the progress
                   },
                   child: const Text('Submit'),
