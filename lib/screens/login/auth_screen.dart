@@ -135,7 +135,7 @@ class AuthScreenState extends State<AuthScreen> {
       print('ID Token: $idToken');
       if (idToken != null) {
         await _authService.callLoginApi(emailController.text, passwordController.text, idToken);
-      }
+      } 
 
       setState(() => isSignIn = true);
       if (mounted) {

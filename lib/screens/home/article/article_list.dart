@@ -44,7 +44,7 @@ class ArticleListPage extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: ArticleCard(
                     title: article['title'] ?? 'Untitled',
-                    imageUrl: article['thumbnailUrl'] ?? 'https://picsum.photos/200/300?grayscale',
+                    imageUrl: article['thumbnailURL'],
                     date: formattedDate,
                     onTap: () {
                       Navigator.push(
@@ -52,7 +52,8 @@ class ArticleListPage extends StatelessWidget {
                         createRoute(
                           ArticleDetailPage(
                             title: article['title'] ?? 'Untitled',
-                            imageUrl: article['thumbnailUrl'] ?? 'https://picsum.photos/200/300?grayscale',
+                            imageUrl: article['thumbnailURL'],
+                            content: article['content'] ?? 'No content available.',
                           ),
                         ),
                       );
