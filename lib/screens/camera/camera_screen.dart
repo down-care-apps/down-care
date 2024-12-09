@@ -1,12 +1,10 @@
-import 'dart:io';
-
-import 'package:down_care/api/image_camera_services.dart';
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart'; // Import the camera package
-import 'package:image_picker/image_picker.dart'; // Import ImagePicker for uploading images
-import 'analysis/analysis_screen.dart'; // Import the analysis screen
-import 'dart:async'; // For Timer
+import 'package:camera/camera.dart';
+import 'package:image_picker/image_picker.dart';
+import 'analysis/analysis_screen.dart';
+import 'dart:async';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:math';
 
 class TakePictureScreen extends StatefulWidget {
   final CameraDescription camera;
@@ -73,7 +71,10 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
       if (!mounted) return;
       await Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => DisplayPictureScreen(imagePath: pickedFile.path, image: pickedFile,)
+          builder: (context) => DisplayPictureScreen(
+            imagePath: pickedFile.path,
+            image: pickedFile,
+          ),
         ),
       );
     }
@@ -87,7 +88,10 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
       if (!mounted) return;
       await Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => DisplayPictureScreen(imagePath: image.path, image: image,),
+          builder: (context) => DisplayPictureScreen(
+            imagePath: image.path,
+            image: image,
+          ),
         ),
       );
     } catch (e) {
@@ -152,7 +156,11 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
                     children: [
                       GestureDetector(
                         onTapDown: (details) => _onTapToFocus(details, context),
-                        child: CameraPreview(_controller),
+                        child: Transform(
+                          alignment: Alignment.center,
+                          transform: _controller.description.lensDirection == CameraLensDirection.front ? Matrix4.rotationY(pi) : Matrix4.identity(),
+                          child: CameraPreview(_controller),
+                        ),
                       ),
                       if (_showFocusIndicator && _tapPosition != null)
                         Positioned(
@@ -171,7 +179,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
                         children: [
                           Expanded(
                             flex: 3,
-                            child: Container(), // This space is taken by CameraPreview
+                            child: Container(),
                           ),
                           Expanded(
                             flex: 1,
@@ -196,7 +204,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
                                       'assets/icon/gallery-export.svg',
                                       width: 36,
                                       height: 36,
-                                      color: Colors.white, // Optional: apply a color tint if needed
+                                      color: Colors.white,
                                     ),
                                     tooltip: 'Upload Image',
                                   ),
@@ -209,7 +217,6 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
                     ],
                   );
                 } else {
-                  // Otherwise, display a black screen while waiting for initialization.
                   return Container(
                     color: Colors.black,
                   );
