@@ -91,4 +91,29 @@ class ReminderServices{
       throw Exception('Error fetching reminders: ${e.toString()}');
     }
   }
+
+  Future<void> deleteReminder(String id) async{
+    final user = UserService();
+
+    try{
+      final token = await user.getTokenUser();
+
+      final response = await http.delete(
+        Uri.parse('$_baseUrl/$id'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if(response.statusCode == 200){
+        print('Reminder deleted');
+      }
+
+      if(response.statusCode != 204){
+        throw Exception('Failed to delete reminder: ${response.statusCode}');
+      }
+    }catch(e){
+      throw Exception('Error deleting reminder: ${e.toString()}');
+    }
+  }
 }
