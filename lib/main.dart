@@ -63,11 +63,11 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignUpScreen(),
         '/main': (context) => const MainScreen(),
         '/maps': (context) => const MapPage(),
-        '/progress': (context) => ProgressScreen(),
+        '/progress': (context) => const ProgressScreen(),
         '/reminder': (context) => const ReminderPage(),
         '/kidsProfile': (context) => const KidsProfileScreen(),
         '/addKid': (context) => const KidAddScreen(),
-        '/kidDetails': (context) => KidDetailScreen(id: ''), // ID will be passed via arguments
+        '/kidDetails': (context) => const KidDetailScreen(id: ''), // ID will be passed via arguments
       },
       debugShowCheckedModeBanner: false,
     );

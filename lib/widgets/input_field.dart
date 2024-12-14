@@ -29,10 +29,10 @@ class InputField extends StatefulWidget {
   });
 
   @override
-  _InputFieldState createState() => _InputFieldState();
+  InputFieldState createState() => InputFieldState();
 }
 
-class _InputFieldState extends State<InputField> {
+class InputFieldState extends State<InputField> {
   bool _isPasswordVisible = false;
 
   @override

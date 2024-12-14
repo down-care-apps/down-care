@@ -1,27 +1,161 @@
-import 'package:down_care/api/childrens_service.dart';
 import 'package:down_care/api/progressServices.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-class DetailProgress extends StatelessWidget {
-  Map<String, dynamic> kidProfile;
-  final progressKid = ProgressServices();
+class DetailProgress extends StatefulWidget {
+  final Map<String, dynamic> kidProfile;
 
-  DetailProgress({required this.kidProfile});
+  const DetailProgress({super.key, required this.kidProfile});
+
+  @override
+  DetailProgressState createState() => DetailProgressState();
+}
+
+class DetailProgressState extends State<DetailProgress> {
+  final ProgressServices progressKid = ProgressServices();
+  List<FlSpot> weightSpots = [];
+  List<FlSpot> heightSpots = [];
+  bool isLoading = true; // Track loading state
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProgressData();
+  }
+
+  int _getMonthIndex(String month) {
+    const monthMapping = {
+      'Januari': 0,
+      'Februari': 1,
+      'Maret': 2,
+      'April': 3,
+      'Mei': 4,
+      'Juni': 5,
+      'Juli': 6,
+      'Agustus': 7,
+      'September': 8,
+      'Oktober': 9,
+      'November': 10,
+      'Desember': 11
+    };
+
+    return monthMapping[month] ?? -1;
+  }
+
+  String getMonthTitle(int index) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[index];
+  }
+
+  Future<void> _fetchProgressData() async {
+    try {
+      final progressData = await progressKid.getProgressByChildId(widget.kidProfile['id']);
+      List<FlSpot> weightData = [];
+      List<FlSpot> heightData = [];
+
+      for (var record in progressData) {
+        var monthData = record['month'];
+        monthData.forEach((month, data) {
+          int monthIndex = _getMonthIndex(month);
+          if (monthIndex != -1) {
+            double weight = double.tryParse(data['weight']) ?? 0.0;
+            double height = double.tryParse(data['height']) ?? 0.0;
+
+            weightData.add(FlSpot(monthIndex.toDouble(), weight));
+            heightData.add(FlSpot(monthIndex.toDouble(), height));
+          }
+        });
+      }
+
+      setState(() {
+        weightSpots = weightData;
+        heightSpots = heightData;
+        isLoading = false;
+      });
+    } catch (e) {
+      // print('Error fetching progress data: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Widget buildLineChart(BuildContext context, List<FlSpot> spots, Color lineColor, Color areaColor, String title, double interval) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w500, color: Colors.black87),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 200,
+              child: LineChart(
+                LineChartData(
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: interval,
+                        reservedSize: 40,
+                        getTitlesWidget: (value, meta) => Text(
+                          value.toStringAsFixed(0),
+                          style: const TextStyle(fontSize: 10, color: Colors.black54),
+                        ),
+                      ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            getMonthTitle(value.toInt()),
+                            style: const TextStyle(fontSize: 10, color: Colors.black54),
+                          );
+                        },
+                        reservedSize: 40,
+                      ),
+                    ),
+                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  ),
+                  gridData: const FlGridData(show: false),
+                  borderData: FlBorderData(show: false),
+                  lineBarsData: [
+                    LineChartBarData(
+                      isCurved: true,
+                      color: lineColor,
+                      belowBarData: BarAreaData(show: true, color: areaColor.withOpacity(0.3)),
+                      dotData: const FlDotData(show: false),
+                      spots: spots,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-          "Statistik Perkembangan",
-          style: const TextStyle(color: Colors.white, fontSize: 24),
-        ),
+        elevation: 0,
+        title: Text('Statistik Pertumbuhan', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
         centerTitle: true,
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.primary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -30,387 +164,51 @@ class DetailProgress extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  child: Text(kidProfile['name'][0]), // Placeholder for profile pic
-                  radius: 30,
-                ),
-                SizedBox(width: 16),
-                Text(
-                  kidProfile['name'],
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Center(
-              child: Text(
-                'Berat Badan',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-              ),
-            ),
-            SizedBox(height: 16),
-// Line chart for Berat Badan
-            SizedBox(
-              width: 340,
-              height: 150,
-              child: LineChart(
-                LineChartData(
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: true, interval: 1, reservedSize: 40),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          // Menampilkan bulan dengan ukuran font lebih kecil
-                          switch (value.toInt()) {
-                            case 0:
-                              return Text(
-                                'Jan',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 1:
-                              return Text(
-                                'Feb',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 2:
-                              return Text(
-                                'Mar',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 3:
-                              return Text(
-                                'Apr',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 4:
-                              return Text(
-                                'May',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 5:
-                              return Text(
-                                'Jun',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 6:
-                              return Text(
-                                'Jul',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 7:
-                              return Text(
-                                'Aug',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 8:
-                              return Text(
-                                'Sep',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 9:
-                              return Text(
-                                'Oct',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 10:
-                              return Text(
-                                'Nov',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 11:
-                              return Text(
-                                'Dec',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            default:
-                              return Text('');
-                          }
-                        },
-                        reservedSize: 40,
-                      ),
-                    ),
-                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  ),
-                  gridData: FlGridData(show: false),
-                  borderData: FlBorderData(show: false),
-                  lineBarsData: [
-                    LineChartBarData(
-                      isCurved: true,
-                      color: Colors.blue,
-                      belowBarData: BarAreaData(show: true, color: Colors.blue.withOpacity(0.2)),
-                      dotData: FlDotData(show: false),
-                      spots: [
-                        FlSpot(0, 35),
-                        FlSpot(1, 36),
-                        FlSpot(2, 36.5),
-                        FlSpot(3, 37),
-                        FlSpot(4, 37.5),
-                        FlSpot(5, 38),
-                        FlSpot(6, 38.5),
-                        FlSpot(7, 39),
-                        FlSpot(8, 39.2),
-                        FlSpot(9, 39.5),
-                        FlSpot(10, 39.7),
-                        FlSpot(11, 40),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 32),
-            Center(
-              child: Text(
-                'Tinggi Badan',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-              ),
-            ),
-            SizedBox(height: 16),
-// Line chart for Tinggi Badan
-            SizedBox(
-              width: 340,
-              height: 150,
-              child: LineChart(
-                LineChartData(
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: true, interval: 5, reservedSize: 40),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          // Menampilkan bulan secara urut dari Januari hingga Desember dengan ukuran teks lebih kecil
-                          switch (value.toInt()) {
-                            case 0:
-                              return Text(
-                                'Jan',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 1:
-                              return Text(
-                                'Feb',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 2:
-                              return Text(
-                                'Mar',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 3:
-                              return Text(
-                                'Apr',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 4:
-                              return Text(
-                                'May',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 5:
-                              return Text(
-                                'Jun',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 6:
-                              return Text(
-                                'Jul',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 7:
-                              return Text(
-                                'Aug',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 8:
-                              return Text(
-                                'Sep',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 9:
-                              return Text(
-                                'Oct',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 10:
-                              return Text(
-                                'Nov',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            case 11:
-                              return Text(
-                                'Dec',
-                                style: TextStyle(fontSize: 10), // Ukuran font lebih kecil
-                              );
-                            default:
-                              return Text('');
-                          }
-                        },
-                        reservedSize: 40,
-                      ),
-                    ),
-                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  ),
-                  gridData: FlGridData(show: false),
-                  borderData: FlBorderData(show: false),
-                  lineBarsData: [
-                    LineChartBarData(
-                      isCurved: true,
-                      color: Colors.green,
-                      belowBarData: BarAreaData(show: true, color: Colors.green.withOpacity(0.2)),
-                      dotData: FlDotData(show: false),
-                      spots: [
-                        FlSpot(0, 140), // Jan
-                        FlSpot(1, 142), // Feb
-                        FlSpot(2, 144), // Mar
-                        FlSpot(3, 146), // Apr
-                        FlSpot(4, 148), // May
-                        FlSpot(5, 150), // Jun
-                        FlSpot(6, 152), // Jul
-                        FlSpot(7, 153), // Aug
-                        FlSpot(8, 154), // Sep
-                        FlSpot(9, 156), // Oct
-                        FlSpot(10, 157), // Nov
-                        FlSpot(11, 158), // Dec
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 16),
-            Center(
-              child: DataTable(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                columns: [
-                  DataColumn(
-                    label: Text(
-                      'Label',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      'Value',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                  ),
-                ],
-                rows: [
-                  DataRow(
-                    cells: [
-                      DataCell(Text('Umur')),
-                      DataCell(
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(kidProfile['age'].toString() + ' tahun'),
-                        ),
-                      ),
-                    ],
-                  ),
-                  DataRow(
-                    cells: [
-                      DataCell(Text('Jenis Kelamin')),
-                      DataCell(
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(kidProfile['gender']),
-                        ),
-                      ),
-                    ],
-                  ),
-                  DataRow(
-                    cells: [
-                      DataCell(Text('Tinggi Badan')),
-                      DataCell(
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(kidProfile['height']),
-                        ),
-                      ),
-                    ],
-                  ),
-                  DataRow(
-                    cells: [
-                      DataCell(Text('Berat Badan')),
-                      DataCell(
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            kidProfile['weight'],
-                            style: TextStyle(color: Colors.blueGrey),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  DataRow(
-                    cells: [
-                      DataCell(Text('Tanggal Lahir')),
-                      DataCell(
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(kidProfile['dateBirthday']),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            // Tambahkan setelah DataTable
-            SizedBox(height: 16),
-            Center(
-              child: Container(
-                padding: const EdgeInsets.all(12.0),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            // Profile Header
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
                   children: [
-                    Text(
-                      'Catatan Penting:',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                    CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                      radius: 30,
+                      child: Text(widget.kidProfile['name'][0],
+                          style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
                     ),
-                    SizedBox(height: 8),
-                    Text(
-                      '- Grafik menunjukkan perkembangan anak selama 12 bulan terakhir.',
-                      style: TextStyle(fontSize: 14, color: Colors.black87),
-                    ),
-                    Text(
-                      '- Pastikan data tinggi badan dan berat badan telah diperbarui secara rutin.',
-                      style: TextStyle(fontSize: 14, color: Colors.black87),
-                    ),
-                    Text(
-                      '- Data ini membantu memantau pertumbuhan anak secara menyeluruh.',
-                      style: TextStyle(fontSize: 14, color: Colors.black87),
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(widget.kidProfile['name'], style: Theme.of(context).textTheme.titleLarge),
+                        Text('${widget.kidProfile['age']} tahun', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.black54)),
+                      ],
                     ),
                   ],
                 ),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
+
+            // Loading indicator while fetching data
+            isLoading
+                ? Center(child: const CircularProgressIndicator())
+                : Column(
+                    children: [
+                      // Weight Chart
+                      buildLineChart(context, weightSpots, Colors.blue, Colors.blue, 'Berat Badan', 1),
+                      const SizedBox(height: 16),
+
+                      // Height Chart
+                      buildLineChart(context, heightSpots, Colors.green, Colors.green, 'Tinggi Badan', 4),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
           ],
         ),
       ),
     );
   }
 }
-

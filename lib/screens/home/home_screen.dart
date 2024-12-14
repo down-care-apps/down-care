@@ -16,7 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:down_care/providers/user_provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -87,13 +87,14 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildProfileCard(),
-              SvgPicture.asset('assets/icon/notification.svg', width: 28, height: 28),
-            ],
-          ),
+          _buildProfileCard(),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //     _buildProfileCard(),
+          //     SvgPicture.asset('assets/icon/notification.svg', width: 28, height: 28),
+          //   ],
+          // ),
           const SizedBox(height: 8),
           Divider(color: Theme.of(context).colorScheme.secondary),
           const SizedBox(height: 8),
