@@ -142,4 +142,29 @@ class ImageCameraServices {
       throw Exception('Error fetching scan: $e');
     }
   }
+
+  Future<void> deleteScan(String id) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final idToken = await UserService().getTokenUser();
+
+    try {
+      final response = await http.delete(
+        Uri.parse('https://api-f3eusviapa-uc.a.run.app/camera/$id'),
+        headers: {
+          'Authorization': 'Bearer $idToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Scan deleted');
+      }
+
+      if (response.statusCode != 204) {
+        throw Exception('Failed to delete scan: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error deleting scan: $e');
+    }
+  }
 }
