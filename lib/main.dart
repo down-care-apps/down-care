@@ -1,3 +1,4 @@
+import 'package:down_care/providers/reminder_provider.dart';
 import 'package:down_care/providers/scan_history_provider.dart';
 import 'package:down_care/providers/user_provider.dart';
 import 'package:down_care/providers/kids_provider.dart';
@@ -32,6 +33,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => KidsProvider()),
         ChangeNotifierProvider(create: (_) => ScanHistoryProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => ReminderProvider()),
       ],
       child: const MyApp(),
     ),
