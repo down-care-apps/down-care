@@ -1,12 +1,16 @@
 import 'package:down_care/api/childrens_service.dart';
+import 'package:down_care/providers/kids_provider.dart';
 import 'package:down_care/screens/home/kids/kids_profile_screen.dart';
+import 'package:down_care/widgets/delete_dialog.dart';
+import 'package:down_care/models/children_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'kids_edit_screen.dart';
 
 class KidDetailScreen extends StatefulWidget {
   final String id;
 
-  const KidDetailScreen({Key? key, required this.id}) : super(key: key);
+  const KidDetailScreen({super.key, required this.id});
 
   @override
   _KidDetailScreenState createState() => _KidDetailScreenState();
@@ -41,37 +45,18 @@ class _KidDetailScreenState extends State<KidDetailScreen> {
     }
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context) {
+  void _showProfileDeleteDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Hapus Profil Anak'),
-          content: const Text('Apakah kamu yakin ingin menghapus profil ini?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Batal'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('Hapus', style: TextStyle(color: Colors.white)),
-              onPressed: () async {
-                await childrensService.deleteProfileChildren(widget.id);
-                Navigator.of(context).pop();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => KidsProfileScreen()),
-                );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Profil Anak telah dihapus'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              },
-            ),
-          ],
+        return DeleteDialog(
+          title: 'Hapus Profil Anak',
+          message: 'Yakin ingin menghapus profil ini?',
+          onDeletePressed: () {
+            final provider = Provider.of<KidsProvider>(context, listen: false);
+            provider.deleteKid(widget.id);
+            Navigator.pop(context);
+          },
         );
       },
     );
@@ -96,7 +81,7 @@ class _KidDetailScreenState extends State<KidDetailScreen> {
           ),
           IconButton(
             icon: Icon(Icons.delete, color: Colors.red.shade400),
-            onPressed: () => _showDeleteConfirmationDialog(context),
+            onPressed: () => _showProfileDeleteDialog(context),
           ),
         ],
       ),

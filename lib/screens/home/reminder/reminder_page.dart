@@ -1,4 +1,6 @@
-import 'package:down_care/api/reminderServices.dart';
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:down_care/providers/reminder_provider.dart';
 import 'package:down_care/screens/home/reminder/history_reminder.dart';
 import 'package:down_care/utils/transition.dart';
 import 'package:down_care/widgets/skeleton_reminder_card.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
 import 'add_reminder_page.dart';
 import 'package:down_care/widgets/card_reminder.dart';
 
@@ -13,14 +16,21 @@ class ReminderPage extends StatefulWidget {
   const ReminderPage({super.key});
 
   @override
-  _ReminderPageState createState() => _ReminderPageState();
+  ReminderPageState createState() => ReminderPageState();
 }
 
-class _ReminderPageState extends State<ReminderPage> {
+class ReminderPageState extends State<ReminderPage> {
   DateTime _selectedDay = DateTime.now();
   bool _showAllReminders = true;
 
-  Future<List<Map<String, dynamic>>> _fetchAllReminders() => ReminderServices().getAllReminders();
+  @override
+  void initState() {
+    super.initState();
+    // Fetch reminders when the page is first loaded
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ReminderProvider>(context, listen: false).fetchReminders();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,31 +147,36 @@ class _ReminderPageState extends State<ReminderPage> {
 
   Widget _buildReminderList() {
     return Expanded(
-      child: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _fetchAllReminders(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      child: Consumer<ReminderProvider>(
+        builder: (context, reminderProvider, child) {
+          // Show loading skeleton while fetching
+          if (reminderProvider.isLoading) {
             return ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: 3,
               itemBuilder: (context, index) => const SkeletonReminderItem(),
             );
           }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+
+          // Check if no reminders exist
+          if (reminderProvider.reminders.isEmpty) {
             return _buildEmptyState('Tidak ada pengingat', Icons.calendar_today);
           }
+
+          // Convert reminders to Map for compatibility with existing code
+          final reminderMaps = reminderProvider.reminders.map((r) => r.toJson()).toList();
 
           // Filter out past reminders only for 'All Reminders' view
           final currentDateTime = DateTime.now();
           final reminders = _showAllReminders
-              ? snapshot.data!.where((reminder) {
+              ? reminderMaps.where((reminder) {
                   final reminderDate = _parseDate(reminder['date']);
                   final reminderTime = _parseTime(reminder['time']);
                   final reminderDateTime = DateTime(reminderDate.year, reminderDate.month, reminderDate.day, reminderTime.hour, reminderTime.minute);
 
                   return reminderDateTime.isAfter(currentDateTime);
                 }).toList()
-              : snapshot.data!;
+              : reminderMaps;
 
           final filteredReminders = (_showAllReminders ? reminders : _filterRemindersByDate(reminders)).toList()..sort(_sortReminders);
 
@@ -235,11 +250,10 @@ class _ReminderPageState extends State<ReminderPage> {
   }
 
   void _navigateToAddReminder(BuildContext context) async {
-    final newReminder = await Navigator.push(
+    await Navigator.push(
       context,
       createRoute(AddReminderPage(selectedDate: _selectedDay)),
     );
-    if (newReminder != null) setState(() {});
   }
 
   DateTime _parseDate(String date) => DateFormat('yyyy-MM-dd').parse(date.split(' ')[0]);

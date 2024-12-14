@@ -1,11 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../models/reminder.dart';
+import 'package:provider/provider.dart';
+import 'package:down_care/models/reminder.dart';
+import 'package:down_care/providers/reminder_provider.dart';
+import 'package:down_care/widgets/delete_dialog.dart';
 
 class ReminderDetailPage extends StatelessWidget {
   final Reminder reminder;
 
   const ReminderDetailPage({super.key, required this.reminder});
+
+  void _showReminderDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DeleteDialog(
+          title: 'Hapus Pengingat',
+          message: 'Yakin ingin menghapus pengingat ini?',
+          onDeletePressed: () {
+            final provider = Provider.of<ReminderProvider>(context, listen: false);
+            provider.deleteReminder(reminder.id);
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +41,12 @@ class ReminderDetailPage extends StatelessWidget {
           icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.primary),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () => _showReminderDeleteDialog(context),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

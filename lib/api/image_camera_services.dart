@@ -1,7 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:down_care/api/user_api.dart';
 import 'package:down_care/models/scan_history.dart';
-import 'package:down_care/screens/camera/analysis/error_message.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:convert';
@@ -10,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:logging/logging.dart';
 
 class ImageCameraServices {
   final FirebaseStorage _storage = FirebaseStorage.instance;
@@ -29,8 +29,8 @@ class ImageCameraServices {
       final ref = _storage.ref().child('images/${DateTime.now().millisecondsSinceEpoch}.jpg');
 
       // Mengunggah file ke Firebase Storage
-      final uploadTask = await ref.putFile(imageFile);
-
+      // final uploadTask = await ref.putFile(imageFile);
+      await ref.putFile(imageFile);
       // Mengatur akses file menjadi publik
       await ref.updateMetadata(SettableMetadata(
         cacheControl: 'public, max-age=31536000',
@@ -44,7 +44,7 @@ class ImageCameraServices {
   }
 
   Future<Map<String, dynamic>> uploadImageToMachineLearning(String imageURL) async {
-    final user = FirebaseAuth.instance.currentUser;
+    // final user = FirebaseAuth.instance.currentUser;
     final idToken = await UserService().getTokenUser();
 
     try {
@@ -70,18 +70,18 @@ class ImageCameraServices {
         };
       } else {
         final errorData = jsonDecode(response.body);
-        final ErrorMessage = errorData['error'];
-        print('server error: $ErrorMessage');
+        final errorMessage = errorData['error'];
+        final log = Logger('ImageCameraServices');
+        log.severe('Server error: $errorMessage');
 
-        throw ErrorMessage;
+        throw errorMessage;
       }
     } catch (e) {
-      print("Error: $e");
-      throw e;
+      rethrow;
     }
   }
 
-  Future<Map<String, dynamic>> uploadImageToServer(String imageURL, result_scan, childrenId) async {
+  Future<Map<String, dynamic>> uploadImageToServer(String imageURL, resultScan, childrenId) async {
     final user = FirebaseAuth.instance.currentUser;
     final idToken = await UserService().getTokenUser();
     childrenId = childrenId ?? 'Unkkown ';
@@ -97,8 +97,8 @@ class ImageCameraServices {
           'userID': user!.uid,
           'childrenId': childrenId,
           'imageURL': imageURL,
-          'result': result_scan['confidence']['down_syndrome'],
-          'imageScan': result_scan['landmarks_url'],
+          'result': resultScan['confidence']['down_syndrome'],
+          'imageScan': resultScan['landmarks_url'],
         }),
       );
 
@@ -108,13 +108,12 @@ class ImageCameraServices {
         throw Exception('Failed to upload image to server: ${response.body}');
       }
     } catch (e) {
-      print("Error uploading to server: $e");
       throw Exception("Failed to upload image and results to server: $e");
     }
   }
 
   Future<List<ScanHistory>> getAllScan() async {
-    final user = FirebaseAuth.instance.currentUser;
+    // final user = FirebaseAuth.instance.currentUser;
     final idToken = await UserService().getTokenUser();
 
     final response = await http.get(
@@ -130,11 +129,7 @@ class ImageCameraServices {
         final List<dynamic> data = json.decode(response.body);
 
         // Ensure data is in list format and map to ScanHistory objects
-        if (data is List) {
-          return data.map((item) => ScanHistory.fromJson(item)).toList();
-        } else {
-          throw Exception('Unexpected data format');
-        }
+        return data.map((item) => ScanHistory.fromJson(item)).toList();
       } else {
         throw Exception('Failed to fetch scan result: ${response.statusCode}');
       }
@@ -144,7 +139,7 @@ class ImageCameraServices {
   }
 
   Future<void> deleteScan(String id) async {
-    final user = FirebaseAuth.instance.currentUser;
+    // final user = FirebaseAuth.instance.currentUser;
     final idToken = await UserService().getTokenUser();
 
     try {
@@ -156,13 +151,15 @@ class ImageCameraServices {
         },
       );
 
-      if (response.statusCode == 200) {
-        print('Scan deleted');
+      // Consider both 200 and 204 as successful responses
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        final log = Logger('ImageCameraServices');
+        log.info('Scan deleted');
+        return;
       }
 
-      if (response.statusCode != 204) {
-        throw Exception('Failed to delete scan: ${response.statusCode}');
-      }
+      // Handle other response codes as errors
+      throw Exception('Failed to delete scan: ${response.statusCode}');
     } catch (e) {
       throw Exception('Error deleting scan: $e');
     }

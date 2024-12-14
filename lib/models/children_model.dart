@@ -31,7 +31,7 @@ class ChildrenModel {
 
   Map<String, dynamic> toJson() {
     return {
-      '_id': id,
+      'id': id,
       'name': name,
       'gender': gender,
       'weight': weight,
@@ -43,7 +43,7 @@ class ChildrenModel {
 
   Map<String, dynamic> toMap() {
     return {
-      '_id': id,
+      'id': id,
       'name': name,
       'age': age,
       'gender': gender,

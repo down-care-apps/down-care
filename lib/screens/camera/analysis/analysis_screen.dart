@@ -7,6 +7,7 @@ import 'package:down_care/screens/camera/analysis/result_card.dart';
 import 'package:down_care/widgets/bottom_navbar.dart';
 import 'package:down_care/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:down_care/providers/kids_provider.dart';
 import 'package:down_care/widgets/kids_modal.dart';
@@ -189,11 +190,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
 
             return KidsProfileModal(
               onSelectChild: (child) async {
-                if (child == null) {
-                  await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan, null);
-                } else {
-                  await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan, child['id']);
-                }
+                await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan, child['id']);
 
                 // Refresh scan history after saving the analysis data
                 await scanHistoryProvider.refreshScanHistory();

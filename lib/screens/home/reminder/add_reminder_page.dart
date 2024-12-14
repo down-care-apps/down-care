@@ -1,10 +1,11 @@
-import 'package:down_care/widgets/date_time_input.dart';
 import 'package:flutter/material.dart';
-
-import 'package:down_care/api/reminderServices.dart';
+import 'package:provider/provider.dart';
+import 'package:down_care/widgets/date_time_input.dart';
 import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/widgets/custom_button.dart';
-import '../../../models/reminder.dart';
+import 'package:down_care/models/reminder.dart';
+import 'package:down_care/providers/reminder_provider.dart';
+// ignore_for_file: use_build_context_synchronously
 
 class AddReminderPage extends StatefulWidget {
   final DateTime selectedDate;
@@ -22,8 +23,7 @@ class _AddReminderPageState extends State<AddReminderPage> {
 
   late DateTime _selectedDate;
   TimeOfDay _selectedTime = TimeOfDay.now();
-
-  final ReminderServices _reminderServices = ReminderServices();
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -31,9 +31,14 @@ class _AddReminderPageState extends State<AddReminderPage> {
     _selectedDate = widget.selectedDate;
   }
 
-  void _saveReminder() {
+  void _saveReminder() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isSubmitting = true;
+      });
+
       final newReminder = Reminder(
+        id: UniqueKey().toString(), // Generate a unique ID
         title: _titleController.text,
         description: _descriptionController.text,
         time: _selectedTime,
@@ -41,7 +46,10 @@ class _AddReminderPageState extends State<AddReminderPage> {
       );
 
       try {
-        _reminderServices.createReminder(newReminder.toJson());
+        // Use the provider to create the reminder
+        await Provider.of<ReminderProvider>(context, listen: false).createReminder(newReminder);
+
+        await Provider.of<ReminderProvider>(context, listen: false).fetchReminders();
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -53,11 +61,15 @@ class _AddReminderPageState extends State<AddReminderPage> {
         Navigator.pop(context);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Gagal menambahkan pengingat. Silahkan coba lagi.'),
+          SnackBar(
+            content: Text('Gagal menambahkan pengingat: $e'),
             backgroundColor: Colors.red,
           ),
         );
+      } finally {
+        setState(() {
+          _isSubmitting = false;
+        });
       }
     }
   }
@@ -116,8 +128,8 @@ class _AddReminderPageState extends State<AddReminderPage> {
             padding: const EdgeInsets.all(16.0),
             child: CustomButton(
               widthFactor: 1.0,
-              text: 'Tambahkan',
-              onPressed: _saveReminder,
+              text: _isSubmitting ? 'Menambahkan...' : 'Tambahkan',
+              onPressed: _isSubmitting ? () {} : _saveReminder,
               color: Theme.of(context).colorScheme.primary,
               textColor: Colors.white,
             ),
@@ -125,5 +137,12 @@ class _AddReminderPageState extends State<AddReminderPage> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 }

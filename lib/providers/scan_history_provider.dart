@@ -71,4 +71,26 @@ class ScanHistoryProvider extends ChangeNotifier {
       _errorMessage = '';
     });
   }
+
+  Future<void> deleteScan(String id) async {
+    _safeUpdate(() {
+      _isLoading = true;
+    });
+
+    try {
+      await ImageCameraServices().deleteScan(id);
+
+      _safeUpdate(() {
+        _scanHistories.removeWhere((scan) => scan.id == id);
+      });
+    } catch (error) {
+      _safeUpdate(() {
+        _errorMessage = error.toString();
+      });
+    } finally {
+      _safeUpdate(() {
+        _isLoading = false;
+      });
+    }
+  }
 }
