@@ -281,27 +281,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return scanHistoryProvider.isLoading
         ? const Center(child: CircularProgressIndicator())
-        : scanHistoryProvider.errorMessage.isNotEmpty
+        : scanHistoryProvider.latestScanHistories.isEmpty
             ? Center(
-                child: Text(scanHistoryProvider.errorMessage),
+                child: Text('Tidak ada riwayat pemindaian'),
               )
-            : Column(
-                children: scanHistoryProvider.latestScanHistories.map((scanHistory) {
-                  return Column(
-                    children: [
-                      ScanHistoryCard(
-                        scanHistory: scanHistory,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            createRoute(HistoryDetailPage(scanHistory: scanHistory)),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                    ],
+            : scanHistoryProvider.errorMessage.isNotEmpty
+                ? Center(
+                    child: Text(scanHistoryProvider.errorMessage),
+                  )
+                : Column(
+                    children: scanHistoryProvider.latestScanHistories.map((scanHistory) {
+                      return Column(
+                        children: [
+                          ScanHistoryCard(
+                            scanHistory: scanHistory,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                createRoute(HistoryDetailPage(scanHistory: scanHistory)),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                      );
+                    }).toList(),
                   );
-                }).toList(),
-              );
   }
 }
