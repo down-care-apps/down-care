@@ -5,6 +5,7 @@ import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/widgets/custom_button.dart';
 import 'package:down_care/models/reminder.dart';
 import 'package:down_care/providers/reminder_provider.dart';
+// ignore_for_file: use_build_context_synchronously
 
 class AddReminderPage extends StatefulWidget {
   final DateTime selectedDate;
@@ -47,6 +48,8 @@ class _AddReminderPageState extends State<AddReminderPage> {
       try {
         // Use the provider to create the reminder
         await Provider.of<ReminderProvider>(context, listen: false).createReminder(newReminder);
+
+        await Provider.of<ReminderProvider>(context, listen: false).fetchReminders();
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

@@ -19,7 +19,7 @@ class ReminderProvider with ChangeNotifier {
       final reminderList = await _reminderServices.getAllReminders();
       _reminders = reminderList.map((reminderJson) => Reminder.fromJson(reminderJson)).toList();
     } catch (e) {
-      throw Exception('Error fetching reminders: $e');
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -32,22 +32,8 @@ class ReminderProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      // Send the reminder to the server
-      final newReminderData = await _reminderServices.createReminder(reminder.toJson());
-
-      // Create a new Reminder object using the original data and the server-returned ID
-      final createdReminder = Reminder(
-        id: newReminderData['id'] ?? reminder.id,
-        title: reminder.title,
-        description: reminder.description,
-        time: reminder.time,
-        date: reminder.date,
-      );
-
-      _reminders.add(createdReminder);
-
-      // Sort reminders
-      _reminders.sort((a, b) => a.getDateTime().compareTo(b.getDateTime()));
+      final newReminder = await _reminderServices.createReminder(reminder.toJson());
+      _reminders.add(Reminder.fromJson(newReminder));
     } catch (e) {
       rethrow;
     } finally {
@@ -63,6 +49,7 @@ class ReminderProvider with ChangeNotifier {
 
     try {
       await _reminderServices.deleteReminder(id);
+      // Remove the reminder by id (not by title)
       _reminders.removeWhere((reminder) => reminder.id == id);
     } catch (e) {
       rethrow;
