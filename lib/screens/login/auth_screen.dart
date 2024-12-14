@@ -89,7 +89,7 @@ class AuthScreenState extends State<AuthScreen> {
       await _authService.signUpWithEmailPassword(emailController.text, passwordController.text, name);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registrasi berhasil, silahkan login')),
+        SnackBar(content: Text('Registrasi berhasil, silahkan login'), backgroundColor: Colors.green),
       );
 
       // Handle navigation or further actions if needed

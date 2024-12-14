@@ -1,5 +1,6 @@
 // lib/auth_service.dart
 import 'dart:convert';
+import 'package:down_care/api/user_api.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -84,6 +85,30 @@ class AuthService {
       }
     } catch (e) {
       print('Failed to call API: $e');
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    final user = UserService();
+
+    try{
+      final token = await user.getTokenUser();
+
+      final response = await http.delete(
+        Uri.parse('https://api-f3eusviapa-uc.a.run.app/start/delete'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      
+      if(response.statusCode == 200){
+        print('Account deleted');
+      }else{
+        throw Exception('Failed to delete account: ${response.statusCode}');
+      }
+    }catch(e){
+      throw Exception('Error deleting account: ${e.toString()}');
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:down_care/api/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/widgets/custom_button.dart';
@@ -8,6 +9,7 @@ class DeleteAccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController passwordController = TextEditingController();
+    final deleteAccount = AuthService().deleteAccount();
 
     return Scaffold(
       appBar: AppBar(
@@ -46,6 +48,7 @@ class DeleteAccountScreen extends StatelessWidget {
             child: CustomButton(
               text: 'Hapus Akun',
               onPressed: () {
+                deleteAccount;
                 // Handle delete account logic here
               },
             ),
