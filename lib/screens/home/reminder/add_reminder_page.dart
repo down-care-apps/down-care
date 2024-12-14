@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:down_care/api/reminderServices.dart';
 import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/widgets/custom_button.dart';
-import 'reminder.dart';
+import '../../../models/reminder.dart';
 
 class AddReminderPage extends StatefulWidget {
   final DateTime selectedDate;

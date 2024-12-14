@@ -1,4 +1,4 @@
-import 'package:down_care/screens/home/reminder/reminder.dart';
+import 'package:down_care/models/reminder.dart';
 import 'package:down_care/screens/home/reminder/reminder_detail_page.dart';
 import 'package:down_care/utils/transition.dart';
 import 'package:flutter/material.dart';
