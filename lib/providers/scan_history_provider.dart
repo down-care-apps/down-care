@@ -73,20 +73,24 @@ class ScanHistoryProvider extends ChangeNotifier {
   }
 
   Future<void> deleteScan(String id) async {
-    // print('API called to delete scan with id: $id');
+    _safeUpdate(() {
+      _isLoading = true;
+    });
+
     try {
       await ImageCameraServices().deleteScan(id);
 
       _safeUpdate(() {
         _scanHistories.removeWhere((scan) => scan.id == id);
       });
-
-      // print('Scan deleted successfully.');
     } catch (error) {
       _safeUpdate(() {
         _errorMessage = error.toString();
       });
-      // print('Error deleting scan: $error');
+    } finally {
+      _safeUpdate(() {
+        _isLoading = false;
+      });
     }
   }
 }

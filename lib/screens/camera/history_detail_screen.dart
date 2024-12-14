@@ -1,4 +1,5 @@
 import 'package:down_care/api/childrens_service.dart';
+import 'package:down_care/widgets/delete_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:down_care/models/scan_history.dart';
@@ -72,8 +73,8 @@ class HistoryDetailPage extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.red),
-            onPressed: () => _showDeleteConfirmationDialog(context),
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () => _showScanDeleteDialog(context),
           ),
         ],
       ),
@@ -151,78 +152,94 @@ class HistoryDetailPage extends StatelessWidget {
     );
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context) {
+  void _showScanDeleteDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Hapus Scan',
-            style: GoogleFonts.inter(
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
-          ),
-          content: Text(
-            'Apakah Anda yakin ingin menghapus scan ini? Tindakan ini tidak dapat dibatalkan.',
-            style: GoogleFonts.inter(),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Batal',
-                style: GoogleFonts.inter(color: Colors.grey),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
-              },
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: Text(
-                'Hapus',
-                style: GoogleFonts.inter(color: Colors.white),
-              ),
-              onPressed: () {
-                _deleteScan(context);
-              },
-            ),
-          ],
+        return DeleteDialog(
+          title: 'Hapus Hasil Scan',
+          message: 'Yakin ingin menghapus hasil scan ini?',
+          onDeletePressed: () {
+            final provider = Provider.of<ScanHistoryProvider>(context, listen: false);
+            provider.deleteScan(scanHistory.id);
+            Navigator.pop(context);
+          },
         );
       },
     );
   }
+  // void _showDeleteConfirmationDialog(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text(
+  //           'Hapus Scan',
+  //           style: GoogleFonts.inter(
+  //             fontWeight: FontWeight.bold,
+  //             color: Colors.red,
+  //           ),
+  //         ),
+  //         content: Text(
+  //           'Apakah Anda yakin ingin menghapus scan ini? Tindakan ini tidak dapat dibatalkan.',
+  //           style: GoogleFonts.inter(),
+  //         ),
+  //         actions: <Widget>[
+  //           TextButton(
+  //             child: Text(
+  //               'Batal',
+  //               style: GoogleFonts.inter(color: Colors.grey),
+  //             ),
+  //             onPressed: () {
+  //               Navigator.of(context).pop(); // Dismiss the dialog
+  //             },
+  //           ),
+  //           ElevatedButton(
+  //             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+  //             child: Text(
+  //               'Hapus',
+  //               style: GoogleFonts.inter(color: Colors.white),
+  //             ),
+  //             onPressed: () {
+  //               _deleteScan(context);
+  //             },
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
-  Future<void> _deleteScan(BuildContext context) async {
-    final provider = Provider.of<ScanHistoryProvider>(context, listen: false);
+  // Future<void> _deleteScan(BuildContext context) async {
+  //   final provider = Provider.of<ScanHistoryProvider>(context, listen: false);
 
-    try {
-      await provider.deleteScan(scanHistory.id);
+  //   try {
+  //     await provider.deleteScan(scanHistory.id);
 
-      // Show success snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Scan berhasil dihapus',
-            style: GoogleFonts.inter(),
-          ),
-          backgroundColor: Colors.green,
-        ),
-      );
+  //     // Show success snackbar
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text(
+  //           'Scan berhasil dihapus',
+  //           style: GoogleFonts.inter(),
+  //         ),
+  //         backgroundColor: Colors.green,
+  //       ),
+  //     );
 
-      Navigator.of(context)
-        ..pop() // Close the dialog
-        ..pop(); // Go back to the previous screen
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Gagal menghapus scan: ${e.toString()}',
-            style: GoogleFonts.inter(),
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
+  //     Navigator.of(context)
+  //       ..pop() // Close the dialog
+  //       ..pop(); // Go back to the previous screen
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text(
+  //           'Gagal menghapus scan: ${e.toString()}',
+  //           style: GoogleFonts.inter(),
+  //         ),
+  //         backgroundColor: Colors.red,
+  //       ),
+  //     );
+  //   }
+  // }
 }
