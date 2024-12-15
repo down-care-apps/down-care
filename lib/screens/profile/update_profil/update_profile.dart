@@ -6,6 +6,7 @@ import 'package:down_care/widgets/custom_button.dart';
 import 'package:down_care/widgets/avatar_picker.dart';
 import 'package:down_care/providers/user_provider.dart';
 import 'package:provider/provider.dart';
+// ignore_for_file: use_build_context_synchronously
 
 class UpdateProfileScreen extends StatefulWidget {
   const UpdateProfileScreen({super.key});

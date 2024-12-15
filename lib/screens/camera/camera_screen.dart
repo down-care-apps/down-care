@@ -95,7 +95,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
         ),
       );
     } catch (e) {
-      print('Error taking picture: $e');
+      throw Exception('Error taking picture: $e');
     }
   }
 
@@ -107,7 +107,7 @@ class _TakePictureScreenState extends State<TakePictureScreen> {
       final double dy = offset.dy / box.size.height;
 
       _controller.setFocusPoint(Offset(dx, dy)).catchError((e) {
-        print('Error setting focus point: $e');
+        throw Exception('Error setting focus point: $e');
       });
 
       setState(() {

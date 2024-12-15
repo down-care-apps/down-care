@@ -38,7 +38,6 @@ class ChildrensService {
           'Content-Type': 'application/json',
         },
       );
-      print('Response all: ${response.body}');
       // Check response status
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -53,7 +52,6 @@ class ChildrensService {
         throw Exception('Failed to fetch childrens: ${response.body}');
       }
     } catch (e) {
-      print('Server response error: $e');
       throw Exception('Error fetching childrens: ${e.toString()}');
     }
   }
@@ -76,7 +74,6 @@ class ChildrensService {
           'Content-Type': 'application/json',
         },
       );
-      print('Response anak: ${response.body}');
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
@@ -140,7 +137,6 @@ class ChildrensService {
 
       switch (response.statusCode) {
         case 200:
-          print('Profile Children updated successfully');
           return json.decode(response.body);
         case 404:
           throw Exception('Profile Children not found: ${response.body}');
@@ -173,7 +169,6 @@ class ChildrensService {
 
       switch (response.statusCode) {
         case 200:
-          print('Profile Children deleted successfully');
           break;
         case 404:
           throw Exception('Profile Children not found: ${response.body}');

@@ -12,7 +12,7 @@ class AboutAppScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'Tentang Down Care',
           style: TextStyle(
             fontWeight: FontWeight.w600,
@@ -90,7 +90,7 @@ class AboutAppScreen extends StatelessWidget {
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       childAspectRatio: 1.2,
       children: [
         _buildFeatureItem(
@@ -132,7 +132,7 @@ class AboutAppScreen extends StatelessWidget {
         child: Theme(
           data: ThemeData(
             dividerColor: Colors.transparent,
-            expansionTileTheme: ExpansionTileThemeData(
+            expansionTileTheme: const ExpansionTileThemeData(
               backgroundColor: Colors.transparent,
               collapsedBackgroundColor: Colors.transparent,
             ),
@@ -140,7 +140,7 @@ class AboutAppScreen extends StatelessWidget {
           child: ExpansionTile(
             title: Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.black87,
                 fontWeight: FontWeight.w600,
               ),
@@ -149,7 +149,7 @@ class AboutAppScreen extends StatelessWidget {
             children: [
               Text(
                 content,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.black87,
                   fontSize: 14,
                   height: 1.5,
@@ -167,7 +167,7 @@ class AboutAppScreen extends StatelessWidget {
     return Builder(
       builder: (context) => Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w700,
           color: Colors.black87,
@@ -180,7 +180,7 @@ class AboutAppScreen extends StatelessWidget {
   Widget _buildDescriptionText(String text) {
     return Text(
       text,
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 16,
         color: Colors.black87,
         height: 1.5,
@@ -212,7 +212,7 @@ class AboutAppScreen extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Colors.black87,
@@ -222,7 +222,7 @@ class AboutAppScreen extends StatelessWidget {
             Text(
               description,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 color: Colors.black87,
               ),

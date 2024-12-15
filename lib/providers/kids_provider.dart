@@ -42,7 +42,6 @@ class KidsProvider with ChangeNotifier {
       );
 
       if (createdKid != null) {
-        print('Created Kid: $createdKid');
         final newKid = ChildrenModel(
           id: createdKid['childrenId'],
           name: kid.name,
@@ -52,7 +51,6 @@ class KidsProvider with ChangeNotifier {
           height: kid.height,
           dateBirthday: kid.dateBirthday,
         );
-        print('New Kid ID: ${newKid.id}');
         _kidsList.add(newKid);
         notifyListeners();
       } else {

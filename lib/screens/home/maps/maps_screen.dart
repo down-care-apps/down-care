@@ -13,9 +13,9 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  Location _locationController = Location();
-  LatLng? _currentP = null;
-  Set<Marker> _markers = {};
+  final Location _locationController = Location();
+  LatLng? _currentP;
+  final Set<Marker> _markers = {};
   GoogleMapController? _mapController;
   bool _initialLocationSet = false;
   bool _userMovedMap = false;
@@ -51,21 +51,21 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> getLocationUpdates() async {
-    bool _servicesEnabled;
-    PermissionStatus _permissionGranted;
+    bool servicesEnabled;
+    PermissionStatus permissionGranted;
 
-    _servicesEnabled = await _locationController.serviceEnabled();
-    if (!_servicesEnabled) {
-      _servicesEnabled = await _locationController.requestService();
-      if (!_servicesEnabled) {
+    servicesEnabled = await _locationController.serviceEnabled();
+    if (!servicesEnabled) {
+      servicesEnabled = await _locationController.requestService();
+      if (!servicesEnabled) {
         return;
       }
     }
 
-    _permissionGranted = await _locationController.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await _locationController.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
+    permissionGranted = await _locationController.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await _locationController.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
         return;
       }
     }
@@ -79,10 +79,10 @@ class _MapPageState extends State<MapPage> {
           if (!_initialLocationSet) {
             _markers.add(
               Marker(
-                markerId: MarkerId('_currentLocation'),
+                markerId: const MarkerId('_currentLocation'),
                 icon: BitmapDescriptor.defaultMarker,
                 position: _currentP!,
-                infoWindow: InfoWindow(title: 'Your Location'),
+                infoWindow: const InfoWindow(title: 'Your Location'),
               ),
             );
 
@@ -156,7 +156,7 @@ class _MapPageState extends State<MapPage> {
         }
       }
     } catch (e) {
-      print('Error finding hospitals: $e');
+      throw Exception('Error fetching nearby hospitals: $e');
     }
   }
 
@@ -165,8 +165,8 @@ class _MapPageState extends State<MapPage> {
     if (markers.isEmpty) {
       // Return a default bounds if no markers
       return LatLngBounds(
-        southwest: _currentP ?? LatLng(0, 0),
-        northeast: _currentP ?? LatLng(0, 0),
+        southwest: _currentP ?? const LatLng(0, 0),
+        northeast: _currentP ?? const LatLng(0, 0),
       );
     }
 

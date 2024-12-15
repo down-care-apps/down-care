@@ -14,20 +14,12 @@ class KidsProfileScreen extends StatefulWidget {
 
 class _KidsProfileScreenState extends State<KidsProfileScreen> {
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    context.read<KidsProvider>().fetchKids();
-  }
-
-  Future<void> _navigateToAddScreen(BuildContext context) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const KidAddScreen()),
-    );
-
-    if (result == true) {
+  void initState() {
+    super.initState();
+    // Fetch kids data after the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<KidsProvider>().fetchKids();
-    }
+    });
   }
 
   Widget _buildEmptyState() {
@@ -51,11 +43,6 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
       appBar: _buildAppBar(),
       body: Consumer<KidsProvider>(
         builder: (context, kidsProvider, child) {
-          // Automatically fetch data if needed
-          if (kidsProvider.kidsList.isEmpty && !kidsProvider.isLoading && kidsProvider.error == null) {
-            kidsProvider.fetchKids();
-          }
-
           // Handle loading state
           if (kidsProvider.isLoading) {
             return const Center(child: CircularProgressIndicator());

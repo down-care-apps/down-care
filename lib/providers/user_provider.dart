@@ -16,7 +16,7 @@ class UserProvider with ChangeNotifier {
       _user = await _userService.getCurrentUserData();
       notifyListeners();
     } catch (e) {
-      print('Error fetching user data: $e');
+      throw Exception('Error fetching user data: $e');
     }
   }
 
@@ -29,7 +29,7 @@ class UserProvider with ChangeNotifier {
       // After successful update, fetch the latest data from the API
       await fetchCurrentUser();
     } catch (e) {
-      print('Error updating user data: $e');
+      throw Exception('Error updating user data: $e');
     }
   }
 

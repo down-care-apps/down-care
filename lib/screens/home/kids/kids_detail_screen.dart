@@ -1,8 +1,6 @@
 import 'package:down_care/api/childrens_service.dart';
 import 'package:down_care/providers/kids_provider.dart';
-import 'package:down_care/screens/home/kids/kids_profile_screen.dart';
 import 'package:down_care/widgets/delete_dialog.dart';
-import 'package:down_care/models/children_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'kids_edit_screen.dart';
