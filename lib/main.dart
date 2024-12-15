@@ -1,3 +1,4 @@
+import 'package:down_care/providers/article_provider.dart';
 import 'package:down_care/providers/reminder_provider.dart';
 import 'package:down_care/providers/scan_history_provider.dart';
 import 'package:down_care/providers/user_provider.dart';
@@ -5,6 +6,7 @@ import 'package:down_care/providers/kids_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import './firebase_options.dart';
@@ -34,6 +36,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ScanHistoryProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => ReminderProvider()),
+        ChangeNotifierProvider(create: (_) => ArticlesProvider()),
       ],
       child: const MyApp(),
     ),
@@ -81,9 +84,17 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: const BottomNavBar(),
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        body: const BottomNavBar(),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      ),
     );
   }
 }
