@@ -1,4 +1,5 @@
 import 'package:down_care/api/articles_service.dart';
+import 'package:down_care/providers/article_provider.dart';
 import 'package:down_care/providers/scan_history_provider.dart';
 import 'package:down_care/screens/home/article/article_mosaik.dart';
 import 'package:down_care/screens/home/article/article_translokasi.dart';
@@ -35,6 +36,9 @@ class _HomeScreenState extends State<HomeScreen> {
     // Fetch scan history data when the screen is initialized
     final scanHistoryProvider = Provider.of<ScanHistoryProvider>(context, listen: false);
     scanHistoryProvider.fetchScanHistory();
+    // Fetch articles data when the screen is initialized
+    final articlesProvider = Provider.of<ArticlesProvider>(context, listen: false);
+    articlesProvider.fetchArticles(limit: 3);
   }
 
   @override
@@ -181,10 +185,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildArticleList() {
-    return FutureBuilder(
-      future: ArticlesService().getArticles(limit: 3),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+    return Consumer<ArticlesProvider>(
+      builder: (context, articlesProvider, child) {
+        if (articlesProvider.isLoading && articlesProvider.articles.isEmpty) {
           return SizedBox(
             height: 190,
             child: ListView.builder(
@@ -198,28 +201,28 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
           );
-        } else if (snapshot.hasError) {
-          return Text('Error loading articles ${snapshot.error}');
-        } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
+        } else if (articlesProvider.error != null) {
+          return Text('Error loading articles: ${articlesProvider.error}');
+        } else if (articlesProvider.articles.isEmpty) {
           return const Text('No articles found');
         } else {
-          final articles = snapshot.data as List<Map<String, dynamic>>;
+          final articles = articlesProvider.articles.take(3).toList(); // Limit to 3 articles
 
           return SizedBox(
             height: 190,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.zero,
-              itemCount: articles.length < 3 ? articles.length : 3,
+              itemCount: articles.length,
               itemBuilder: (context, index) {
                 return Container(
                   margin: EdgeInsets.only(left: index == 0 ? 16 : 0),
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 4.0),
                     child: ArticleCard(
-                      title: articles[index]['title'] ?? 'No Title', // Ensure title is not null
-                      imageUrl: articles[index]['thumbnailURL'], // Ensure thumbnailUrl is not null
-                      content: articles[index]['content'] ?? 'No Content', // Ensure note is not null
+                      title: articles[index].title, // Use the Article model
+                      imageUrl: articles[index].thumbnailURL ?? '', // Use the Article model
+                      content: articles[index].content, // Use the Article model
                     ),
                   ),
                 );
