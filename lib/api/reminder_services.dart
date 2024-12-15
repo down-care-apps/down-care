@@ -82,6 +82,42 @@ class ReminderServices {
     }
   }
 
+  Future<Map<String, dynamic>?> updateReminder(reminder) async {
+    try {
+      final userService = UserService();
+      final token = await userService.getTokenUser();
+      final id = reminder.id;
+
+      final response = await http.put(
+        Uri.parse('$_baseUrl/$id'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          reminder
+        }),
+      );
+
+      switch (response.statusCode) {
+        case 200:
+          return json.decode(response.body);
+        case 404:
+          throw Exception('Reminder not found: ${response.body}');
+        case 400:
+          throw Exception('Bad request: ${response.body}');
+        case 401:
+          throw Exception('Unauthorized request. Please log in again.');
+        case 500:
+          throw Exception('Server error: ${response.body}');
+        default:
+          throw Exception('Failed to update reminder. Status code: ${response.statusCode}, Response: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error updating reminder: $e');
+    }
+  }
+
   Future<void> deleteReminder(String id) async {
     final user = UserService();
 
