@@ -133,20 +133,11 @@ class _KidDetailScreenState extends State<KidDetailScreen> {
                   ),
                   const SizedBox(height: 30),
 
-                  // Details Card with Glassmorphic Effect
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
+                  // Details Card with Elevation
+                  Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.shade200,
-                          spreadRadius: 1,
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                      border: Border.all(color: Colors.grey.shade100, width: 1),
                     ),
                     child: Column(
                       children: [

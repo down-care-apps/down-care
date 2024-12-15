@@ -19,19 +19,11 @@ class KidsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => _navigateToDetails(context),
-      child: Container(
+      child: Card(
         margin: const EdgeInsets.symmetric(vertical: 8.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            ),
-          ],
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),

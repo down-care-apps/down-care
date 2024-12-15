@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:down_care/utils/transition.dart';
-import 'package:down_care/widgets/scan_history_card.dart';
+import 'package:down_care/widgets/card_scan_history.dart';
 import 'package:down_care/screens/home/home_widgets/section_title.dart';
 import 'package:down_care/screens/home/home_widgets/syndrome_type_card.dart';
 import 'package:down_care/screens/home/home_widgets/article_card.dart';

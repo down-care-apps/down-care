@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:down_care/screens/camera/camera_screen.dart';
 import 'package:camera/camera.dart';
-import 'package:down_care/widgets/scan_history_card.dart';
+import 'package:down_care/widgets/card_scan_history.dart';
 import 'package:down_care/screens/camera/history_detail_screen.dart';
 import 'package:down_care/utils/transition.dart';
 import 'package:down_care/models/scan_history.dart';
