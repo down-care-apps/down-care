@@ -3,6 +3,9 @@ import 'package:down_care/providers/scan_history_provider.dart';
 import 'package:down_care/screens/home/article/article_mosaik.dart';
 import 'package:down_care/screens/home/article/article_translokasi.dart';
 import 'package:down_care/screens/home/article/article_trisomi21.dart';
+import 'package:down_care/widgets/skeleton_article_home.dart';
+import 'package:down_care/widgets/skeleton_profile_home.dart';
+import 'package:down_care/widgets/skeleton_scan_history_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -63,15 +66,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: _buildDownSyndromeMenu(context),
                   ),
                   const SizedBox(height: 24),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: SectionTitle(title: 'Riwayat Pemindaian Terbaru'),
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: _buildScanHistoryList(context),
-                  ),
+                  // Conditionally render scan history section
+                  _buildScanHistorySection(context),
                 ],
               ),
             ],
@@ -88,13 +84,6 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildProfileCard(),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //   children: [
-          //     _buildProfileCard(),
-          //     SvgPicture.asset('assets/icon/notification.svg', width: 28, height: 28),
-          //   ],
-          // ),
           const SizedBox(height: 8),
           Divider(color: Theme.of(context).colorScheme.secondary),
           const SizedBox(height: 8),
@@ -118,11 +107,11 @@ class _HomeScreenState extends State<HomeScreen> {
         final user = userProvider.user;
 
         if (user == null) {
-          return const CircularProgressIndicator();
+          return const ProfileCardSkeleton();
         }
 
-        final username = user.displayName.isNotEmpty ? user.displayName : 'Unknown User';
-        final avatarUrl = user.photoURL.isNotEmpty ? user.photoURL : '';
+        final username = user.displayName;
+        final avatarUrl = user.photoURL;
 
         return Row(
           children: [
@@ -196,7 +185,19 @@ class _HomeScreenState extends State<HomeScreen> {
       future: ArticlesService().getArticles(limit: 3),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return SizedBox(
+            height: 190,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: 3,
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: EdgeInsets.only(left: index == 0 ? 16 : 0),
+                  child: const ArticleCardSkeleton(),
+                );
+              },
+            ),
+          );
         } else if (snapshot.hasError) {
           return Text('Error loading articles ${snapshot.error}');
         } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
@@ -276,13 +277,38 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildScanHistorySection(BuildContext context) {
+    final scanHistoryProvider = Provider.of<ScanHistoryProvider>(context);
+
+    if (scanHistoryProvider.latestScanHistories.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: SectionTitle(title: 'Riwayat Pemindaian Terbaru'),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: _buildScanHistoryList(context),
+        ),
+      ],
+    );
+  }
+
   Widget _buildScanHistoryList(BuildContext context) {
     final scanHistoryProvider = Provider.of<ScanHistoryProvider>(context);
 
     return scanHistoryProvider.isLoading
-        ? const Center(child: CircularProgressIndicator())
+        ? Column(
+            children: List.generate(3, (index) => const SkeletonScanHistoryCard()).toList(),
+          )
         : scanHistoryProvider.latestScanHistories.isEmpty
-            ? Center(
+            ? const Center(
                 child: Text('Tidak ada riwayat pemindaian'),
               )
             : scanHistoryProvider.errorMessage.isNotEmpty
