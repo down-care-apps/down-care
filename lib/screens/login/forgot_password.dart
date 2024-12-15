@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/widgets/custom_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+// ignore_for_file: use_build_context_synchronously
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -43,9 +44,7 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       } else {
         // Show error message
         setState(() {
-          emailError = result['message'] == 'No account exists with this email address' 
-              ? 'Email tidak terdaftar'
-              : result['message'];
+          emailError = result['message'] == 'No account exists with this email address' ? 'Email tidak terdaftar' : result['message'];
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -65,54 +64,34 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   Future<Map<String, dynamic>> resetPassword(String email) async {
     final auth = FirebaseAuth.instance;
-    
+
     try {
       try {
         final userCredential = await auth.createUserWithEmailAndPassword(
           email: email,
           password: 'temporary_password_123',
         );
-        
+
         await userCredential.user?.delete();
-        
-        return {
-          'success': false,
-          'message': 'No account exists with this email address'
-        };
-        
+
+        return {'success': false, 'message': 'No account exists with this email address'};
       } on FirebaseAuthException catch (e) {
         if (e.code == 'email-already-in-use') {
           await auth.sendPasswordResetEmail(email: email);
-          return {
-            'success': true,
-            'message': 'Password reset email sent successfully'
-          };
+          return {'success': true, 'message': 'Password reset email sent successfully'};
         }
-        
+
         switch (e.code) {
           case 'invalid-email':
-            return {
-              'success': false,
-              'message': 'Format email tidak valid'
-            };
+            return {'success': false, 'message': 'Format email tidak valid'};
           case 'too-many-requests':
-            return {
-              'success': false,
-              'message': 'Terlalu banyak permintaan. Silakan coba lagi nanti'
-            };
+            return {'success': false, 'message': 'Terlalu banyak permintaan. Silakan coba lagi nanti'};
           default:
-            return {
-              'success': false,
-              'message': 'Terjadi kesalahan: ${e.message}'
-            };
+            return {'success': false, 'message': 'Terjadi kesalahan: ${e.message}'};
         }
       }
-      
     } catch (e) {
-      return {
-        'success': false,
-        'message': 'Terjadi kesalahan yang tidak terduga: $e'
-      };
+      return {'success': false, 'message': 'Terjadi kesalahan yang tidak terduga: $e'};
     }
   }
 
@@ -122,9 +101,7 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lupa Kata Sandi', 
-          style: TextStyle(color: Colors.white, fontSize: 24)
-        ),
+        title: const Text('Lupa Kata Sandi', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.primary,
         leading: IconButton(
@@ -143,17 +120,11 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('assets/logo_blue.png', 
-                    height: screenSize.height * 0.17
-                  ),
+                  Image.asset('assets/logo_blue.png', height: screenSize.height * 0.17),
                   SizedBox(height: screenSize.height * 0.02),
                   Text(
                     'Reset Kata Sandi Anda',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontSize: 26,
-                      fontWeight: FontWeight.w600
-                    ),
+                    style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 26, fontWeight: FontWeight.w600),
                   ),
                   SizedBox(height: screenSize.height * 0.02),
                   const Text(

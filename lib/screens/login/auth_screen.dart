@@ -3,12 +3,12 @@ import 'package:down_care/api/googleSignIn.dart';
 import 'package:down_care/main.dart';
 import 'package:down_care/screens/login/forgot_password.dart';
 import 'package:down_care/screens/login/sign_in_screen.dart';
+import 'package:down_care/utils/transition.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/widgets/custom_button.dart';
+// ignore_for_file: use_build_context_synchronously
 
 class AuthScreen extends StatefulWidget {
   final bool isSignIn;
@@ -80,7 +80,7 @@ class AuthScreenState extends State<AuthScreen> {
       if (isEmailRegistered) {
         emailError = 'Email sudah terdaftar, silahkan gunakan email lain';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Email sudah terdaftar, silahkan gunakan email lain'), backgroundColor: Colors.red),
+          const SnackBar(content: Text('Email sudah terdaftar, silahkan gunakan email lain'), backgroundColor: Colors.red),
         );
         return; // Exit the method if the email is already registered
       }
@@ -89,7 +89,7 @@ class AuthScreenState extends State<AuthScreen> {
       await _authService.signUpWithEmailPassword(emailController.text, passwordController.text, name);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registrasi berhasil, silahkan login'), backgroundColor: Colors.green),
+        const SnackBar(content: Text('Registrasi berhasil, silahkan login'), backgroundColor: Colors.green),
       );
 
       // Handle navigation or further actions if needed
@@ -132,10 +132,10 @@ class AuthScreenState extends State<AuthScreen> {
       );
 
       String? idToken = await userCredential.user?.getIdToken();
-      print('ID Token: $idToken');
+      // print('ID Token: $idToken');
       if (idToken != null) {
         await _authService.callLoginApi(emailController.text, passwordController.text, idToken);
-      } 
+      }
 
       setState(() => isSignIn = true);
       if (mounted) {
@@ -207,7 +207,7 @@ class AuthScreenState extends State<AuthScreen> {
       if (user != null && mounted) {
         // Navigate to main screen and remove all previous routes
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => MainScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
           (route) => false,
         );
       } else {
@@ -233,7 +233,7 @@ class AuthScreenState extends State<AuthScreen> {
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation1, animation2) {
-          return routeName == '/signin' ? AuthScreen(isSignIn: true) : AuthScreen(isSignIn: false);
+          return routeName == '/signin' ? const AuthScreen(isSignIn: true) : const AuthScreen(isSignIn: false);
         },
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
@@ -247,7 +247,7 @@ class AuthScreenState extends State<AuthScreen> {
       isPassword: isPassword,
       controller: controller,
       error: error,
-      maxLines: isPassword ? 1 : null, // Ensure maxLines is 1 for password fields
+      maxLines: 1,
       onChanged: (value) {
         setState(() {
           error = value.isEmpty ? 'Please enter your ${hintText.toLowerCase()}' : null;
@@ -277,13 +277,10 @@ class AuthScreenState extends State<AuthScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 24)),
+        automaticallyImplyLeading: false,
+        title: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.primary,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
       ),
       body: SingleChildScrollView(
         child: ConstrainedBox(
@@ -315,7 +312,7 @@ class AuthScreenState extends State<AuthScreen> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
+                            createRoute(const ForgotPasswordScreen()),
                           );
                         },
                         child: const Text('Lupa Kata Sandi?'),
@@ -350,7 +347,8 @@ class AuthScreenState extends State<AuthScreen> {
                       Text(widget.isSignIn ? 'Belum punya akun?' : 'Sudah punya akun?', style: const TextStyle(color: Colors.black, fontSize: 16)),
                       TextButton(
                         onPressed: () => _navigateWithoutTransition(context, widget.isSignIn ? '/signup' : '/signin'),
-                        child: Text(widget.isSignIn ? 'Daftar' : 'Masuk', style: const TextStyle(color: Colors.blue, fontSize: 16)),
+                        child:
+                            Text(widget.isSignIn ? 'Daftar' : 'Masuk', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16)),
                       ),
                     ],
                   ),
