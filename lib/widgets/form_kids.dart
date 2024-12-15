@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../widgets/input_field.dart'; // Assuming InputField is in this location
-import '../../../widgets/custom_button.dart'; // Assuming CustomButton is in this location
+import '../../../widgets/input_field.dart';
+import '../../../widgets/custom_button.dart';
 
 class KidsForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
@@ -52,7 +52,7 @@ class _KidsFormState extends State<KidsForm> {
 
     if (picked != null) {
       setState(() {
-        widget.birthDateController.text = DateFormat('dd/MM/yyyy').format(picked);
+        widget.birthDateController.text = DateFormat('yyyy-MM-dd').format(picked);
       });
     }
   }
