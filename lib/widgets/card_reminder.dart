@@ -51,60 +51,64 @@ class ReminderItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
-          boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.2), spreadRadius: 1, blurRadius: 10, offset: const Offset(0, 4))],
         ),
-        child: ClipRRect(
+        child: Material(
+          elevation: 2,
           borderRadius: BorderRadius.circular(15),
-          child: Container(
-            decoration: BoxDecoration(border: Border(left: BorderSide(color: primaryColor, width: 4))),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          reminder['title'],
-                          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: isPastReminder ? Colors.grey.shade600 : Colors.black87),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          reminder['description'],
-                          style: TextStyle(color: isPastReminder ? Colors.grey.shade500 : Colors.grey.shade700, fontSize: 14),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Container(
+              decoration: BoxDecoration(border: Border(left: BorderSide(color: primaryColor, width: 4))),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            reminder['title'],
+                            style:
+                                TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: isPastReminder ? Colors.grey.shade600 : Colors.black87),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            reminder['description'],
+                            style: TextStyle(color: isPastReminder ? Colors.grey.shade500 : Colors.grey.shade700, fontSize: 14),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                    const SizedBox(width: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: primaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            dateFormatter.format(reminderDate),
+                            style: TextStyle(fontSize: 11, color: primaryColor.withOpacity(0.7), fontWeight: FontWeight.w600),
+                          ),
+                          Text(
+                            reminder['time'] != null
+                                ? reminder['time'].toString().replaceAll('TimeOfDay(', '').replaceAll(')', '')
+                                : 'Waktu Tidak Diketahui',
+                            style: TextStyle(fontSize: 11, color: primaryColor.withOpacity(0.7), fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          dateFormatter.format(reminderDate),
-                          style: TextStyle(fontSize: 11, color: primaryColor.withOpacity(0.7), fontWeight: FontWeight.w600),
-                        ),
-                        Text(
-                          reminder['time'] != null
-                              ? reminder['time'].toString().replaceAll('TimeOfDay(', '').replaceAll(')', '')
-                              : 'Waktu Tidak Diketahui',
-                          style: TextStyle(fontSize: 11, color: primaryColor.withOpacity(0.7), fontWeight: FontWeight.w600),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

@@ -169,79 +169,90 @@ class ProgressScreenState extends State<ProgressScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
+        child: children.isEmpty
+            ? Center(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildDropdown<String>(
-                      label: 'Profil Anak',
-                      value: selectedKid,
-                      items: children.map((child) {
-                        return DropdownMenuItem<String>(
-                          value: child['id'].toString(),
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                backgroundImage: NetworkImage(child['imageUrl'] ?? 'https://example.com/default_image.jpg'),
-                                child: child['imageUrl'] == null ? Text(child['name']?[0] ?? '?') : null,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(child['name'] ?? 'Unnamed Child'),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (newValue) {
-                        setState(() {
-                          selectedKid = newValue;
-                          if (newValue != null) {
-                            _loadChildDetails(newValue);
-                          }
-                        });
-                      },
-                    ),
-                    if (selectedKidData != null) ...[
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () => _navigateToDetailProgress(selectedKidData!),
-                          child: const Text('View Details'),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildDropdown<String>(
-                        label: 'Bulan',
-                        value: selectedMonth,
-                        items: months.map((month) {
-                          return DropdownMenuItem<String>(
-                            value: month,
-                            child: Text(month),
-                          );
-                        }).toList(),
-                        onChanged: (newValue) => setState(() => selectedMonth = newValue),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildField('Berat', weightController, keyboardType: TextInputType.number),
-                      const SizedBox(height: 16),
-                      _buildField('Tinggi', heightController, keyboardType: TextInputType.number),
-                      const SizedBox(height: 16),
-                      _buildField('Catatan Penting', importantNoteController, maxLines: 6),
-                    ],
+                    Icon(Icons.people_alt, size: 80, color: Colors.grey.shade300),
+                    const SizedBox(height: 16),
+                    Text("Belum ada data anak", style: TextStyle(color: Colors.grey.shade600, fontSize: 18)),
                   ],
                 ),
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildDropdown<String>(
+                            label: 'Profil Anak',
+                            value: selectedKid,
+                            items: children.map((child) {
+                              return DropdownMenuItem<String>(
+                                value: child['id'].toString(),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage: NetworkImage(child['imageUrl'] ?? 'https://example.com/default_image.jpg'),
+                                      child: child['imageUrl'] == null ? Text(child['name']?[0] ?? '?') : null,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(child['name'] ?? 'Unnamed Child'),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (newValue) {
+                              setState(() {
+                                selectedKid = newValue;
+                                if (newValue != null) {
+                                  _loadChildDetails(newValue);
+                                }
+                              });
+                            },
+                          ),
+                          if (selectedKidData != null) ...[
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () => _navigateToDetailProgress(selectedKidData!),
+                                child: const Text('View Details'),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildDropdown<String>(
+                              label: 'Bulan',
+                              value: selectedMonth,
+                              items: months.map((month) {
+                                return DropdownMenuItem<String>(
+                                  value: month,
+                                  child: Text(month),
+                                );
+                              }).toList(),
+                              onChanged: (newValue) => setState(() => selectedMonth = newValue),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildField('Berat', weightController, keyboardType: TextInputType.number),
+                            const SizedBox(height: 16),
+                            _buildField('Tinggi', heightController, keyboardType: TextInputType.number),
+                            const SizedBox(height: 16),
+                            _buildField('Catatan Penting', importantNoteController, maxLines: 6),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                  CustomButton(
+                    text: 'Submit',
+                    onPressed: _submitProgress,
+                    widthFactor: 1.0,
+                  ),
+                ],
               ),
-            ),
-            CustomButton(
-              text: 'Submit',
-              onPressed: _submitProgress,
-              widthFactor: 1.0,
-            ),
-          ],
-        ),
       ),
     );
   }

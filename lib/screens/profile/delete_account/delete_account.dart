@@ -13,11 +13,13 @@ class DeleteAccountScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        title: Text('Hapus Akun', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
         centerTitle: true,
-        title: const Text('Hapus Akun'),
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.primary),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Column(

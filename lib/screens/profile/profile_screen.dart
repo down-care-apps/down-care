@@ -8,7 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:down_care/widgets/custom_button.dart';
 import 'package:down_care/screens/profile/update_profil/update_profile.dart';
 import 'package:down_care/utils/transition.dart';
-import 'package:down_care/providers/user_provider.dart'; 
+import 'package:down_care/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -29,47 +29,47 @@ class ProfileScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: Column(
-                    children: [
-                      // Use Consumer to access user data from the provider
-                      Consumer<UserProvider>(
-                        builder: (context, userProvider, child) {
-                          final user = userProvider.user;
-                          if (user == null) {
-                            return const CircularProgressIndicator();
-                          }
-                          final profileUrl = user.photoURL.isNotEmpty ? user.photoURL : '';
-                          return CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.grey[300],
-                            backgroundImage: profileUrl.isNotEmpty ? NetworkImage(profileUrl) : null,
-                            child: profileUrl.isEmpty ? const Icon(Icons.person, color: Colors.white, size: 40) : null,
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      Consumer<UserProvider>(
-                        builder: (context, userProvider, child) {
-                          final user = userProvider.user;
-                          if (user == null) {
-                            return const CircularProgressIndicator();
-                          }
-                          final username = user.displayName.isNotEmpty ? user.displayName : 'Unknown User';
-                          return Text(
-                            username,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
+                // Center(
+                //   child: Column(
+                //     children: [
+                //       // Use Consumer to access user data from the provider
+                //       Consumer<UserProvider>(
+                //         builder: (context, userProvider, child) {
+                //           final user = userProvider.user;
+                //           if (user == null) {
+                //             return const CircularProgressIndicator();
+                //           }
+                //           final profileUrl = user.photoURL.isNotEmpty ? user.photoURL : '';
+                //           return CircleAvatar(
+                //             radius: 50,
+                //             backgroundColor: Colors.grey[300],
+                //             backgroundImage: profileUrl.isNotEmpty ? NetworkImage(profileUrl) : null,
+                //             child: profileUrl.isEmpty ? const Icon(Icons.person, color: Colors.white, size: 40) : null,
+                //           );
+                //         },
+                //       ),
+                //       const SizedBox(height: 10),
+                //       Consumer<UserProvider>(
+                //         builder: (context, userProvider, child) {
+                //           final user = userProvider.user;
+                //           if (user == null) {
+                //             return const CircularProgressIndicator();
+                //           }
+                //           final username = user.displayName.isNotEmpty ? user.displayName : 'Unknown User';
+                //           return Text(
+                //             username,
+                //             style: TextStyle(
+                //               fontSize: 24,
+                //               fontWeight: FontWeight.bold,
+                //               fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                //             ),
+                //           );
+                //         },
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                // const SizedBox(height: 16),
                 _buildSection(
                   context,
                   title: "Akun",
@@ -144,41 +144,31 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildSection(BuildContext context, {required String title, required List<Widget> items}) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.secondary,
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blueGrey.withOpacity(0.2),
-            spreadRadius: 0.5,
-            blurRadius: 2,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0, left: 8.0),
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, left: 8.0),
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                ),
               ),
             ),
-          ),
-          Divider(color: Theme.of(context).colorScheme.secondary),
-          ...items,
-        ],
+            Divider(color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
+            ...items,
+          ],
+        ),
       ),
     );
   }

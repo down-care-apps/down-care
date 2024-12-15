@@ -1,4 +1,5 @@
 import 'package:down_care/providers/article_provider.dart';
+import 'package:down_care/providers/kids_provider.dart';
 import 'package:down_care/providers/scan_history_provider.dart';
 import 'package:down_care/screens/home/article/article_mosaik.dart';
 import 'package:down_care/screens/home/article/article_translokasi.dart';
@@ -10,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:down_care/utils/transition.dart';
-import 'package:down_care/widgets/scan_history_card.dart';
+import 'package:down_care/widgets/card_scan_history.dart';
 import 'package:down_care/screens/home/home_widgets/section_title.dart';
 import 'package:down_care/screens/home/home_widgets/syndrome_type_card.dart';
 import 'package:down_care/screens/home/home_widgets/article_card.dart';
@@ -120,40 +121,28 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         final username = user.displayName.isNotEmpty ? user.displayName : 'Unknown User';
-        final avatarUrl = user.photoURL.isNotEmpty ? user.photoURL : '';
 
-        return Row(
-          children: [
-            CircleAvatar(
-              radius: 34,
-              backgroundColor: Colors.grey[300],
-              backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-              child: avatarUrl.isEmpty ? const Icon(Icons.person, color: Colors.white, size: 24) : null,
-            ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RichText(
-                  text: TextSpan(
-                    style: GoogleFonts.leagueSpartan(fontSize: 20, color: Colors.black),
-                    children: const [
-                      TextSpan(text: 'Hello,', style: TextStyle(fontWeight: FontWeight.w300)),
-                    ],
-                  ),
+        return RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: 'Hello, ',
+                style: GoogleFonts.leagueSpartan(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black,
                 ),
-                const SizedBox(height: 4),
-                RichText(
-                  text: TextSpan(
-                    style: GoogleFonts.leagueSpartan(fontSize: 20, color: Colors.black),
-                    children: [
-                      TextSpan(text: username, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    ],
-                  ),
+              ),
+              TextSpan(
+                text: '$username 👋',
+                style: GoogleFonts.leagueSpartan(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         );
       },
     );

@@ -22,16 +22,14 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
     });
   }
 
-  Widget _buildEmptyState() {
-    return const Center(
+  Widget _buildEmptyState(String message, IconData icon) {
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            'Tidak ada data anak',
-            style: TextStyle(fontSize: 16),
-          ),
-          SizedBox(height: 24),
+          Icon(icon, size: 80, color: Colors.grey.shade300),
+          const SizedBox(height: 16),
+          Text(message, style: TextStyle(color: Colors.grey.shade600, fontSize: 18)),
         ],
       ),
     );
@@ -48,7 +46,12 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // Handle error state
+          // Handle empty state first
+          if (kidsProvider.kidsList.isEmpty) {
+            return _buildEmptyState("Belum ada data anak", Icons.people_alt);
+          }
+
+          // Only show error if there's a genuine error and no kids
           if (kidsProvider.error != null) {
             return Center(
               child: Text(
@@ -56,11 +59,6 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
                 style: const TextStyle(color: Colors.red),
               ),
             );
-          }
-
-          // Handle empty state
-          if (kidsProvider.kidsList.isEmpty) {
-            return _buildEmptyState();
           }
 
           // Build list of kids
@@ -97,7 +95,6 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
           id: kid.id.toString(),
           name: kid.name,
           age: '${kid.age} tahun',
-          imageUrl: 'https://example.com/default_image.jpg',
         );
       },
     );

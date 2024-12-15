@@ -84,7 +84,7 @@ class KidsProfileModal extends StatelessWidget {
                     contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                     leading: CircleAvatar(
                       radius: 24,
-                      backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
+                      backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
                       child: Text(
                         (child.name).substring(0, 1),
                         style: TextStyle(

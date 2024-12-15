@@ -9,15 +9,12 @@ class AboutAppScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        title: Text('DownCare', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
         centerTitle: true,
-        title: const Text(
-          'Tentang Down Care',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.primary),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SingleChildScrollView(

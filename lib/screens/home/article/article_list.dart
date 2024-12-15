@@ -41,7 +41,7 @@ class ArticleListPage extends StatelessWidget {
                 final formattedDate = article['date'] != null ? _parseCustomDate(article['date']) : 'Unknown Date';
 
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: ArticleCard(
                     title: article['title'] ?? 'Untitled',
                     imageUrl: article['thumbnailURL'],
