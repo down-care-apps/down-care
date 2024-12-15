@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -30,6 +32,24 @@ class DateTimeInputFieldState extends State<DateTimeInputField> {
     _selectedTime = widget.initialTime;
   }
 
+  bool _isValidDateTime(DateTime date, TimeOfDay time) {
+    final now = DateTime.now();
+    final currentTime = TimeOfDay.now();
+
+    // If selected date is today
+    if (date.year == now.year && date.month == now.month && date.day == now.day) {
+      // Convert TimeOfDay to minutes for easier comparison
+      final selectedTimeInMinutes = time.hour * 60 + time.minute;
+      final currentTimeInMinutes = currentTime.hour * 60 + currentTime.minute;
+
+      // Return true only if selected time is after or equal to current time
+      return selectedTimeInMinutes >= currentTimeInMinutes;
+    }
+
+    // For future dates, always return true
+    return date.isAfter(now) || date.isAtSameMomentAs(now);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -57,12 +77,27 @@ class DateTimeInputFieldState extends State<DateTimeInputField> {
                     final date = await showDatePicker(
                       context: context,
                       initialDate: _selectedDate,
-                      firstDate: DateTime(2000),
+                      firstDate: DateTime.now(), // Prevent selecting dates before today
                       lastDate: DateTime(2100),
                     );
                     if (date != null) {
-                      setState(() => _selectedDate = date);
-                      widget.onDateChanged(date);
+                      // If selected date is today, validate time
+                      if (_isValidDateTime(date, _selectedTime)) {
+                        setState(() => _selectedDate = date);
+                        widget.onDateChanged(date);
+                      } else {
+                        // If time is invalid for today, reset time to current time
+                        final now = DateTime.now();
+                        final currentTime = TimeOfDay.fromDateTime(now);
+
+                        setState(() {
+                          _selectedDate = date;
+                          _selectedTime = currentTime;
+                        });
+
+                        widget.onDateChanged(date);
+                        widget.onTimeChanged(currentTime);
+                      }
                     }
                   },
                   child: Padding(
@@ -113,10 +148,41 @@ class DateTimeInputFieldState extends State<DateTimeInputField> {
                     final time = await showTimePicker(
                       context: context,
                       initialTime: _selectedTime,
+                      builder: (context, child) {
+                        return Theme(
+                          data: ThemeData.light().copyWith(
+                            colorScheme: ColorScheme.fromSeed(
+                              seedColor: Theme.of(context).colorScheme.primary,
+                              primary: Theme.of(context).colorScheme.primary,
+                            ),
+                            timePickerTheme: TimePickerThemeData(
+                              backgroundColor: Colors.white,
+                              hourMinuteColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                              hourMinuteTextColor: Colors.black87,
+                              dialHandColor: Theme.of(context).colorScheme.primary,
+                              dialBackgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                              dayPeriodColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                              dayPeriodTextColor: Colors.black87,
+                            ),
+                          ),
+                          child: child!,
+                        );
+                      },
                     );
                     if (time != null) {
-                      setState(() => _selectedTime = time);
-                      widget.onTimeChanged(time);
+                      // Validate date and time
+                      if (_isValidDateTime(_selectedDate, time)) {
+                        setState(() => _selectedTime = time);
+                        widget.onTimeChanged(time);
+                      } else {
+                        // If time is invalid, show a message and keep current time
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Pilih waktu setelah ${TimeOfDay.now().format(context)}'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     }
                   },
                   child: Padding(

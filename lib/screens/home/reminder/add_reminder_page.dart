@@ -33,6 +33,21 @@ class _AddReminderPageState extends State<AddReminderPage> {
 
   void _saveReminder() async {
     if (_formKey.currentState!.validate()) {
+      // Create a DateTime combining the selected date and time
+      final selectedDateTime = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _selectedTime.hour, _selectedTime.minute);
+
+      // Check if the selected date and time is in the past
+      final now = DateTime.now();
+      if (selectedDateTime.isBefore(now)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('waktu di masa depan'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
       setState(() {
         _isSubmitting = true;
       });
