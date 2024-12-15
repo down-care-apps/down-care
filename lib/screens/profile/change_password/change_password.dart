@@ -61,7 +61,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       currentPasswordController.clear();
       newPasswordController.clear();
       confirmNewPasswordController.clear();
-
     } on FirebaseAuthException catch (e) {
       // Handle specific Firebase authentication errors
       String errorMessage = '';
@@ -123,11 +122,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        title: Text('Ubah Kata Sandi', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
         centerTitle: true,
-        title: const Text('Ubah Kata Sandi'),
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.primary),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Column(

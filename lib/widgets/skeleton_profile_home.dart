@@ -6,46 +6,31 @@ class ProfileCardSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            width: 68,
-            height: 68,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: RichText(
+        text: const TextSpan(
           children: [
-            Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: Container(
-                width: 100,
-                height: 20,
+            TextSpan(
+              text: 'Hello, ',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w400,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 4),
-            Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: Container(
-                width: 150,
-                height: 24,
+            TextSpan(
+              text: 'Loading... 👋',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 }

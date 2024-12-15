@@ -63,11 +63,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        title: Text('Perbarui Profil', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
         centerTitle: true,
-        title: const Text('Perbarui Profil'),
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.primary),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Consumer<UserProvider>(
@@ -92,8 +94,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      const AvatarPicker(),
-                      const SizedBox(height: 16),
+                      // const AvatarPicker(),
+                      // const SizedBox(height: 16),
                       InputField(
                         labelText: 'Nama Lengkap',
                         controller: usernameController,

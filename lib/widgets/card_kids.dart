@@ -1,10 +1,10 @@
+import 'package:down_care/utils/transition.dart';
 import 'package:flutter/material.dart';
 import '../screens/home/kids/kids_detail_screen.dart';
 
 class KidsCard extends StatelessWidget {
   final String name;
   final String age;
-  final String imageUrl;
   final String id;
 
   const KidsCard({
@@ -12,7 +12,6 @@ class KidsCard extends StatelessWidget {
     required this.id,
     required this.name,
     required this.age,
-    required this.imageUrl,
   });
 
   @override
@@ -29,7 +28,7 @@ class KidsCard extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              _buildAvatar(),
+              _buildAvatar(context),
               const SizedBox(width: 16.0),
               _buildKidInfo(context),
               const SizedBox(width: 8.0),
@@ -41,11 +40,18 @@ class KidsCard extends StatelessWidget {
     );
   }
 
-  Widget _buildAvatar() {
+  Widget _buildAvatar(context) {
     return CircleAvatar(
-      radius: 30,
-      backgroundImage: NetworkImage(imageUrl),
-      backgroundColor: Colors.blue.shade50,
+      radius: 25,
+      backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
+      child: Text(
+        name[0].toUpperCase(),
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 
@@ -83,9 +89,7 @@ class KidsCard extends StatelessWidget {
   void _navigateToDetails(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => KidDetailScreen(id: id),
-      ),
+      createRoute(KidDetailScreen(id: id)),
     );
   }
 }

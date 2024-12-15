@@ -111,28 +111,6 @@ class _KidDetailScreenState extends State<KidDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Profile Avatar with Soft Shadow
-                  CircleAvatar(
-                    radius: 60,
-                    backgroundColor: Colors.blue.shade50,
-                    backgroundImage: NetworkImage(
-                      childData['profileImage'] ?? 'https://example.com/default_image.jpg',
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Name with Modern Typography
-                  Text(
-                    childData['name'] ?? 'Unnamed Child',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.grey.shade900,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-
                   // Details Card with Elevation
                   Card(
                     elevation: 2,
@@ -141,6 +119,8 @@ class _KidDetailScreenState extends State<KidDetailScreen> {
                     ),
                     child: Column(
                       children: [
+                        _buildDetailRow('Nama Lengkap', childData['name'] ?? 'N/A'),
+                        _buildDivider(),
                         _buildDetailRow('Jenis Kelamin', childData['gender'] ?? 'N/A'),
                         _buildDivider(),
                         _buildDetailRow('Umur', '${childData['age'] ?? 'N/A'} Tahun'),

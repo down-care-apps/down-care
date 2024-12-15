@@ -120,40 +120,28 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         final username = user.displayName.isNotEmpty ? user.displayName : 'Unknown User';
-        final avatarUrl = user.photoURL.isNotEmpty ? user.photoURL : '';
 
-        return Row(
-          children: [
-            CircleAvatar(
-              radius: 34,
-              backgroundColor: Colors.grey[300],
-              backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-              child: avatarUrl.isEmpty ? const Icon(Icons.person, color: Colors.white, size: 24) : null,
-            ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RichText(
-                  text: TextSpan(
-                    style: GoogleFonts.leagueSpartan(fontSize: 20, color: Colors.black),
-                    children: const [
-                      TextSpan(text: 'Hello,', style: TextStyle(fontWeight: FontWeight.w300)),
-                    ],
-                  ),
+        return RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: 'Hello, ',
+                style: GoogleFonts.leagueSpartan(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black,
                 ),
-                const SizedBox(height: 4),
-                RichText(
-                  text: TextSpan(
-                    style: GoogleFonts.leagueSpartan(fontSize: 20, color: Colors.black),
-                    children: [
-                      TextSpan(text: username, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    ],
-                  ),
+              ),
+              TextSpan(
+                text: '$username 👋',
+                style: GoogleFonts.leagueSpartan(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         );
       },
     );

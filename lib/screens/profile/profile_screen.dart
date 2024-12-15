@@ -29,47 +29,47 @@ class ProfileScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: Column(
-                    children: [
-                      // Use Consumer to access user data from the provider
-                      Consumer<UserProvider>(
-                        builder: (context, userProvider, child) {
-                          final user = userProvider.user;
-                          if (user == null) {
-                            return const CircularProgressIndicator();
-                          }
-                          final profileUrl = user.photoURL.isNotEmpty ? user.photoURL : '';
-                          return CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.grey[300],
-                            backgroundImage: profileUrl.isNotEmpty ? NetworkImage(profileUrl) : null,
-                            child: profileUrl.isEmpty ? const Icon(Icons.person, color: Colors.white, size: 40) : null,
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 10),
-                      Consumer<UserProvider>(
-                        builder: (context, userProvider, child) {
-                          final user = userProvider.user;
-                          if (user == null) {
-                            return const CircularProgressIndicator();
-                          }
-                          final username = user.displayName.isNotEmpty ? user.displayName : 'Unknown User';
-                          return Text(
-                            username,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: GoogleFonts.leagueSpartan().fontFamily,
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
+                // Center(
+                //   child: Column(
+                //     children: [
+                //       // Use Consumer to access user data from the provider
+                //       Consumer<UserProvider>(
+                //         builder: (context, userProvider, child) {
+                //           final user = userProvider.user;
+                //           if (user == null) {
+                //             return const CircularProgressIndicator();
+                //           }
+                //           final profileUrl = user.photoURL.isNotEmpty ? user.photoURL : '';
+                //           return CircleAvatar(
+                //             radius: 50,
+                //             backgroundColor: Colors.grey[300],
+                //             backgroundImage: profileUrl.isNotEmpty ? NetworkImage(profileUrl) : null,
+                //             child: profileUrl.isEmpty ? const Icon(Icons.person, color: Colors.white, size: 40) : null,
+                //           );
+                //         },
+                //       ),
+                //       const SizedBox(height: 10),
+                //       Consumer<UserProvider>(
+                //         builder: (context, userProvider, child) {
+                //           final user = userProvider.user;
+                //           if (user == null) {
+                //             return const CircularProgressIndicator();
+                //           }
+                //           final username = user.displayName.isNotEmpty ? user.displayName : 'Unknown User';
+                //           return Text(
+                //             username,
+                //             style: TextStyle(
+                //               fontSize: 24,
+                //               fontWeight: FontWeight.bold,
+                //               fontFamily: GoogleFonts.leagueSpartan().fontFamily,
+                //             ),
+                //           );
+                //         },
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                // const SizedBox(height: 16),
                 _buildSection(
                   context,
                   title: "Akun",

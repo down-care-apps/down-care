@@ -97,7 +97,6 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
           id: kid.id.toString(),
           name: kid.name,
           age: '${kid.age} tahun',
-          imageUrl: 'https://example.com/default_image.jpg',
         );
       },
     );
