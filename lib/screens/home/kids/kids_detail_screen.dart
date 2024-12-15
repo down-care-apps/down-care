@@ -1,5 +1,6 @@
 import 'package:down_care/api/childrens_service.dart';
 import 'package:down_care/providers/kids_provider.dart';
+import 'package:down_care/utils/transition.dart';
 import 'package:down_care/widgets/delete_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,9 +34,7 @@ class _KidDetailScreenState extends State<KidDetailScreen> {
   Future<void> _navigateToEditScreen() async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => KidEditScreen(id: widget.id),
-      ),
+      createRoute(KidEditScreen(id: widget.id)),
     );
 
     if (result == true) {

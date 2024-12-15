@@ -1,9 +1,12 @@
 import 'package:down_care/providers/article_provider.dart';
-import 'package:down_care/providers/kids_provider.dart';
 import 'package:down_care/providers/scan_history_provider.dart';
 import 'package:down_care/screens/home/article/article_mosaik.dart';
 import 'package:down_care/screens/home/article/article_translokasi.dart';
 import 'package:down_care/screens/home/article/article_trisomi21.dart';
+import 'package:down_care/screens/home/kids/kids_profile_screen.dart';
+import 'package:down_care/screens/home/maps/maps_screen.dart';
+import 'package:down_care/screens/home/progress/progress_screen.dart';
+import 'package:down_care/screens/home/reminder/reminder_page.dart';
 import 'package:down_care/widgets/skeleton_article_home.dart';
 import 'package:down_care/widgets/skeleton_profile_home.dart';
 import 'package:down_care/widgets/skeleton_scan_history_card.dart';
@@ -151,7 +154,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMenuButton(BuildContext context, dynamic icon, String label, String route) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, route);
+        final screen = {
+          '/progress': const ProgressScreen(),
+          '/reminder': const ReminderPage(),
+          '/maps': const MapPage(),
+          '/kidsProfile': const KidsProfileScreen(),
+        }[route];
+
+        if (screen != null) {
+          Navigator.push(context, createRoute(screen));
+        }
       },
       child: Column(
         children: [
