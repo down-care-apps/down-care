@@ -1,5 +1,6 @@
 import 'package:down_care/widgets/form_kids.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../models/children_model.dart';
 import '../../../providers/kids_provider.dart';
@@ -20,8 +21,19 @@ class _KidAddScreenState extends State<KidAddScreen> {
 
   String? gender;
 
+  int _calculateAge(DateTime birthDate) {
+    final today = DateTime.now();
+    int age = today.year - birthDate.year;
+    if (today.month < birthDate.month || (today.month == birthDate.month && today.day < birthDate.day)) {
+      age--;
+    }
+    return age;
+  }
+
   void _saveKid() {
     if (_formKey.currentState!.validate()) {
+      final birthDate = DateFormat('yyyy-MM-dd').parse(birthDateController.text); // Parsing the birthdate
+      final age = _calculateAge(birthDate); // Calculating the age
       final newKid = ChildrenModel(
         id: UniqueKey().toString(),
         name: nameController.text,
@@ -29,7 +41,7 @@ class _KidAddScreenState extends State<KidAddScreen> {
         height: heightController.text,
         gender: gender ?? '',
         dateBirthday: birthDateController.text,
-        age: '',
+        age: age.toString(),
       );
 
       // ignore: use_build_context_synchronously

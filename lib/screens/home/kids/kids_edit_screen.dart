@@ -1,6 +1,8 @@
+import 'package:down_care/providers/kids_provider.dart';
 import 'package:down_care/widgets/form_kids.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/api/childrens_service.dart';
+import 'package:provider/provider.dart';
 // ignore_for_file: use_build_context_synchronously
 
 class KidEditScreen extends StatefulWidget {
@@ -48,6 +50,9 @@ class _KidEditScreenState extends State<KidEditScreen> {
 
     try {
       await childrensService.updateProfileChildren(id, name, weight, height, gender, dateBirthday);
+
+      // Inform KidsProvider to refresh the kids list
+      context.read<KidsProvider>().fetchKids();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
