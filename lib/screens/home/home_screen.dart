@@ -110,8 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
           return const ProfileCardSkeleton();
         }
 
-        final username = user.displayName;
-        final avatarUrl = user.photoURL;
+        final username = user.displayName.isNotEmpty ? user.displayName : 'Unknown User';
+        final avatarUrl = user.photoURL.isNotEmpty ? user.photoURL : '';
 
         return Row(
           children: [
