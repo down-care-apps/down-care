@@ -76,7 +76,7 @@ class _ReminderHistoryPageState extends State<ReminderHistoryPage> {
                 children: [
                   Icon(Icons.history_outlined, size: 80, color: Colors.grey.shade300),
                   const SizedBox(height: 16),
-                  Text('No past reminders', style: TextStyle(color: Colors.grey.shade600, fontSize: 18)),
+                  Text('Tidak ada riwayat pengingat', style: TextStyle(color: Colors.grey.shade600, fontSize: 18)),
                 ],
               ),
             );

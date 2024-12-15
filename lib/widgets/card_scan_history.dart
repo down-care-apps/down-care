@@ -23,7 +23,6 @@ class ScanHistoryCard extends StatelessWidget {
         ),
         child: Container(
           padding: const EdgeInsets.all(8),
-          margin: const EdgeInsets.only(bottom: 8),
           child: Row(
             children: [
               ClipRRect(

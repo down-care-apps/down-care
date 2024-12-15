@@ -1,4 +1,5 @@
 import 'package:down_care/providers/article_provider.dart';
+import 'package:down_care/providers/kids_provider.dart';
 import 'package:down_care/providers/scan_history_provider.dart';
 import 'package:down_care/screens/home/article/article_mosaik.dart';
 import 'package:down_care/screens/home/article/article_translokasi.dart';

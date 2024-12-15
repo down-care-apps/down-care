@@ -63,14 +63,7 @@ class _HistoryPageState extends State<HistoryPage> {
         ),
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // Implement search functionality here
-            },
-          ),
-        ],
+        centerTitle: true,
       ),
       body: Consumer<ScanHistoryProvider>(
         builder: (context, scanHistoryProvider, child) {
@@ -81,18 +74,6 @@ class _HistoryPageState extends State<HistoryPage> {
               itemBuilder: (context, index) {
                 return const SkeletonScanHistoryCard(); // Show skeleton
               },
-            );
-          }
-
-          // Check for error state
-          if (scanHistoryProvider.errorMessage.isNotEmpty) {
-            return const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Center(
-                child: Text(
-                  'Tidak ada riwayat pemindaian tersedia. Silahkan scan gambar terlebih dahulu.',
-                ),
-              ),
             );
           }
 
@@ -113,8 +94,15 @@ class _HistoryPageState extends State<HistoryPage> {
             );
           } else {
             // No data available
-            return const Center(
-              child: Text('Tidak ada riwayat pemindaian tersedia.'),
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.history, size: 80, color: Colors.grey.shade300),
+                  const SizedBox(height: 16),
+                  Text("Tidak ada riwayat pemindaian", style: TextStyle(color: Colors.grey.shade600, fontSize: 18)),
+                ],
+              ),
             );
           }
         },

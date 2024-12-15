@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:down_care/providers/scan_history_provider.dart';
@@ -157,56 +156,62 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
     }
 
     if (!mounted) return;
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (BuildContext context) {
-        return Consumer<KidsProvider>(
-          builder: (context, kidsProvider, child) {
-            if (kidsProvider.isLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
 
-            if (kidsProvider.error != null) {
-              return Center(
-                child: Text(
-                  'Error: ${kidsProvider.error}',
-                  style: const TextStyle(color: Colors.red),
-                ),
-              );
-            }
+    // Check if kidsList is empty
+    if (kidsProvider.kidsList.isEmpty) {
+      // Automatically act like the "Lewati" button
+      await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan, null);
+      await scanHistoryProvider.refreshScanHistory();
 
-            final childrens = kidsProvider.kidsList;
-            if (childrens.isEmpty) {
-              return const Center(
-                child: Text(
-                  'Tidak ada data anak',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-              );
-            }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const BottomNavBar(initialIndex: 1),
+        ),
+      );
+    } else {
+      // Show the modal if there are children
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        builder: (BuildContext context) {
+          return Consumer<KidsProvider>(
+            builder: (context, kidsProvider, child) {
+              if (kidsProvider.isLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-            return KidsProfileModal(
-              onSelectChild: (child) async {
-                await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan, child['id']);
-
-                // Refresh scan history after saving the analysis data
-                await scanHistoryProvider.refreshScanHistory();
-
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const BottomNavBar(initialIndex: 1),
+              if (kidsProvider.error != null) {
+                return Center(
+                  child: Text(
+                    'Error: ${kidsProvider.error}',
+                    style: const TextStyle(color: Colors.red),
                   ),
                 );
-              },
-            );
-          },
-        );
-      },
-    );
+              }
+
+              return KidsProfileModal(
+                onSelectChild: (child) async {
+                  await ImageCameraServices().uploadImageToServer(firebaseUrl, resultScan, child['id']);
+
+                  // Refresh scan history after saving the analysis data
+                  await scanHistoryProvider.refreshScanHistory();
+
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const BottomNavBar(initialIndex: 1),
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        },
+      );
+    }
   }
 }

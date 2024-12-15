@@ -38,20 +38,28 @@ class ChildrensService {
           'Content-Type': 'application/json',
         },
       );
+
       // Check response status
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
-        // Ensure data is in list format
-        if (data is List<dynamic> && data.isNotEmpty) {
+        // Return empty list if no children found instead of throwing an exception
+        if (data is List<dynamic>) {
           return data;
         } else {
-          throw Exception('No childrens found');
+          return []; // Return empty list if data is not a list
         }
+      } else if (response.statusCode == 404) {
+        // Specifically handle 404 (Not Found) as an empty list scenario
+        return [];
       } else {
         throw Exception('Failed to fetch childrens: ${response.body}');
       }
     } catch (e) {
+      // Only throw exceptions for actual errors, not for "no children" scenarios
+      if (e.toString().contains('No childrens found')) {
+        return [];
+      }
       throw Exception('Error fetching childrens: ${e.toString()}');
     }
   }
