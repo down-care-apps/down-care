@@ -1,5 +1,5 @@
 import 'package:down_care/api/auth_service.dart';
-import 'package:down_care/api/googleSignIn.dart';
+import 'package:down_care/api/google_sign_in.dart';
 import 'package:down_care/main.dart';
 import 'package:down_care/screens/login/forgot_password.dart';
 import 'package:down_care/screens/login/sign_in_screen.dart';

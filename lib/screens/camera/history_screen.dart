@@ -38,7 +38,7 @@ class _HistoryPageState extends State<HistoryPage> {
         ),
       );
     } catch (e) {
-      print('Error: $e');
+      throw Exception('Error opening camera: $e');
     }
   }
 

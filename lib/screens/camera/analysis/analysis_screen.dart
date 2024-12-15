@@ -1,3 +1,4 @@
+
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:down_care/providers/scan_history_provider.dart';
@@ -7,11 +8,11 @@ import 'package:down_care/screens/camera/analysis/result_card.dart';
 import 'package:down_care/widgets/bottom_navbar.dart';
 import 'package:down_care/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:down_care/providers/kids_provider.dart';
 import 'package:down_care/widgets/kids_modal.dart';
 import 'package:down_care/api/image_camera_services.dart';
+// ignore_for_file: use_build_context_synchronously
 
 class DisplayPictureScreen extends StatefulWidget {
   final String imagePath;
@@ -47,7 +48,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
   Future<void> _fetchAnalysisResult() async {
     try {
       final Map<String, dynamic>? scanImage = await _savedImage();
-      print('Scan Image Response: $scanImage');
+      // print('Scan Image Response: $scanImage');
       if (scanImage != null && scanImage['resultScan']['confidence'] != null) {
         _firebaseUrl = scanImage['firebaseUrl'];
         _resultScan = scanImage['resultScan'];
@@ -94,7 +95,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> with SingleT
         throw Exception("Gagal mengunggah gambar ke Firebase");
       }
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 

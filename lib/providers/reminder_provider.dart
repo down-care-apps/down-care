@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:down_care/models/reminder.dart';
-import 'package:down_care/api/reminderServices.dart';
+import 'package:down_care/api/reminder_services.dart';
 
 class ReminderProvider with ChangeNotifier {
   final ReminderServices _reminderServices = ReminderServices();

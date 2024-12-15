@@ -32,6 +32,7 @@ class _KidAddScreenState extends State<KidAddScreen> {
         age: '',
       );
 
+      // ignore: use_build_context_synchronously
       Provider.of<KidsProvider>(context, listen: false).addKid(newKid).then((_) => Navigator.pop(context, true));
     }
   }

@@ -19,17 +19,6 @@ class _KidsProfileScreenState extends State<KidsProfileScreen> {
     context.read<KidsProvider>().fetchKids();
   }
 
-  Future<void> _navigateToAddScreen(BuildContext context) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const KidAddScreen()),
-    );
-
-    if (result == true) {
-      context.read<KidsProvider>().fetchKids();
-    }
-  }
-
   Widget _buildEmptyState() {
     return const Center(
       child: Column(

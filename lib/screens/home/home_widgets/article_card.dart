@@ -8,11 +8,11 @@ class ArticleCard extends StatelessWidget {
   final String content;
 
   const ArticleCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.imageUrl,
     required this.content,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

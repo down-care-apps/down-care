@@ -27,8 +27,7 @@ class GoogleSignInService {
       // Sign in to Firebase with the Google credential
       return await _auth.signInWithCredential(credential);
     } on FirebaseAuthException catch (e) {
-      print('FirebaseAuth error: ${e.message}');
-      rethrow;
+      throw Exception('FirebaseAuth error: ${e.message}');
     } catch (e) {
       if (e.toString().contains('network_error')) {
         throw Exception('Network error occurred. Please check your connection.');
@@ -43,8 +42,7 @@ class GoogleSignInService {
           throw Exception('Google Play Services update required');
         }
       }
-      print('Google Sign-In error: $e');
-      rethrow;
+      throw Exception('Google Sign-In error: $e');
     }
   }
 

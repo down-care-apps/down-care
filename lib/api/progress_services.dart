@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:down_care/api/childrens_service.dart';
 import 'package:http/http.dart' as http;
 import 'user_api.dart';
-import 'package:intl/intl.dart';
 
 class ProgressServices {
   // Singleton pattern
@@ -29,13 +28,8 @@ class ProgressServices {
         },
       );
 
-      print('Response Body: ${response.body}'); // Log the raw response body
-
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
-
-        // Log the structure of the response data
-        print('Decoded Response Data: $responseData');
 
         if (responseData.containsKey('data')) {
           final List<dynamic> progressData = responseData['data'];
@@ -50,7 +44,7 @@ class ProgressServices {
         throw Exception('Failed to fetch progress data: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error in getProgressByChildId: $e');
+      // print('Error in getProgressByChildId: $e');
       throw Exception('Error fetching progress data: ${e.toString()}');
     }
   }
@@ -60,9 +54,8 @@ class ProgressServices {
       final userService = UserService();
       final token = await userService.getTokenUser();
       final id = kid['id'];
-      print("ID:" + id);
       final response = await http.post(
-        Uri.parse('$_baseUrl'),
+        Uri.parse(_baseUrl),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

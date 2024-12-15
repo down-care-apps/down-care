@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:down_care/api/user_api.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:logging/logging.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -16,22 +17,22 @@ class AuthService {
   }
 
   Future<bool> isEmailRegistered(String email) async {
-  try {
-    // Attempt to create a user with the given email and a dummy password
-    await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: email,
-      password: 'dummyPassword', // Use a temporary password
-    );
-    // If the user is created successfully, delete it
-    await FirebaseAuth.instance.currentUser ?.delete();
-    return false; // Email is not registered
-  } on FirebaseAuthException catch (e) {
-    if (e.code == 'email-already-in-use') {
-      return true; // Email is already registered
+    try {
+      // Attempt to create a user with the given email and a dummy password
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: 'dummyPassword', // Use a temporary password
+      );
+      // If the user is created successfully, delete it
+      await FirebaseAuth.instance.currentUser?.delete();
+      return false; // Email is not registered
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        return true; // Email is already registered
+      }
+      return false; // Other errors (e.g., invalid email format)
     }
-    return false; // Other errors (e.g., invalid email format)
   }
-}
 
   Future<void> signUpWithEmailPassword(String email, String password, String name) async {
     final url = Uri.parse('https://api-f3eusviapa-uc.a.run.app/start/register');
@@ -49,20 +50,18 @@ class AuthService {
 
       if (response.statusCode == 201) {
         final data = json.decode(response.body);
-        print('User registered: ${data['uid']}');
+        Logger('AuthService').info('User registered: ${data['uid']}');
         // Handle navigation or further actions if needed
       } else {
-        print('Failed to register user: ${response.body}');
         throw Exception('Registration failed: ${response.body}');
       }
     } catch (error) {
-      print('Error registering user: $error');
       throw Exception('Error: $error');
     }
   }
 
   Future<void> callLoginApi(String email, String password, String idToken) async {
-    final url = 'https://api-f3eusviapa-uc.a.run.app/start/login';
+    const url = 'https://api-f3eusviapa-uc.a.run.app/start/login';
 
     try {
       final response = await http.post(
@@ -79,19 +78,19 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-        print('Response data: ${response.body}');
+        Logger('AuthService').info('Response data: ${response.body}');
       } else {
-        print('Error: ${response.statusCode} - ${response.body}');
+        throw Exception('Failed to call login API: ${response.statusCode}');
       }
     } catch (e) {
-      print('Failed to call API: $e');
+      throw Exception('Error calling login API: $e');
     }
   }
 
   Future<void> deleteAccount() async {
     final user = UserService();
 
-    try{
+    try {
       final token = await user.getTokenUser();
 
       final response = await http.delete(
@@ -101,15 +100,14 @@ class AuthService {
           'Content-Type': 'application/json',
         },
       );
-      
-      if(response.statusCode == 200){
-        print('Account deleted');
-      }else{
+
+      if (response.statusCode == 200) {
+        Logger('AuthService').info('Account deleted');
+      } else {
         throw Exception('Failed to delete account: ${response.statusCode}');
       }
-    }catch(e){
+    } catch (e) {
       throw Exception('Error deleting account: ${e.toString()}');
     }
   }
 }
-

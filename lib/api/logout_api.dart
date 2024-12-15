@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:down_care/screens/login/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,7 +22,7 @@ Future<void> logoutUser(BuildContext context) async {
       );
     }
   } catch (error) {
-    print('Error logging out: $error');
+    // print('Error logging out: $error');
     // Show an error message to the user
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

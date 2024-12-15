@@ -65,7 +65,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     } on FirebaseAuthException catch (e) {
       // Handle specific Firebase authentication errors
       String errorMessage = '';
-      print('Error code: ${e.code}');
+
       switch (e.code) {
         case 'invalid-credential':
           errorMessage = 'Kata sandi saat ini salah';

@@ -1,4 +1,3 @@
-import 'package:down_care/api/articles_service.dart';
 import 'package:down_care/providers/article_provider.dart';
 import 'package:down_care/providers/scan_history_provider.dart';
 import 'package:down_care/screens/home/article/article_mosaik.dart';

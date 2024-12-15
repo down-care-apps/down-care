@@ -1,11 +1,12 @@
 import 'package:down_care/widgets/form_kids.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/api/childrens_service.dart';
+// ignore_for_file: use_build_context_synchronously
 
 class KidEditScreen extends StatefulWidget {
   final String id;
 
-  KidEditScreen({required this.id});
+  const KidEditScreen({super.key, required this.id});
 
   @override
   _KidEditScreenState createState() => _KidEditScreenState();

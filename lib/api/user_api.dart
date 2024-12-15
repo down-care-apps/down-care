@@ -70,6 +70,7 @@ class UserService {
 
     // If the phone number doesn't start with '+', add the default country code '+62'
     if (!phoneNumber.startsWith('+')) {
+      // ignore: prefer_interpolation_to_compose_strings
       phoneNumber = '+62' + phoneNumber;
     }
 
@@ -113,7 +114,6 @@ class UserService {
       // Check the status code and handle responses
       switch (response.statusCode) {
         case 200:
-          print('User updated successfully');
           break;
         case 404:
           throw Exception('User not found: ${response.body}');

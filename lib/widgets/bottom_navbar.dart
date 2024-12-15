@@ -18,7 +18,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   late int _currentIndex;
 
   final List<Widget> _screens = [
-    HomeScreen(),
+    const HomeScreen(),
     const HistoryPage(),
     const ProfileScreen(),
   ];

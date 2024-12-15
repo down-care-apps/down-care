@@ -22,6 +22,7 @@ class _AvatarPickerState extends State<AvatarPicker> {
         _image = pickedImage;
       });
     }
+    // ignore: use_build_context_synchronously
     Navigator.of(context).pop();
   }
 

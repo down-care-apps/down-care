@@ -10,9 +10,6 @@ class ReminderServices {
 
     try {
       final token = await user.getTokenUser();
-      if (token == null) {
-        throw Exception('Failed to retrieve user token');
-      }
 
       final response = await http.post(
         Uri.parse(_baseUrl),
@@ -22,8 +19,6 @@ class ReminderServices {
         },
         body: json.encode(reminder),
       );
-
-      print(reminder['title']);
 
       if (response.statusCode == 201) {
         return json.decode(response.body);
@@ -103,7 +98,8 @@ class ReminderServices {
 
       // Handle both 200 and 204 as success
       if (response.statusCode == 200 || response.statusCode == 204) {
-        print('Reminder deleted');
+        // print('Reminder deleted');
+        return;
       } else {
         throw Exception('Failed to delete reminder: ${response.statusCode}');
       }

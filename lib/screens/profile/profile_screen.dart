@@ -2,7 +2,7 @@ import 'package:down_care/screens/profile/about_app/about_app.dart';
 import 'package:down_care/screens/profile/change_password/change_password.dart';
 import 'package:down_care/screens/profile/delete_account/delete_account.dart';
 import 'package:flutter/material.dart';
-import 'package:down_care/api/logoutApi.dart';
+import 'package:down_care/api/logout_api.dart';
 import 'package:down_care/screens/profile/profile_menu_item.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:down_care/widgets/custom_button.dart';

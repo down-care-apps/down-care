@@ -1,4 +1,4 @@
-import 'package:down_care/api/progressServices.dart';
+import 'package:down_care/api/progress_services.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -194,7 +194,7 @@ class DetailProgressState extends State<DetailProgress> {
 
             // Loading indicator while fetching data
             isLoading
-                ? Center(child: const CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : Column(
                     children: [
                       // Weight Chart
