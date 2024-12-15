@@ -29,15 +29,21 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch user data when the screen is initialized
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    userProvider.fetchCurrentUser();
-    // Fetch scan history data when the screen is initialized
-    final scanHistoryProvider = Provider.of<ScanHistoryProvider>(context, listen: false);
-    scanHistoryProvider.fetchScanHistory();
-    // Fetch articles data when the screen is initialized
-    final articlesProvider = Provider.of<ArticlesProvider>(context, listen: false);
-    articlesProvider.fetchArticles(limit: 3);
+
+    // Use addPostFrameCallback to ensure the fetch methods are called after the build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Fetch user data when the screen is initialized
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.fetchCurrentUser();
+
+      // Fetch scan history data when the screen is initialized
+      final scanHistoryProvider = Provider.of<ScanHistoryProvider>(context, listen: false);
+      scanHistoryProvider.fetchScanHistory();
+
+      // Fetch articles data when the screen is initialized
+      final articlesProvider = Provider.of<ArticlesProvider>(context, listen: false);
+      articlesProvider.fetchArticles(limit: 3);
+    });
   }
 
   @override
