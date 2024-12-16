@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:down_care/screens/home/article/article_menarik.dart'; // Import halaman detail artikel
+import 'package:down_care/screens/home/article/article_detail.dart';
 
 class ArticleCard extends StatelessWidget {
   final String title;

@@ -1,12 +1,12 @@
 import 'package:down_care/providers/article_provider.dart';
-import 'package:down_care/providers/kids_provider.dart';
 import 'package:down_care/providers/scan_history_provider.dart';
-import 'package:down_care/screens/home/article/article_mosaik.dart';
-import 'package:down_care/screens/home/article/article_translokasi.dart';
-import 'package:down_care/screens/home/article/article_trisomi21.dart';
+import 'package:down_care/screens/home/article/article_detail.dart';
+import 'package:down_care/screens/home/kids/kids_profile_screen.dart';
+import 'package:down_care/screens/home/maps/maps_screen.dart';
+import 'package:down_care/screens/home/progress/progress_screen.dart';
+import 'package:down_care/screens/home/reminder/reminder_page.dart';
 import 'package:down_care/widgets/skeleton_article_home.dart';
 import 'package:down_care/widgets/skeleton_profile_home.dart';
-import 'package:down_care/widgets/skeleton_scan_history_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // Fetch articles data when the screen is initialized
       final articlesProvider = Provider.of<ArticlesProvider>(context, listen: false);
-      articlesProvider.fetchArticles(limit: 3);
+      articlesProvider.fetchArticles();
     });
   }
 
@@ -151,7 +151,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMenuButton(BuildContext context, dynamic icon, String label, String route) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, route);
+        final screen = {
+          '/progress': const ProgressScreen(),
+          '/reminder': const ReminderPage(),
+          '/maps': const MapPage(),
+          '/kidsProfile': const KidsProfileScreen(),
+        }[route];
+
+        if (screen != null) {
+          Navigator.push(context, createRoute(screen));
+        }
       },
       child: Column(
         children: [
@@ -229,48 +238,34 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildDownSyndromeMenu(BuildContext context) {
+    final articlesProvider = Provider.of<ArticlesProvider>(context);
+    final filteredArticles = articlesProvider.getArticlesByCategory('jenis');
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ArticleScreen()),
-              );
-            },
-            child: SyndromeTypeCard(name: 'Trisomi 21', imageUrl: 'assets/trisomi21.jpeg'),
-          ),
-        ),
-        SizedBox(width: 8),
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ArticleMosaikScreen()),
-              );
-            },
-            child: SyndromeTypeCard(name: 'Mosaik', imageUrl: 'assets/Mosaik.jpg'),
-          ),
-        ),
-        SizedBox(width: 8),
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ArticleTranslokasi()),
-              );
-            },
+      children: filteredArticles.take(3).map((article) {
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: SyndromeTypeCard(
-              name: 'Mosaik',
-              imageUrl: 'assets/Translokasi.jpg',
+              name: article.title,
+              imageUrl: article.thumbnailURL ?? '',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ArticleDetailPage(
+                      title: article.title,
+                      imageUrl: article.thumbnailURL ?? '',
+                      content: article.content,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-        ),
-      ],
+        );
+      }).toList(),
     );
   }
 
@@ -300,35 +295,23 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildScanHistoryList(BuildContext context) {
     final scanHistoryProvider = Provider.of<ScanHistoryProvider>(context);
 
-    return scanHistoryProvider.isLoading
-        ? Column(
-            children: List.generate(3, (index) => const SkeletonScanHistoryCard()).toList(),
-          )
-        : scanHistoryProvider.latestScanHistories.isEmpty
-            ? const Center(
-                child: Text('Tidak ada riwayat pemindaian'),
-              )
-            : scanHistoryProvider.errorMessage.isNotEmpty
-                ? Center(
-                    child: Text(scanHistoryProvider.errorMessage),
-                  )
-                : Column(
-                    children: scanHistoryProvider.latestScanHistories.map((scanHistory) {
-                      return Column(
-                        children: [
-                          ScanHistoryCard(
-                            scanHistory: scanHistory,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                createRoute(HistoryDetailPage(scanHistory: scanHistory)),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 8),
-                        ],
-                      );
-                    }).toList(),
-                  );
+    return Column(
+      children: scanHistoryProvider.latestScanHistories.map((scanHistory) {
+        return Column(
+          children: [
+            ScanHistoryCard(
+              scanHistory: scanHistory,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  createRoute(HistoryDetailPage(scanHistory: scanHistory)),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        );
+      }).toList(),
+    );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:down_care/api/progress_services.dart';
+import 'package:down_care/utils/transition.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/screens/home/progress/detail_progress.dart';
@@ -87,9 +88,7 @@ class ProgressScreenState extends State<ProgressScreen> {
   void _navigateToDetailProgress(Map<String, dynamic> kidProfile) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => DetailProgress(kidProfile: kidProfile),
-      ),
+      createRoute(DetailProgress(kidProfile: kidProfile)),
     );
   }
 
