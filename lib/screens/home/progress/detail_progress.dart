@@ -153,14 +153,31 @@ class DetailProgressState extends State<DetailProgress> {
   Widget buildNotesList() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: monthNotes.asMap().entries.map((entry) {
+      children: monthNotes.asMap().entries.where((entry) => entry.value.isNotEmpty).map((entry) {
         int index = entry.key;
         String note = entry.value;
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4.0),
-          child: Text(
-            '${getMonthTitle(index)}: $note',
-            style: const TextStyle(fontSize: 12, color: Colors.black54),
+
+        return Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Container(
+            width: double.infinity, // Make the card take the full width
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  getMonthTitle(index),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  note,
+                  style: const TextStyle(fontSize: 18, color: Colors.black54),
+                ),
+              ],
+            ),
           ),
         );
       }).toList(),
@@ -226,7 +243,10 @@ class DetailProgressState extends State<DetailProgress> {
                       // Height Chart
                       buildLineChart(context, heightSpots, Colors.green, Colors.green, 'Tinggi Badan', 4),
                       const SizedBox(height: 16),
-
+                      Text(
+                        'Catatan',
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w500, color: Colors.black87),
+                      ),
                       // Notes List
                       buildNotesList(),
                     ],
