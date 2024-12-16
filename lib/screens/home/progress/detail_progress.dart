@@ -15,6 +15,7 @@ class DetailProgressState extends State<DetailProgress> {
   final ProgressServices progressKid = ProgressServices();
   List<FlSpot> weightSpots = [];
   List<FlSpot> heightSpots = [];
+  List<String> monthNotes = []; // List to store notes for each month
   bool isLoading = true; // Track loading state
 
   @override
@@ -52,6 +53,7 @@ class DetailProgressState extends State<DetailProgress> {
       final progressData = await progressKid.getProgressByChildId(widget.kidProfile['id']);
       List<FlSpot> weightData = [];
       List<FlSpot> heightData = [];
+      List<String> notes = List.filled(12, ''); // Initialize notes list
 
       for (var record in progressData) {
         var monthData = record['month'];
@@ -60,9 +62,11 @@ class DetailProgressState extends State<DetailProgress> {
           if (monthIndex != -1) {
             double weight = double.tryParse(data['weight']) ?? 0.0;
             double height = double.tryParse(data['height']) ?? 0.0;
+            String note = data['note'] ?? '';
 
             weightData.add(FlSpot(monthIndex.toDouble(), weight));
             heightData.add(FlSpot(monthIndex.toDouble(), height));
+            notes[monthIndex] = note; // Store the note for the corresponding month
           }
         });
       }
@@ -70,6 +74,7 @@ class DetailProgressState extends State<DetailProgress> {
       setState(() {
         weightSpots = weightData;
         heightSpots = heightData;
+        monthNotes = notes; // Update the notes list
         isLoading = false;
       });
     } catch (e) {
@@ -145,6 +150,23 @@ class DetailProgressState extends State<DetailProgress> {
     );
   }
 
+  Widget buildNotesList() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: monthNotes.asMap().entries.map((entry) {
+        int index = entry.key;
+        String note = entry.value;
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Text(
+            '${getMonthTitle(index)}: $note',
+            style: const TextStyle(fontSize: 12, color: Colors.black54),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -204,6 +226,9 @@ class DetailProgressState extends State<DetailProgress> {
                       // Height Chart
                       buildLineChart(context, heightSpots, Colors.green, Colors.green, 'Tinggi Badan', 4),
                       const SizedBox(height: 16),
+
+                      // Notes List
+                      buildNotesList(),
                     ],
                   ),
           ],
