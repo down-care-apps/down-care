@@ -1,8 +1,6 @@
 import 'package:down_care/providers/article_provider.dart';
 import 'package:down_care/providers/scan_history_provider.dart';
-import 'package:down_care/screens/home/article/article_mosaik.dart';
-import 'package:down_care/screens/home/article/article_translokasi.dart';
-import 'package:down_care/screens/home/article/article_trisomi21.dart';
+import 'package:down_care/screens/home/article/article_detail.dart';
 import 'package:down_care/screens/home/kids/kids_profile_screen.dart';
 import 'package:down_care/screens/home/maps/maps_screen.dart';
 import 'package:down_care/screens/home/progress/progress_screen.dart';
@@ -45,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // Fetch articles data when the screen is initialized
       final articlesProvider = Provider.of<ArticlesProvider>(context, listen: false);
-      articlesProvider.fetchArticles(limit: 3);
+      articlesProvider.fetchArticles();
     });
   }
 
@@ -240,48 +238,34 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildDownSyndromeMenu(BuildContext context) {
+    final articlesProvider = Provider.of<ArticlesProvider>(context);
+    final filteredArticles = articlesProvider.getArticlesByCategory('jenis');
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ArticleScreen()),
-              );
-            },
-            child: SyndromeTypeCard(name: 'Trisomi 21', imageUrl: 'assets/trisomi21.jpeg'),
-          ),
-        ),
-        SizedBox(width: 8),
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ArticleMosaikScreen()),
-              );
-            },
-            child: SyndromeTypeCard(name: 'Mosaik', imageUrl: 'assets/Mosaik.jpg'),
-          ),
-        ),
-        SizedBox(width: 8),
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ArticleTranslokasi()),
-              );
-            },
+      children: filteredArticles.take(3).map((article) {
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: SyndromeTypeCard(
-              name: 'Mosaik',
-              imageUrl: 'assets/Translokasi.jpg',
+              name: article.title,
+              imageUrl: article.thumbnailURL ?? '',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ArticleDetailPage(
+                      title: article.title,
+                      imageUrl: article.thumbnailURL ?? '',
+                      content: article.content,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-        ),
-      ],
+        );
+      }).toList(),
     );
   }
 

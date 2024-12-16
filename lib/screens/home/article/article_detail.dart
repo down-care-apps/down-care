@@ -6,19 +6,30 @@ class ArticleDetailPage extends StatelessWidget {
   final String content;
 
   const ArticleDetailPage({
-    Key? key,
+    super.key,
     required this.title,
     required this.imageUrl,
     required this.content,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detail Artikel'),
+        elevation: 0,
+        title: Text(
+          'Detail Artikel',
+          style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.primary),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
+        // Wrap the body with SingleChildScrollView
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,18 +48,18 @@ class ArticleDetailPage extends StatelessWidget {
             // Judul artikel
             Text(
               title,
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             // Garis pembatas
-            Divider(
+            const Divider(
               color: Colors.grey,
               thickness: 1,
             ),
             const SizedBox(height: 16),
             Text(
               content,
-              style: TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16),
             ),
           ],
         ),

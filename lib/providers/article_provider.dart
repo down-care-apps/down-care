@@ -80,4 +80,8 @@ class ArticlesProvider with ChangeNotifier {
 
     return filteredArticles;
   }
+
+  List<Article> getArticlesByCategory(String category) {
+    return _articles.where((article) => article.category?.toLowerCase() == category.toLowerCase()).toList();
+  }
 }

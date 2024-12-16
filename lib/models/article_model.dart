@@ -7,6 +7,7 @@ class Article {
   final String date;
   final String author;
   final String? thumbnailURL;
+  final String? category;
 
   Article({
     required this.id,
@@ -15,6 +16,7 @@ class Article {
     required this.date,
     required this.author,
     this.thumbnailURL,
+    this.category,
   });
 
   factory Article.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class Article {
       date: json['date'] ?? '',
       author: json['author'] ?? '',
       thumbnailURL: json['thumbnailURL'],
+      category: json['category'],
     );
   }
 
@@ -36,6 +39,7 @@ class Article {
       'date': date,
       'author': author,
       'thumbnailURL': thumbnailURL,
+      'category': category,
     };
   }
 

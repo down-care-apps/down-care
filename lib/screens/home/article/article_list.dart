@@ -1,9 +1,9 @@
 import 'package:down_care/screens/home/article/article_card.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/api/articles_service.dart';
-import 'package:down_care/screens/home/article/article_menarik.dart';
+import 'package:down_care/screens/home/article/article_detail.dart';
 import 'package:intl/intl.dart';
-import 'package:down_care/utils/transition.dart'; // Import the transition file
+import 'package:down_care/utils/transition.dart';
 
 class ArticleListPage extends StatelessWidget {
   const ArticleListPage({super.key});
