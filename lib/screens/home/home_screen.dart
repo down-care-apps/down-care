@@ -9,7 +9,6 @@ import 'package:down_care/screens/home/progress/progress_screen.dart';
 import 'package:down_care/screens/home/reminder/reminder_page.dart';
 import 'package:down_care/widgets/skeleton_article_home.dart';
 import 'package:down_care/widgets/skeleton_profile_home.dart';
-import 'package:down_care/widgets/skeleton_scan_history_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -312,35 +311,23 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildScanHistoryList(BuildContext context) {
     final scanHistoryProvider = Provider.of<ScanHistoryProvider>(context);
 
-    return scanHistoryProvider.isLoading
-        ? Column(
-            children: List.generate(3, (index) => const SkeletonScanHistoryCard()).toList(),
-          )
-        : scanHistoryProvider.latestScanHistories.isEmpty
-            ? const Center(
-                child: Text('Tidak ada riwayat pemindaian'),
-              )
-            : scanHistoryProvider.errorMessage.isNotEmpty
-                ? Center(
-                    child: Text(scanHistoryProvider.errorMessage),
-                  )
-                : Column(
-                    children: scanHistoryProvider.latestScanHistories.map((scanHistory) {
-                      return Column(
-                        children: [
-                          ScanHistoryCard(
-                            scanHistory: scanHistory,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                createRoute(HistoryDetailPage(scanHistory: scanHistory)),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 8),
-                        ],
-                      );
-                    }).toList(),
-                  );
+    return Column(
+      children: scanHistoryProvider.latestScanHistories.map((scanHistory) {
+        return Column(
+          children: [
+            ScanHistoryCard(
+              scanHistory: scanHistory,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  createRoute(HistoryDetailPage(scanHistory: scanHistory)),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        );
+      }).toList(),
+    );
   }
 }
