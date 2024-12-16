@@ -28,6 +28,11 @@ class ProgressScreenState extends State<ProgressScreen> {
 
   bool isLoading = true;
 
+  // Validation error states
+  String? weightError;
+  String? heightError;
+  String? monthError;
+
   @override
   void initState() {
     super.initState();
@@ -63,10 +68,35 @@ class ProgressScreenState extends State<ProgressScreen> {
   }
 
   Future<void> _submitProgress() async {
+    // Reset errors
+    setState(() {
+      weightError = null;
+      heightError = null;
+      monthError = null;
+    });
+
     if (selectedKidData == null) {
       _showSnackBar('Please select a kid before submitting progress');
       return;
     }
+
+    // Validation
+    bool isValid = true;
+
+    if (selectedMonth == null) {
+      setState(() => monthError = 'Pilih bulan terlebih dahulu');
+      isValid = false;
+    }
+    if (weightController.text.isEmpty) {
+      setState(() => weightError = 'Berat tidak boleh kosong');
+      isValid = false;
+    }
+    if (heightController.text.isEmpty) {
+      setState(() => heightError = 'Tinggi tidak boleh kosong');
+      isValid = false;
+    }
+
+    if (!isValid) return;
 
     try {
       await ProgressServices().createProgress(
@@ -96,7 +126,7 @@ class ProgressScreenState extends State<ProgressScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  Widget _buildField(String label, TextEditingController controller, {TextInputType? keyboardType, int maxLines = 1}) {
+  Widget _buildField(String label, TextEditingController controller, {TextInputType? keyboardType, int maxLines = 1, String? error}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -108,6 +138,14 @@ class ProgressScreenState extends State<ProgressScreen> {
           keyboardType: keyboardType,
           maxLines: maxLines,
         ),
+        if (error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Text(
+              error,
+              style: const TextStyle(color: Colors.red, fontSize: 12),
+            ),
+          ),
       ],
     );
   }
@@ -117,13 +155,14 @@ class ProgressScreenState extends State<ProgressScreen> {
     required T? value,
     required List<DropdownMenuItem<T>> items,
     required void Function(T?) onChanged,
+    String? error,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
+            padding: const EdgeInsets.only(bottom: 4.0),
             child: Text(
               label,
               style: TextStyle(
@@ -156,6 +195,14 @@ class ProgressScreenState extends State<ProgressScreen> {
             dropdownColor: Colors.white,
           ),
         ),
+        if (error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Text(
+              error,
+              style: const TextStyle(color: Colors.red, fontSize: 12),
+            ),
+          ),
       ],
     );
   }
@@ -173,9 +220,7 @@ class ProgressScreenState extends State<ProgressScreen> {
         ),
       ),
       body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(), // Show loading spinner while fetching data
-            )
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: children.isEmpty
@@ -206,8 +251,7 @@ class ProgressScreenState extends State<ProgressScreen> {
                                       child: Row(
                                         children: [
                                           CircleAvatar(
-                                            backgroundImage: NetworkImage(child['imageUrl'] ?? 'https://example.com/default_image.jpg'),
-                                            child: child['imageUrl'] == null ? Text(child['name']?[0] ?? '?') : null,
+                                            child: Text(child['name']?[0] ?? '?'),
                                           ),
                                           const SizedBox(width: 8),
                                           Text(child['name'] ?? 'Unnamed Child'),
@@ -232,7 +276,6 @@ class ProgressScreenState extends State<ProgressScreen> {
                                       child: const Text('View Details'),
                                     ),
                                   ),
-                                  const SizedBox(height: 16),
                                   _buildDropdown<String>(
                                     label: 'Bulan',
                                     value: selectedMonth,
@@ -243,11 +286,12 @@ class ProgressScreenState extends State<ProgressScreen> {
                                       );
                                     }).toList(),
                                     onChanged: (newValue) => setState(() => selectedMonth = newValue),
+                                    error: monthError,
                                   ),
                                   const SizedBox(height: 16),
-                                  _buildField('Berat', weightController, keyboardType: TextInputType.number),
+                                  _buildField('Berat', weightController, keyboardType: TextInputType.number, error: weightError),
                                   const SizedBox(height: 16),
-                                  _buildField('Tinggi', heightController, keyboardType: TextInputType.number),
+                                  _buildField('Tinggi', heightController, keyboardType: TextInputType.number, error: heightError),
                                   const SizedBox(height: 16),
                                   _buildField('Catatan Penting', importantNoteController, maxLines: 6),
                                 ],
