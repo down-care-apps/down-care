@@ -2,6 +2,7 @@ import 'package:down_care/api/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/widgets/custom_button.dart';
+// ignore_for_file: use_build_context_synchronously
 
 class DeleteAccountScreen extends StatelessWidget {
   const DeleteAccountScreen({super.key});
@@ -9,7 +10,39 @@ class DeleteAccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextEditingController passwordController = TextEditingController();
-    final deleteAccount = AuthService().deleteAccount();
+
+    void deleteAccount() async {
+      final password = passwordController.text;
+
+      if (password.isEmpty) {
+        // Show an error message if password is empty
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Kata sandi tidak boleh kosong')),
+        );
+        return;
+      }
+
+      try {
+        // Call the deleteAccount method here
+
+        await AuthService().deleteAccount(password);
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Akun berhasil dihapus')),
+        );
+
+        // Navigate to the home
+        if (context.mounted) {
+          Navigator.popUntil(context, ModalRoute.withName('/'));
+        }
+      } catch (e) {
+        // Handle any errors during account deletion
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Terjadi kesalahan: ${e.toString()}')),
+        );
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -49,10 +82,7 @@ class DeleteAccountScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: CustomButton(
               text: 'Hapus Akun',
-              onPressed: () {
-                deleteAccount;
-                // Handle delete account logic here
-              },
+              onPressed: deleteAccount,
             ),
           ),
         ],
