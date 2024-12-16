@@ -165,10 +165,10 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: Theme.of(context).primaryColor.withOpacity(0.1),
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(16),
             ),
             child: SvgPicture.asset(
               icon,
@@ -177,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Text(
             label,
             style: GoogleFonts.leagueSpartan(fontSize: 12, fontWeight: FontWeight.w600),
@@ -253,8 +253,8 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => ArticleDetailPage(
+                  createRoute(
+                    ArticleDetailPage(
                       title: article.title,
                       imageUrl: article.thumbnailURL ?? '',
                       content: article.content,

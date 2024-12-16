@@ -1,3 +1,4 @@
+import 'package:down_care/utils/transition.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:down_care/screens/home/article/article_detail.dart';
@@ -20,8 +21,8 @@ class ArticleCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => ArticleDetailPage(
+          createRoute(
+            ArticleDetailPage(
               title: title,
               imageUrl: imageUrl,
               content: content,

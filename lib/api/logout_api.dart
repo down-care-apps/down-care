@@ -1,4 +1,5 @@
 import 'package:down_care/screens/login/welcome.dart';
+import 'package:down_care/utils/transition.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +18,7 @@ Future<void> logoutUser(BuildContext context) async {
     if (context.mounted) {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const Welcome()),
+        createRoute(const Welcome()),
         (Route<dynamic> route) => false,
       );
     }

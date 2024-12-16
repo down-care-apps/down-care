@@ -3,7 +3,6 @@ import 'package:down_care/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:down_care/widgets/input_field.dart';
 import 'package:down_care/widgets/custom_button.dart';
-import 'package:down_care/widgets/avatar_picker.dart';
 import 'package:down_care/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 // ignore_for_file: use_build_context_synchronously
